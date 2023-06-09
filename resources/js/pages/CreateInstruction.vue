@@ -1,12 +1,12 @@
 <template>
     <Title></Title>
-    <h1>page home</h1>
+    <h1>create instruction</h1>
 </template>
 
 <script>
     import Title from '../components/Title.vue';
     export default {
-        name: 'HomePage',
+        name: 'CreateInstruction',
         components: { Title }
     }
 </script>

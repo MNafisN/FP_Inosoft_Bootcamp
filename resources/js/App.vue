@@ -1,24 +1,15 @@
 <template>
-    <RouterLink to="/app">Home</RouterLink>|
-    <RouterLink to="/app/about">About</RouterLink>
-    <RouterView></RouterView>
-    <span><button class="btn btn-primary" @click="decrement">-</button> {{ count }} <button class="btn btn-danger" @click="increment">+</button></span>
+    <div class="bg-info-subtle">
+        <Header></Header>
+        <div class="m-4">
+            <RouterView></RouterView>
+        </div>
+    </div>
 </template>
 <script>
+import Header from './components/Header.vue'
     export default {
         name: 'App',
-        computed: {
-            count() {
-                return this.$store.getters.count
-            }
-        },
-        methods: {
-            increment() {
-                this.$store.dispatch("increment")
-            },
-            decrement() {
-                this.$store.dispatch("decrement")
-            }
-        }
+        components: {Header}
     }
 </script>
