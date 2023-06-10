@@ -1,0 +1,12 @@
+.h-fit{
+    height: fit-content;
+}
+.border-left-dashed{
+    border-left: 1px dashed rgba(0, 0, 0, 0.5);
+}
+.w-5per6{
+    width: calc(500%/6);
+}
+.w-1per6{
+    width: calc(100%/6);
+}
