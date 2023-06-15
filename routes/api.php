@@ -3,7 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
-
+use App\Http\Controllers\InstructionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -32,4 +32,11 @@ Route::group([
         Route::post('refresh', [AuthController::class, 'refresh']);
         Route::post('logout', [AuthController::class, 'logout']);
     });
+});
+
+Route::group([
+    'prefix' => 'instruction',
+    'middleware' => 'auth:api'
+], function() {
+    // Route::post('index', [InstructionController::class, 'index']);
 });
