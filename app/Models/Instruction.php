@@ -8,7 +8,7 @@ use Jenssegers\Mongodb\Eloquent\Model;
 use Jenssegers\Mongodb\Relations\BelongsTo;
 use App\Models\Vendor;
 use App\Models\Customer;
-use App\Models\TransactionCode;
+use App\Models\Transaction_Code;
 
 class Instruction extends Model
 {
@@ -23,12 +23,20 @@ class Instruction extends Model
      * @var array
      */
     protected $fillable = [
-        'title',
-        'description',
-        'assigned',
-        'todo_subtasks',
-        'created_at',
-        'updated_at'
+        'instruction_id',
+        'instruction_type',
+        'vendor_id',
+        'attention_of',
+        'quotation_no',
+        'cust_id',
+        'cust_po_number',
+        'cost_detail',
+        'attachment',
+        'notes',
+        'transaction_code',
+        'invoices',
+        'termination',
+        'instruction_status'
     ];
 
     /**
@@ -58,6 +66,6 @@ class Instruction extends Model
      */
     public function TransactionCode() : BelongsTo
     {
-        return $this->belongsTo(TransacrionCode::class, 'transaction_code', 'transaction_code');
+        return $this->belongsTo(Transacrion_Code::class, 'transaction_code', 'transaction_code');
     }
 }

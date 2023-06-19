@@ -10,11 +10,10 @@ class Vendor extends Model
     use HasFactory;
 
     protected $connection = 'mongodb';
-    protected $collection = 'vendor';
+    protected $collection = 'vendors';
 
 
     protected $fillable = [
-        '_id',
         'vendor_id',
         'vendor_name',
         'vendor_description',

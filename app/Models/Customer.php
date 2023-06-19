@@ -14,7 +14,6 @@ class Customer extends Model
 
 
     protected $fillable = [
-        '_id',
         'cust_id',
         'cust_name',
         'cust_address'
