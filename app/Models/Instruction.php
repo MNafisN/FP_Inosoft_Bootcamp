@@ -8,7 +8,7 @@ use Jenssegers\Mongodb\Eloquent\Model;
 use Jenssegers\Mongodb\Relations\BelongsTo;
 use App\Models\Vendor;
 use App\Models\Customer;
-use App\Models\Transaction_Code;
+use App\Models\Transaction;
 
 class Instruction extends Model
 {
@@ -66,6 +66,6 @@ class Instruction extends Model
      */
     public function TransactionCode() : BelongsTo
     {
-        return $this->belongsTo(Transacrion_Code::class, 'transaction_code', 'transaction_code');
+        return $this->belongsTo(Transaction::class, 'transaction_code', 'transaction_code');
     }
 }

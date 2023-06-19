@@ -10,7 +10,7 @@ class Customer extends Model
     use HasFactory;
 
     protected $connection = 'mongodb';
-    protected $collection = 'customer';
+    protected $collection = 'customers';
 
 
     protected $fillable = [

@@ -10,7 +10,7 @@ class Transaction extends Model
     use HasFactory;
 
     protected $connection = 'mongodb';
-    protected $collection = 'transaction';
+    protected $collection = 'transactions';
 
 
     protected $fillable = [
