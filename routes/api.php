@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\InstructionController;
+use App\Models\Instruction;
 
 /*
 |--------------------------------------------------------------------------
@@ -38,5 +39,20 @@ Route::group([
     'prefix' => 'instruction',
     'middleware' => 'auth:api'
 ], function() {
-    // Route::post('index', [InstructionController::class, 'index']);
+    Route::get('search/{query}', [InstructionController::class, 'searchInstruction']);
+    
+    Route::get('list', [InstructionController::class, 'getInstructionList']);
+    Route::get('list/inProgress', [InstructionController::class, 'getInstructionInProgressList']);
+    Route::get('list/draft', [InstructionController::class, 'getInstructionDraftList']);
+    Route::get('list/completed', [InstructionController::class, 'getCompletedInstructionList']);
+    Route::post('add', [InstructionController::class, 'addInstruction']);
+
+    Route::get('{id}', [InstructionController::class, 'getInstructionDetail']);
+    Route::get('edit/{id}', [InstructionController::class, 'editInstruction']);
+    Route::put('update', [InstructionController::class, 'updateInstruction']);
+    Route::put('draft/{id}', [InstructionController::class, 'setInstructionToDraft']);
+    Route::put('completed/{id}', [InstructionController::class, 'setInstructionToCompleted']);
+    Route::put('terminate/{id}', [InstructionController::class, 'setInstructionToCancelled']);
+
+    Route::delete('delete/{id}', [InstructionController::class, 'deleteInstruction']);
 });
