@@ -10,7 +10,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h1 class="modal-title fs-5" id="exampleModalLabel">
-                        Modal title
+                        Reason of Rejection
                     </h1>
                     <button
                         type="button"
