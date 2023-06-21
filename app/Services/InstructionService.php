@@ -40,6 +40,44 @@ class InstructionService
     }
 
     /**
+     * untuk mengambil semua list instruction di collection instructions yang berstatus in progress
+     */
+    public function getInProgress() : ?Object
+    {
+        $instructions = $this->instructionRepository->getStatus('In Progress');
+        if ($instructions->isEmpty()) {
+            throw new InvalidArgumentException('Data instruksi kosong');
+        }
+        return $instructions;
+    }
+
+    /**
+     * untuk mengambil semua list instruction di collection instructions yang berstatus draft
+     */
+    public function getDraft() : ?Object
+    {
+        $instructions = $this->instructionRepository->getStatus('Draft');
+        if ($instructions->isEmpty()) {
+            throw new InvalidArgumentException('Data instruksi kosong');
+        }
+        return $instructions;
+    }
+
+    /**
+     * untuk mengambil semua list instruction di collection instructions yang berstatus cancelled dan completed
+     */
+    public function getCompleted() : ?Object
+    {
+        $cancelledInstructions = $this->instructionRepository->getStatus('Cancelled');
+        $completedInstructions = $this->instructionRepository->getStatus('Completed');
+        if ($cancelledInstructions->isEmpty() && $completedInstructions->isEmpty()) {
+            throw new InvalidArgumentException('Data instruksi kosong');
+        }
+        $instructions = $cancelledInstructions->merge($completedInstructions);
+        return $instructions;
+    }
+
+    /**
      * untuk menambahkan data instruction baru
      */
     public function store(array $formData) : Object
@@ -106,28 +144,59 @@ class InstructionService
         return $updatedInstruction;
     }
 
-    /** */
-    public function setComplete(string $instructionId)
+    /** 
+     * untuk mengubah status instruksi menjadi draft
+    */
+    public function setDraft(string $instructionId) : Object
     {
         $instruction = $this->instructionRepository->getById($instructionId);
         if (!$instruction) {
             throw new InvalidArgumentException('Data instruksi tidak ditemukan');
         }
 
-        $completedInstruction = $this->instructionRepository->setComplete($instructionId);
+        $draftInstruction = $this->instructionRepository->setInstructionStatus($instructionId, 'Draft');
+        return $draftInstruction;
+    }
+
+
+    /** 
+     * untuk mengubah status instruksi menjadi completed
+    */
+    public function setComplete(string $instructionId) : Object
+    {
+        $instruction = $this->instructionRepository->getById($instructionId);
+        if (!$instruction) {
+            throw new InvalidArgumentException('Data instruksi tidak ditemukan');
+        }
+
+        $completedInstruction = $this->instructionRepository->setInstructionStatus($instructionId, 'Completed');
         return $completedInstruction;
+    }
+
+    /** 
+     * untuk mengubah status instruksi menjadi cancelled
+    */
+    public function setCancelled(string $instructionId) : Object
+    {
+        $instruction = $this->instructionRepository->getById($instructionId);
+        if (!$instruction) {
+            throw new InvalidArgumentException('Data instruksi tidak ditemukan');
+        }
+
+        $cancelledInstruction = $this->instructionRepository->setInstructionStatus($instructionId, 'Cancelled');
+        return $cancelledInstruction;
     }
 
     /**
      * untuk menghapus data instruction
      */
-    public function delete(array $formData) : string
+    public function delete(string $instructionId) : string
     {
-        $instruction = $this->instructionRepository->getById($formData['instruction_id']);
+        $instruction = $this->instructionRepository->getById($instructionId);
         if (!$instruction) {
             throw new InvalidArgumentException('Data instruksi tidak ditemukan');
         }
-        $instructionId = $formData['instruction_id'];
+        // $instructionId = $formData['instruction_id'];
         $this->instructionRepository->delete($instructionId);
         return $instructionId;
     }

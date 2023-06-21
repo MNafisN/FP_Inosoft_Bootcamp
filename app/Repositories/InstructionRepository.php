@@ -34,6 +34,15 @@ class InstructionRepository
         return $instructions;
     }
 
+    /** 
+     * untuk mengambil semua list instruksi dengan status tertentu
+     */
+    public function getStatus(string $status) : Object
+    {
+        $instructions = $this->instruction->where('instruction_status', $status)->get();
+        return $instructions;
+    }
+
     /**
      * untuk mengambil data instruksi berdasarkan id
      */
@@ -75,13 +84,15 @@ class InstructionRepository
         return $instruction->fresh();
     }
     
-    /** */
-    public function setComplete(string $instructionId)
+    /** 
+     * untuk mengubah status suatu instruksi dalam database
+    */
+    public function setInstructionStatus(string $instructionId, string $status) : Object
     {
         $instruction = $this->getById($instructionId);
-        $instruction->instruction_status = 'Completed';
+        $instruction->instruction_status = $status;
         $instruction->save();
-        return $instruction->fresh;
+        return $instruction->fresh();
     }
 
     /**
