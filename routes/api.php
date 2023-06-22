@@ -45,14 +45,14 @@ Route::group([
     Route::get('list/inProgress', [InstructionController::class, 'getInstructionInProgressList']);
     Route::get('list/draft', [InstructionController::class, 'getInstructionDraftList']);
     Route::get('list/completed', [InstructionController::class, 'getCompletedInstructionList']);
-    Route::post('add', [InstructionController::class, 'addInstruction']);
+    Route::post('add', [InstructionController::class, 'addInstruction']);           // TODO
 
-    Route::get('{id}', [InstructionController::class, 'getInstructionDetail']);
-    Route::get('edit/{id}', [InstructionController::class, 'editInstruction']);
-    Route::put('update', [InstructionController::class, 'updateInstruction']);
+    Route::get('{id}', [InstructionController::class, 'getInstructionDetail']);     // TODO
+    Route::get('edit/{id}', [InstructionController::class, 'editInstruction']);     // TODO
+    Route::put('update', [InstructionController::class, 'updateInstruction']);      // TODO
     Route::put('draft/{id}', [InstructionController::class, 'setInstructionToDraft']);
     Route::put('completed/{id}', [InstructionController::class, 'setInstructionToCompleted']);
-    Route::put('terminate/{id}', [InstructionController::class, 'setInstructionToCancelled']);
+    Route::put('terminate/{id}', [InstructionController::class, 'setInstructionToCancelled']);  //Revisi ?
 
     Route::delete('delete/{id}', [InstructionController::class, 'deleteInstruction']);
 });
