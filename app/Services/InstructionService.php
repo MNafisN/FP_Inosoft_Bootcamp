@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Repositories\InstructionRepository;
 use MongoDB\Exception\InvalidArgumentException;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 
 class InstructionService
 {
@@ -20,9 +21,10 @@ class InstructionService
      */
     public function getSearched(string $query) :?Object
     {
-        $instructions = $this->instructionRepository->getSearched($query);
+        $queryDecoder = urldecode($query);
+        $instructions = $this->instructionRepository->getSearched($queryDecoder);
         if ($instructions->isEmpty()) {
-            throw new InvalidArgumentException('Data instruksi kosong');
+            throw new InvalidArgumentException('Data instruksi tidak ditemukan');
         }
         return $instructions;
     }
@@ -46,7 +48,7 @@ class InstructionService
     {
         $instructions = $this->instructionRepository->getStatus('In Progress');
         if ($instructions->isEmpty()) {
-            throw new InvalidArgumentException('Data instruksi kosong');
+            throw new InvalidArgumentException('Data instruksi berstatus In Progress kosong');
         }
         return $instructions;
     }
@@ -58,7 +60,7 @@ class InstructionService
     {
         $instructions = $this->instructionRepository->getStatus('Draft');
         if ($instructions->isEmpty()) {
-            throw new InvalidArgumentException('Data instruksi kosong');
+            throw new InvalidArgumentException('Data instruksi berstatus Draft kosong');
         }
         return $instructions;
     }
@@ -71,7 +73,7 @@ class InstructionService
         $cancelledInstructions = $this->instructionRepository->getStatus('Cancelled');
         $completedInstructions = $this->instructionRepository->getStatus('Completed');
         if ($cancelledInstructions->isEmpty() && $completedInstructions->isEmpty()) {
-            throw new InvalidArgumentException('Data instruksi kosong');
+            throw new InvalidArgumentException('Data instruksi berstatus Completed maupun Cancelled kosong');
         }
         $instructions = $cancelledInstructions->merge($completedInstructions);
         return $instructions;
@@ -92,17 +94,45 @@ class InstructionService
             'invoice_to' => 'required',
             'customer_contact' => 'required',
             'customer_po_number' => 'required',
-            'cost_detail' => 'required',
-            'attachment' => 'nullable',
+            'cost_detail' => 'sometimes|required',
+            'attachment' => 'nullable|file',
             'notes' => 'nullable',
             'transaction_no' => 'required',
-            'invoices' => 'sometimes|required',
+            'invoices' => 'sometimes|nullable',
             'termination' => 'sometimes|nullable',
             'instruction_status' => 'required'
         ]);
 
+        if ($formData['cost_detail']) {
+            for ($i=0; $i<count($formData['cost_detail']); $i++) {
+                $validatorCostDetail = Validator::make($formData['cost_detail'][$i], [
+                    'cost_description' => 'required',
+                    'quantity' => 'required|numeric|min:0|not_in:0',
+                    'unit_of_measurement' => 'required|in:MEN,PCS,HRS,MT',
+                    'unit_price' => 'required|numeric|min:0',
+                    'GST_percentage' => 'numeric|min:0',
+                    'currency' => 'required|in:USD,AUD',
+                    'vat_amount' => 'required|numeric',
+                    'sub_total' => 'required|numeric',
+                    'total' => 'required|numeric',
+                    'charge_to' => 'required|string'
+                ]);
+                if ($validatorCostDetail->fails()) {
+                    $costDetailErrors['cost_detail_'.$i] = $validatorCostDetail->errors()->toArray();
+                }
+            }
+        }
+
         if ($validator->fails()) {
-            throw new InvalidArgumentException($validator->errors()->first());
+            $errors = $validator->errors();
+        }
+
+        if (isset($errors)) {
+            $errMessageBag = $errors->toArray(); 
+            if (isset($costDetailErrors)) {
+                $errMessageBag['cost_detail'] = $costDetailErrors;
+            }
+            throw ValidationException::withMessages($errMessageBag);
         }
 
         $newInstruction = $this->instructionRepository->save($validator->validated());
@@ -176,14 +206,25 @@ class InstructionService
     /** 
      * untuk mengubah status instruksi menjadi cancelled
     */
-    public function setCancelled(string $instructionId) : Object
+    public function setCancelled(array $formData) : Object
     {
-        $instruction = $this->instructionRepository->getById($instructionId);
+        $validator = Validator::make($formData['termination'], [
+            'termination_reason' => 'required|string|min:5',
+            'attachment' => 'required|file'
+        ]);
+
+        if ($validator->fails()) {
+            throw new InvalidArgumentException($validator->errors()->first());
+        }
+
+        $instruction = $this->instructionRepository->getById($formData['instruction_id']);
         if (!$instruction) {
             throw new InvalidArgumentException('Data instruksi tidak ditemukan');
         }
 
-        $cancelledInstruction = $this->instructionRepository->setInstructionStatus($instructionId, 'Cancelled');
+        //TODO: update instruction termination
+
+        $cancelledInstruction = $this->instructionRepository->setInstructionStatus($formData['instruction_id'], 'Cancelled');
         return $cancelledInstruction;
     }
 

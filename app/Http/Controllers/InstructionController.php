@@ -149,7 +149,7 @@ class InstructionController extends Controller
         } catch (Exception $err) {
             return response()->json([
                 'status' => 422,
-                'error' => $err->getMessage()
+                'error' => $err->getTrace()[0]['args'][0]
             ], 422);
         }
     }
@@ -237,12 +237,12 @@ class InstructionController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function setInstructionToCancelled(string $instructionId) : JsonResponse
+    public function setInstructionToCancelled(Request $request) : JsonResponse
     {
-        // $data = $request->all();
+        $data = $request->all();
 
         try {
-            $instruction = $this->instructionService->setCancelled($instructionId);
+            $instruction = $this->instructionService->setCancelled($data);
             return response()->json([
                 'status' => 200,
                 'message' => 'Instruction updated successfully',
