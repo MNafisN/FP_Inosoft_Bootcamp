@@ -213,10 +213,10 @@ class InstructionController extends Controller
         try {
             $instruction = $this->instructionService->updateAttachment($data);
             return response()->json([
-                'status' => 201,
+                'status' => 200,
                 'message' => 'Instruction attachment updated successfully',
                 'instruction' => $instruction
-            ], 201);
+            ], 200);
         } catch (Exception $err) {
             return response()->json([
                 'status' => 422,
@@ -246,7 +246,7 @@ class InstructionController extends Controller
         } catch (Exception $err) {
             return response()->json([
                 'status' => 422,
-                'error' => $err->getMessage()
+                'error' => $err->getTrace()[0]['args'][0]
             ], 422);
         }
     }

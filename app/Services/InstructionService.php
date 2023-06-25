@@ -129,7 +129,6 @@ class InstructionService
      */
     public function store(array $formData) : Object
     {
-        
         $validator = Validator::make($formData, [
             'instruction_id' => 'required|string|unique:App\Models\Instruction,instruction_id',
             'instruction_type' => 'required|string',
@@ -186,12 +185,13 @@ class InstructionService
             throw ValidationException::withMessages($errMessageBag);
         }
 
+        $newInstruction = $this->instructionRepository->save($formData);
+
         $storeVendorData = $this->vendorRepository->save(array_intersect_key($validator->validated(), array_flip(['assigned_vendor', 'vendor_address', 'invoice_to'])));
         if (!$storeVendorData) {
             throw new InvalidArgumentException('ERROR VENDOR NOT AVAILABLE');
         }
 
-        $newInstruction = $this->instructionRepository->save($formData);
         return $newInstruction;
     }
 
@@ -230,33 +230,73 @@ class InstructionService
      */
     public function update(array $formData) : Object
     {
+        $validator = Validator::make($formData, [
+            'instruction_id' => 'required|string',
+            'assigned_vendor' => 'required',
+            'vendor_address' => 'required',
+            'attention_of' => 'required|string',
+            'quotation_number' => 'nullable|numeric|min:5',
+            'invoice_to' => 'sometimes|required',
+            'customer_contact' => 'sometimes|required',
+            'cust_po_number' => 'nullable|required',
+            'cost_detail' => 'required',
+            'attachment.*' => 'sometimes|nullable|mimes:jpg,jpeg,png,pdf|max:20000',
+            'notes' => 'nullable',
+            'transaction_code' => 'sometimes|required',
+            'invoices' => 'sometimes|nullable',
+            'termination' => 'sometimes|nullable',
+            'instruction_status' => 'required'
+        ],
+        [
+            // 'attachment.*.required' => 'Please upload a file',
+            'attachment.*.mimes' => 'Only jpeg, png and pdf images are allowed',
+            'attachment.*.max' => 'Sorry! Maximum allowed size for a file is 20MB',
+        ]);
+
+        if ($formData['cost_detail']) {
+            for ($i=0; $i<count($formData['cost_detail']); $i++) {
+                $validatorCostDetail = Validator::make($formData['cost_detail'][$i], [
+                    'cost_description' => 'required',
+                    'quantity' => 'required|numeric|min:0|not_in:0',
+                    'unit_of_measurement' => 'required|in:MEN,PCS,HRS,MT',
+                    'unit_price' => 'required|numeric|min:0',
+                    'GST_percentage' => 'numeric|min:0',
+                    'currency' => 'required|in:USD,AUD',
+                    'vat_amount' => 'required|numeric',
+                    'sub_total' => 'required|numeric',
+                    'total' => 'required|numeric',
+                    'charge_to' => 'required|string'
+                ]);
+                if ($validatorCostDetail->fails()) {
+                    $costDetailErrors['cost_detail_'.$i] = $validatorCostDetail->errors()->toArray();
+                }
+            }
+        }
+
+        if ($validator->fails()) {
+            $errors = $validator->errors();
+        }
+
+        if (isset($errors)) {
+            $errMessageBag = $errors->toArray(); 
+            if (isset($costDetailErrors)) {
+                $errMessageBag['cost_detail'] = $costDetailErrors;
+            }
+            throw ValidationException::withMessages($errMessageBag);
+        }
+
         $instruction = $this->instructionRepository->getById($formData['instruction_id']);
         if (!$instruction) {
             throw new InvalidArgumentException('Data instruksi tidak ditemukan');
         }
 
-        $validator = Validator::make($formData, [
-            'assigned_vendor' => 'required',
-            'vendor_address' => 'required',
-            'attention_of' => 'required|string',
-            'quotation_number' => 'required|numeric|min:5',
-            'invoice_to' => 'required',
-            'customer_contact' => 'required',
-            'customer_po_number' => 'required',
-            'cost_detail' => 'required',
-            'attachment' => 'nullable',
-            'notes' => 'nullable',
-            'transaction_no' => 'required',
-            'invoices' => 'sometimes|required',
-            'termination' => 'sometimes|nullable',
-            'instruction_status' => 'required'
-        ]);
+        $updatedInstruction = $this->instructionRepository->save($formData);
 
-        if ($validator->fails()) {
-            throw new InvalidArgumentException($validator->errors()->first());
+        $storeVendorData = $this->vendorRepository->save(array_intersect_key($validator->validated(), array_flip(['assigned_vendor', 'vendor_address', 'invoice_to'])));
+        if (!$storeVendorData) {
+            throw new InvalidArgumentException('ERROR VENDOR NOT AVAILABLE');
         }
 
-        $updatedInstruction = $this->instructionRepository->save($validator->validated());
         return $updatedInstruction;
     }
 
