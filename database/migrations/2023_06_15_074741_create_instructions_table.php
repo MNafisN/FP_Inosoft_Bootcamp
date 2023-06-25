@@ -18,11 +18,13 @@ return new class extends Migration
             $table->string('instruction_id')->unique();
             $table->string('instruction_type');
             $table->timestamps();
-            $table->string('vendor_id');
+            $table->string('assigned_vendor');
+            $table->string('vendor_address');
             $table->string('attention_of');
-            $table->integer('quotation_no');
-            $table->string('cust_id');
-            $table->string('cust_po_number');
+            $table->integer('quotation_number');
+            $table->string('invoice_to');
+            $table->string('customer_contact');
+            $table->string('customer_po_number');
             $table->cost_detail();
             $table->attachment();
             $table->text('notes');

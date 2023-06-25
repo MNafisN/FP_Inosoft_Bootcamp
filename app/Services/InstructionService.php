@@ -3,6 +3,11 @@
 namespace App\Services;
 
 use App\Repositories\InstructionRepository;
+use App\Repositories\CustomerRepository;
+use App\Repositories\TransactionRepository;
+use App\Repositories\VendorRepository;
+use App\Repositories\InternalRepository;
+
 use MongoDB\Exception\InvalidArgumentException;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
@@ -10,16 +15,27 @@ use Illuminate\Validation\ValidationException;
 class InstructionService
 {
     protected $instructionRepository;
+    protected $customerRepository;
+    protected $vendorRepository;
+    protected $transactionRepository;
 
-    public function __construct(InstructionRepository $instructionRepository)
+    public function __construct(
+            InstructionRepository $instructionRepository,
+            CustomerRepository $customerRepository,
+            TransactionRepository $transactionRepository,
+            VendorRepository $vendorRepository
+        )
     {
         $this->instructionRepository = $instructionRepository;
+        $this->customerRepository = $customerRepository;
+        $this->transactionRepository = $transactionRepository;
+        $this->vendorRepository = $vendorRepository;
     }
 
     /**
      * untuk mengambil list instruction berdasarkan hasil pencarian
      */
-    public function getSearched(string $query) :?Object
+    public function getSearched(string $query) : ?Object
     {
         $queryDecoder = urldecode($query);
         $instructions = $this->instructionRepository->getSearched($queryDecoder);
@@ -66,6 +82,20 @@ class InstructionService
     }
 
     /**
+     * untuk mengambil semua list instruction di collection instructions yang berstatus draft dan in progress
+     */
+    public function getOpen() : ?Object
+    {
+        $draftInstructions = $this->instructionRepository->getStatus('Draft');
+        $inProgressInstructions = $this->instructionRepository->getStatus('In Progress');
+        if ($draftInstructions->isEmpty() && $inProgressInstructions->isEmpty()) {
+            throw new InvalidArgumentException('Data instruksi berstatus Draft maupun In Progress kosong');
+        }
+        $instructions = $draftInstructions->merge($inProgressInstructions);
+        return $instructions;
+    }
+
+    /**
      * untuk mengambil semua list instruction di collection instructions yang berstatus cancelled dan completed
      */
     public function getCompleted() : ?Object
@@ -80,27 +110,48 @@ class InstructionService
     }
 
     /**
+     * untuk menyediakan data vendor, vendor address, invoice to, dan customer pada form instruksi baru
+     */
+    public function addNew() : array
+    {
+        $customers = $this->customerRepository->getAll();
+        $transactions = $this->transactionRepository->getAll();
+        $vendors = $this->vendorRepository->getAll();
+
+        $data['customers'] = $customers->toArray();
+        $data['transactions'] = $transactions->toArray();
+        $data['vendors'] = $vendors->toArray();
+        return $data;
+    }
+
+    /**
      * untuk menambahkan data instruction baru
      */
     public function store(array $formData) : Object
     {
+        
         $validator = Validator::make($formData, [
-            'instruction_id' => 'required|string',
+            'instruction_id' => 'required|string|unique:App\Models\Instruction,instruction_id',
             'instruction_type' => 'required|string',
             'assigned_vendor' => 'required',
             'vendor_address' => 'required',
             'attention_of' => 'required|string',
-            'quotation_number' => 'required|numeric|min:5',
-            'invoice_to' => 'required',
-            'customer_contact' => 'required',
-            'customer_po_number' => 'required',
-            'cost_detail' => 'sometimes|required',
-            'attachment' => 'nullable|file',
+            'quotation_number' => 'nullable|numeric|min:5',
+            'invoice_to' => 'sometimes|required',
+            'customer_contact' => 'sometimes|required',
+            'cust_po_number' => 'nullable|required',
+            'cost_detail' => 'required',
+            'attachment.*' => 'sometimes|nullable|mimes:jpg,jpeg,png,pdf|max:20000',
             'notes' => 'nullable',
-            'transaction_no' => 'required',
+            'transaction_code' => 'sometimes|required',
             'invoices' => 'sometimes|nullable',
             'termination' => 'sometimes|nullable',
             'instruction_status' => 'required'
+        ],
+        [
+            // 'attachment.*.required' => 'Please upload a file',
+            'attachment.*.mimes' => 'Only jpeg, png and pdf images are allowed',
+            'attachment.*.max' => 'Sorry! Maximum allowed size for a file is 20MB',
         ]);
 
         if ($formData['cost_detail']) {
@@ -135,8 +186,43 @@ class InstructionService
             throw ValidationException::withMessages($errMessageBag);
         }
 
-        $newInstruction = $this->instructionRepository->save($validator->validated());
+        $storeVendorData = $this->vendorRepository->save(array_intersect_key($validator->validated(), array_flip(['assigned_vendor', 'vendor_address', 'invoice_to'])));
+        if (!$storeVendorData) {
+            throw new InvalidArgumentException('ERROR VENDOR NOT AVAILABLE');
+        }
+
+        $newInstruction = $this->instructionRepository->save($formData);
         return $newInstruction;
+    }
+
+    /**
+     * untuk memperbarui attachment instruksi
+     */
+    public function updateAttachment(array $formData) : Object
+    {
+        $validator = Validator::make($formData, [
+            'instruction_id' => 'required|string',
+            'attachment.*' => 'sometimes|nullable|mimes:jpg,jpeg,png,pdf|max:20000',
+        ],
+        [
+            // 'attachment.*.required' => 'Please upload a file',
+            'attachment.*.mimes' => 'Only jpeg, png and pdf images are allowed',
+            'attachment.*.max' => 'Sorry! Maximum allowed size for a file is 20MB',
+        ]);
+
+        if ($validator->fails()) {
+            $errors = $validator->errors();
+            $errMessageBag = $errors->toArray(); 
+            throw ValidationException::withMessages($errMessageBag);
+        }
+
+        $instruction = $this->instructionRepository->getById($formData['instruction_id']);
+        if (!$instruction) {
+            throw new InvalidArgumentException('Data instruksi tidak ditemukan');
+        }
+
+        $updatedInstruction = $this->instructionRepository->saveAttachment($formData);
+        return $updatedInstruction;
     }
 
     /**

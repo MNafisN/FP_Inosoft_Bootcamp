@@ -24,20 +24,22 @@ class InstructionFactory extends Factory
             $instructionType = 'Service Instruction';
         }
 
+        $vendorAddress = [];
+        for ($i=0; $i<fake()->numberBetween(1, 5); $i++) {
+            array_push($vendorAddress, fake()->streetAddress());
+        }
 
         return [
             'instruction_id' => fake()->unique()->numerify(
                 $instructionId . '-' . fake()->numberBetween(2020, 2023) . '-####'
             ),
             'instruction_type' => $instructionType,
-            'vendor_id' => fake()->unique()->numerify(
-                'VDR-' . fake()->numberBetween(2020, 2023) . '-####'
-            ),
+            'assigned_vendor' => fake()->streetName(),
+            'vendor_address' => fake()->randomElement($vendorAddress),
             'attention_of' => fake()->name(),
-            'quotation_no' => fake()->numberBetween(10000, 99999),
-            'cust_id' => fake()->unique()->numerify(
-                'CUST-' . fake()->numberBetween(2020, 2023) . '-####'
-            ),
+            'quotation_number' => fake()->numberBetween(10000, 99999),
+            'invoice_to' => fake()->word(),
+            'customer_contact' => fake()->name(),
             'cust_po_number' => fake()->regexify('[A-Z0-9]{10}'),
             'cost_detail' => [],
             'attachment' => [],

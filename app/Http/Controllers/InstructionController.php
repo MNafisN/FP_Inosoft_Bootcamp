@@ -107,6 +107,28 @@ class InstructionController extends Controller
     }
 
     /**
+     * Tampilkan daftar instruksi berstatus draft dan in progress
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getOpenInstructionList() : JsonResponse
+    {
+        try {
+            $result = [
+                'status' => 200,
+                'data' => $this->instructionService->getOpen()
+            ];
+        } catch (Exception $err) {
+            $result = [
+                'status' => 404,
+                'error' => $err->getMessage()
+            ];
+        }
+
+        return response()->json($result, $result['status']);
+    }
+
+    /**
      * Tampilkan daftar instruksi berstatus cancelled dan completed
      *
      * @return \Illuminate\Http\JsonResponse
@@ -129,6 +151,29 @@ class InstructionController extends Controller
     }
 
     /**
+     * Sediakan data untuk halaman tambah instruksi baru
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function addNewInstruction() : JsonResponse
+    {
+        try {
+            $result = [
+                'status' => 200,
+                'data' => $this->instructionService->addNew()
+            ];
+        } catch (Exception $err) {
+            $result = [
+                'status' => 404,
+                'error' => $err->getMessage()
+            ];
+        }
+
+        return response()->json($result, $result['status']);
+    }
+
+
+    /**
      * Tambah instruksi baru
      *
      * @param  \Illuminate\Http\Request  $request
@@ -144,6 +189,32 @@ class InstructionController extends Controller
             return response()->json([
                 'status' => 201,
                 'message' => 'Instruction added successfully',
+                'instruction' => $instruction
+            ], 201);
+        } catch (Exception $err) {
+            return response()->json([
+                'status' => 422,
+                'error' => $err->getTrace()[0]['args'][0]
+            ], 422);
+        }
+    }
+
+    /**
+     * Perbarui attachment instruksi
+     *
+     * @param  \Illuminate\Http\Request  $request
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function updateInstructionAttachment(Request $request) : JsonResponse
+    {
+        $data = $request->all();
+
+        try {
+            $instruction = $this->instructionService->updateAttachment($data);
+            return response()->json([
+                'status' => 201,
+                'message' => 'Instruction attachment updated successfully',
                 'instruction' => $instruction
             ], 201);
         } catch (Exception $err) {

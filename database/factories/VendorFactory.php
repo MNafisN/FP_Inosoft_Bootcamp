@@ -18,18 +18,18 @@ class VendorFactory extends Factory
     {
         $vendorAddress = [];
         for ($i=0; $i<fake()->numberBetween(1, 5); $i++) {
-            array_push($vendorAddress, fake()->address());
+            array_push($vendorAddress, fake()->streetAddress());
         }
 
         return [
             'vendor_id' => fake()->unique()->numerify(
-                'VDR-' . fake()->numberBetween(2020, 2023) . '-00##'
+                'VDR-' . fake()->numberBetween(2020, 2023) . '-####'
             ),
             'vendor_name' => fake()->streetName(),
             'vendor_description' => fake()->text(50),
             'vendor_phone_number' => fake()->numerify('+628#-###-###-###'),
             'vendor_address' => $vendorAddress,
-            'vendor_invoice_provider' => fake()->words(fake()->numberBetween(1, 5)),
+            'vendor_invoice_provider' => fake()->words(fake()->numberBetween(2, 5)),
         ];
     }
 }
