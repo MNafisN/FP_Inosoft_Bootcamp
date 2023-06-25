@@ -18,7 +18,7 @@ class TransactionFactory extends Factory
     {
         return [
             'transaction_code' => fake()->unique()->numerify(
-                'TRF-' . fake()->numberBetween(2020, 2023) . '-####'
+                fake()->randomElement(['INSP-', 'TRF-']) . fake()->numberBetween(2020, 2023) . '-####'
             ),
             'description' => fake()->text(50),
         ];

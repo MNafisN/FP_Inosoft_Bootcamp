@@ -60,6 +60,20 @@ class InstructionRepository
         $instructionCheck = $this->getById($data['instruction_id']);
         if ($instructionCheck) {
             $instruction = $this->getById($data['instruction_id']);
+            $revision = substr($data['instruction_id'], -3);
+            $revisionNumber = substr($revision, -2);
+            if (str_contains($revision, 'R')) {
+                $revisionNumber++;
+                if ($revisionNumber < 10) {
+                    $revision = " R0" . $revisionNumber;
+                } else {
+                    $revision = " R" . $revisionNumber;
+                }
+            }
+            else { 
+                $revision = " R01";
+            }
+            $instruction->instruction_id = substr($data['instruction_id'], 0, 12) . $revision;
         } else {
             $instruction = new $this->instruction;
 

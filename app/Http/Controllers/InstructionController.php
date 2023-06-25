@@ -160,7 +160,7 @@ class InstructionController extends Controller
         try {
             $result = [
                 'status' => 200,
-                'data' => $this->instructionService->addNew()
+                'form_data' => $this->instructionService->getInstructionFormData()
             ];
         } catch (Exception $err) {
             $result = [
@@ -223,6 +223,31 @@ class InstructionController extends Controller
                 'error' => $err->getTrace()[0]['args'][0]
             ], 422);
         }
+    }
+
+    /**
+     * Sediakan data untuk halaman perbarui instruksi yang sudah ada
+     *
+     * @param  string $instructionId
+     * 
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function editInstruction(string $instructionId) : JsonResponse
+    {
+        try {
+            $result = [
+                'status' => 200,
+                'current_data' => $this->instructionService->getById($instructionId),
+                'form_data' => $this->instructionService->getInstructionFormData()
+            ];
+        } catch (Exception $err) {
+            $result = [
+                'status' => 404,
+                'error' => $err->getMessage()
+            ];
+        }
+
+        return response()->json($result, $result['status']);
     }
 
     /**

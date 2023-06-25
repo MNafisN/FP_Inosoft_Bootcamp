@@ -53,7 +53,7 @@ Route::group([
     Route::put('updateAttachment', [InstructionController::class, 'updateInstructionAttachment']);  // Aksi untuk simpan list attachment sebuah instruksi
     Route::get('{id}', [InstructionController::class, 'getInstructionDetail']);                     // TODO
 
-    Route::get('edit/{id}', [InstructionController::class, 'editInstruction']);                 // TODO
+    Route::get('edit/{id}', [InstructionController::class, 'editInstruction']);                     // Penyedia data untuk form modify instruksi yang sudah ada
     Route::put('update', [InstructionController::class, 'updateInstruction']);                      // Aksi untuk simpan perubahan data form instruksi
 
     Route::put('draft/{id}', [InstructionController::class, 'setInstructionToDraft']);          // TODO, belum lengkap

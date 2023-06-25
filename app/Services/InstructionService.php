@@ -110,13 +110,29 @@ class InstructionService
     }
 
     /**
-     * untuk menyediakan data vendor, vendor address, invoice to, dan customer pada form instruksi baru
+     * untuk mengambil data instruksi berdasarkan instruction id
      */
-    public function addNew() : array
+    public function getById(string $instructionId) : Object
+    {
+        $instruction = $this->instructionRepository->getById($instructionId);
+        if (!$instruction) {
+            throw new InvalidArgumentException('Data instruksi tidak ditemukan');
+        }
+        return $instruction;
+    }
+
+    /**
+     * untuk menyediakan data vendor, vendor address, invoice to, dan customer pada form instruksi
+     */
+    public function getInstructionFormData() : array
     {
         $customers = $this->customerRepository->getAll();
         $transactions = $this->transactionRepository->getAll();
         $vendors = $this->vendorRepository->getAll();
+
+        if ($customers->isEmpty() || $transactions->isEmpty() || $vendors->isEmpty()) {
+            throw new InvalidArgumentException('Ada form data yang kosong karena tabel customers/transactions/vendors kosong');
+        }
 
         $data['customers'] = $customers->toArray();
         $data['transactions'] = $transactions->toArray();
@@ -189,7 +205,7 @@ class InstructionService
 
         $storeVendorData = $this->vendorRepository->save(array_intersect_key($validator->validated(), array_flip(['assigned_vendor', 'vendor_address', 'invoice_to'])));
         if (!$storeVendorData) {
-            throw new InvalidArgumentException('ERROR VENDOR NOT AVAILABLE');
+            throw ValidationException::withMessages(['ERROR VENDOR NOT AVAILABLE']);
         }
 
         return $newInstruction;
@@ -218,7 +234,7 @@ class InstructionService
 
         $instruction = $this->instructionRepository->getById($formData['instruction_id']);
         if (!$instruction) {
-            throw new InvalidArgumentException('Data instruksi tidak ditemukan');
+            throw ValidationException::withMessages(['Data instruksi tidak ditemukan']);
         }
 
         $updatedInstruction = $this->instructionRepository->saveAttachment($formData);
@@ -287,14 +303,14 @@ class InstructionService
 
         $instruction = $this->instructionRepository->getById($formData['instruction_id']);
         if (!$instruction) {
-            throw new InvalidArgumentException('Data instruksi tidak ditemukan');
+            throw ValidationException::withMessages(['Data instruksi tidak ditemukan']);
         }
 
         $updatedInstruction = $this->instructionRepository->save($formData);
 
         $storeVendorData = $this->vendorRepository->save(array_intersect_key($validator->validated(), array_flip(['assigned_vendor', 'vendor_address', 'invoice_to'])));
         if (!$storeVendorData) {
-            throw new InvalidArgumentException('ERROR VENDOR NOT AVAILABLE');
+            throw ValidationException::withMessages(['ERROR VENDOR NOT AVAILABLE']);
         }
 
         return $updatedInstruction;
