@@ -200,21 +200,152 @@ class InstructionController extends Controller
     }
 
     /**
-     * Perbarui attachment instruksi
+     * Tambah attachment instruksi
      *
      * @param  \Illuminate\Http\Request  $request
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function updateInstructionAttachment(Request $request) : JsonResponse
+    public function addInstructionAttachment(Request $request) : JsonResponse
+    {
+        $data = $request->all();
+        // dd($request->attachment->isValid());
+
+        try {
+            $instruction = $this->instructionService->addAttachment($data);
+            return response()->json([
+                'status' => 200,
+                'message' => 'Instruction attachment added successfully',
+                'instruction' => $instruction
+            ], 200);
+        } catch (Exception $err) {
+            return response()->json([
+                'status' => 422,
+                'error' => $err->getTrace()[0]['args'][0]
+            ], 422);
+        }
+    }
+
+    /**
+     * Hapus attachment instruksi
+     *
+     * @param  \Illuminate\Http\Request  $request
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function deleteInstructionAttachment(Request $request) : JsonResponse
     {
         $data = $request->all();
 
         try {
-            $instruction = $this->instructionService->updateAttachment($data);
+            $instruction = $this->instructionService->deleteAttachment($data);
             return response()->json([
                 'status' => 200,
-                'message' => 'Instruction attachment updated successfully',
+                'message' => 'Instruction attachment deleted successfully',
+                'instruction' => $instruction
+            ], 200);
+        } catch (Exception $err) {
+            return response()->json([
+                'status' => 422,
+                'error' => $err->getTrace()[0]['args'][0]
+            ], 422);
+        }
+    }
+
+    /**
+     * Tambah invoice instruksi
+     *
+     * @param  \Illuminate\Http\Request  $request
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function addInstructionInvoice(Request $request) : JsonResponse
+    {
+        $data = $request->all();
+
+        try {
+            $instruction = $this->instructionService->addInvoice($data);
+            return response()->json([
+                'status' => 200,
+                'message' => 'Instruction invoice added successfully',
+                'instruction' => $instruction
+            ], 200);
+        } catch (Exception $err) {
+            return response()->json([
+                'status' => 422,
+                'error' => $err->getTrace()[0]['args'][0]
+            ], 422);
+        }
+    }
+
+    /**
+     * Perbarui invoice instruksi
+     *
+     * @param  \Illuminate\Http\Request  $request
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function updateInstructionInvoice(Request $request) : JsonResponse
+    {
+        $data = $request->all();
+
+        try {
+            $instruction = $this->instructionService->updateInvoice($data);
+            return response()->json([
+                'status' => 200,
+                'message' => 'Instruction invoice updated successfully',
+                'instruction' => $instruction
+            ], 200);
+        } catch (Exception $err) {
+            return response()->json([
+                'status' => 422,
+                'error' => $err->getTrace()[0]['args'][0]
+            ], 422);
+        }
+    }
+
+    /**
+     * Hapus invoice instruksi
+     *
+     * @param  \Illuminate\Http\Request  $request
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function deleteInstructionInvoice(Request $request) : JsonResponse
+    {
+        $data = $request->all();
+
+        try {
+            $instruction = $this->instructionService->deleteInvoice($data);
+            return response()->json([
+                'status' => 200,
+                'message' => 'Instruction invoice deleted successfully',
+                'instruction' => $instruction
+            ], 200);
+        } catch (Exception $err) {
+            return response()->json([
+                'status' => 422,
+                'error' => $err->getTrace()[0]['args'][0]
+            ], 422);
+        }
+    }
+
+    /**
+     * Perbarui instruksi untuk menyimpan alasan dibatalkannya instruksi
+     *
+     * @param  \Illuminate\Http\Request  $request
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function addInstructionTermination(Request $request) : JsonResponse
+    {
+        $data = $request->all();
+
+        try {
+            $instruction = $this->instructionService->updateTermination($data);
+            return response()->json([
+                'status' => 200,
+                'message' => 'Instruction termination updated successfully',
                 'instruction' => $instruction
             ], 200);
         } catch (Exception $err) {
@@ -289,7 +420,31 @@ class InstructionController extends Controller
             $instruction = $this->instructionService->setDraft($instructionId);
             return response()->json([
                 'status' => 200,
-                'message' => 'Instruction updated successfully',
+                'message' => 'Instruction status has been set to Draft',
+                'instruction' => $instruction
+            ], 200);
+        } catch (Exception $err) {
+            return response()->json([
+                'status' => 422,
+                'error' => $err->getMessage()
+            ], 422);
+        }
+    }
+
+    /**
+     * Ubah status instruksi menjadi in progress
+     *
+     * @param  string $instructionId
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function setInstructionToInProgress(string $instructionId) : JsonResponse
+    {
+        try {
+            $instruction = $this->instructionService->setInProgress($instructionId);
+            return response()->json([
+                'status' => 200,
+                'message' => 'Instruction status has been set to In Progress',
                 'instruction' => $instruction
             ], 200);
         } catch (Exception $err) {
@@ -303,19 +458,17 @@ class InstructionController extends Controller
     /**
      * Ubah status instruksi menjadi completed
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  string $instructionId
      *
      * @return \Illuminate\Http\JsonResponse
      */
     public function setInstructionToCompleted(string $instructionId) : JsonResponse
     {
-        // $data = $request->all();
-
         try {
             $instruction = $this->instructionService->setComplete($instructionId);
             return response()->json([
                 'status' => 200,
-                'message' => 'Instruction updated successfully',
+                'message' => 'Instruction has been set to Completed',
                 'instruction' => $instruction
             ], 200);
         } catch (Exception $err) {
@@ -329,19 +482,17 @@ class InstructionController extends Controller
     /**
      * Ubah status instruksi menjadi cancelled
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  string $instructionId
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function setInstructionToCancelled(Request $request) : JsonResponse
+    public function setInstructionToCancelled(string $instructionId) : JsonResponse
     {
-        $data = $request->all();
-
         try {
-            $instruction = $this->instructionService->setCancelled($data);
+            $instruction = $this->instructionService->setCancelled($instructionId);
             return response()->json([
                 'status' => 200,
-                'message' => 'Instruction updated successfully',
+                'message' => 'Instruction has been set to Cancelled',
                 'instruction' => $instruction
             ], 200);
         } catch (Exception $err) {

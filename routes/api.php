@@ -50,15 +50,22 @@ Route::group([
     Route::get('addNew', [InstructionController::class, 'addNewInstruction']);                      // Penyedia data untuk form tambah instruksi baru
     Route::post('add', [InstructionController::class, 'addInstruction']);                           // Aksi untuk simpan data form instruksi baru
 
-    Route::put('updateAttachment', [InstructionController::class, 'updateInstructionAttachment']);  // Aksi untuk simpan list attachment sebuah instruksi
     Route::get('{id}', [InstructionController::class, 'getInstructionDetail']);                     // TODO
+
+    Route::put('addAttachment', [InstructionController::class, 'addInstructionAttachment']);        // Aksi untuk menambah attachment sebuah instruksi di halaman detail instruksi
+    Route::put('deleteAttachment', [InstructionController::class, 'deleteInstructionAttachment']);  // Aksi untuk menghapus attachment sebuah instruksi di halaman detail instruksi
+    Route::put('addInvoice', [InstructionController::class, 'addInstructionInvoice']);              // Aksi untuk menambah invoice sebuah instruksi di halaman detail instruksi
+    Route::put('updateInvoice', [InstructionController::class, 'updateInstructionInvoice']);        // Aksi untuk menyunting invoice sebuah instruksi di halaman detail instruksi
+    Route::put('deleteInvoice', [InstructionController::class, 'deleteInstructionInvoice']);        // Aksi untuk menghapus invoice sebuah instruksi di halaman detail instruksi
+    Route::put('addTermination', [InstructionController::class, 'addInstructionTermination']);      // Aksi untuk simpan alasan instruksi dibatalkan/cancelled
 
     Route::get('edit/{id}', [InstructionController::class, 'editInstruction']);                     // Penyedia data untuk form modify instruksi yang sudah ada
     Route::put('update', [InstructionController::class, 'updateInstruction']);                      // Aksi untuk simpan perubahan data form instruksi
 
-    Route::put('draft/{id}', [InstructionController::class, 'setInstructionToDraft']);          // TODO, belum lengkap
-    Route::put('completed/{id}', [InstructionController::class, 'setInstructionToCompleted']);  // TODO, belum lengkap
-    Route::put('terminate/{id}', [InstructionController::class, 'setInstructionToCancelled']);  // TODO, belum lengkap
+    Route::put('saveAsDraft/{id}', [InstructionController::class, 'setInstructionToDraft']);        // Set status instruksi sebagai Draft
+    Route::put('inProgress/{id}', [InstructionController::class, 'setInstructionToInProgress']);    // Set status instruksi sebagai In Progress
+    Route::put('completed/{id}', [InstructionController::class, 'setInstructionToCompleted']);      // Set status instruksi sebagai Completed, dengan syarat invoice sudah ada
+    Route::put('terminate/{id}', [InstructionController::class, 'setInstructionToCancelled']);      // Set status instruksi sebagai Cancelled, dengan syarat termination sudah ada
 
-    Route::delete('delete/{id}', [InstructionController::class, 'deleteInstruction']);          // Hapus instruksi dengan parameter id instruksi di URI
+    Route::delete('delete/{id}', [InstructionController::class, 'deleteInstruction']);              // Hapus instruksi dengan parameter id instruksi di URI
 });

@@ -101,12 +101,63 @@ class InstructionRepository
     }
     
     /**
-     * untuk menyimpan attachment sebuah instruksi
+     * untuk menyimpan daftar attachment sebuah instruksi
      */
-    public function saveAttachment(array $data) : Object 
+    public function saveAttachment(array $data, string $action) : Object 
     {
         $instruction = $this->getById($data['instruction_id']);
-        $instruction->attachment = $data['attachment'];
+        $attachmentList = $instruction->attachment;
+
+        if ($action == 'store') {
+            $attachmentList[] = $data['attachment'];
+        } else if ($action == 'delete') {
+            array_splice($attachmentList, $data['index'], 1);
+        }
+        
+        $instruction->attachment = $attachmentList;
+        // dd($instruction);
+        $instruction->save();
+        return $instruction->fresh();
+    }
+
+    /**
+     * untuk menyimpan daftar invoice sebuah instruksi
+     */
+    public function saveInvoice(array $data, string $action) : Object 
+    {
+        $instruction = $this->getById($data['instruction_id']);
+        $invoiceList = $instruction->invoices;
+
+        if ($action == 'delete') {
+            array_splice($invoiceList, $data['index'], 1);
+        } else {
+            $invoice['invoice_number'] = $data['invoice_number'];
+            $invoice['invoice_attachment'] = $data['invoice_attachment'];
+            $invoice['invoice_supporting_document'] = $data['invoice_supporting_document'];
+    
+            if ($action == 'store') {
+                $invoiceList[] = $invoice;
+            } else if ($action == 'update') {
+                $invoiceList[$data['index']] = $invoice;
+            }    
+        }
+        
+        $instruction->invoices = $invoiceList;
+        $instruction->save();
+        return $instruction->fresh();
+    }
+
+    /**
+     * untuk menyimpan keterangan dibatalkannya sebuah instruksi
+     */
+    public function saveTermination(array $data, string $by) : Object 
+    {
+        $instruction = $this->getById($data['instruction_id']);
+        $termination['canceled_by'] = $by;
+        $termination['termination_reason'] = $data['termination_reason'];
+        $termination['attachment'] = $data['attachment'];
+
+        $instruction->termination = $termination;
         $instruction->save();
         return $instruction->fresh();
     }

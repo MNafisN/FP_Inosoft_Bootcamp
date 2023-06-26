@@ -212,18 +212,43 @@ class InstructionService
     }
 
     /**
-     * untuk memperbarui attachment instruksi
+     * untuk menambah attachment instruksi
      */
-    public function updateAttachment(array $formData) : Object
+    public function addAttachment(array $formData) : Object
     {
         $validator = Validator::make($formData, [
             'instruction_id' => 'required|string',
-            'attachment.*' => 'sometimes|nullable|mimes:jpg,jpeg,png,pdf|max:20000',
+            'attachment' => 'sometimes|nullable|mimes:jpg,jpeg,png,pdf|max:20000',
         ],
         [
-            // 'attachment.*.required' => 'Please upload a file',
-            'attachment.*.mimes' => 'Only jpeg, png and pdf images are allowed',
-            'attachment.*.max' => 'Sorry! Maximum allowed size for a file is 20MB',
+            // 'attachment.required' => 'Please upload a file',
+            'attachment.mimes' => 'Only jpeg, png and pdf images are allowed',
+            'attachment.max' => 'Sorry! Maximum allowed size for a file is 20MB',
+        ]);
+
+        if ($validator->fails()) {
+            $errors = $validator->errors();
+            $errMessageBag = $errors->toArray(); 
+            throw ValidationException::withMessages($errMessageBag);
+        }
+
+        $instruction = $this->instructionRepository->getById($formData['instruction_id']);
+        if (!$instruction) {
+            throw ValidationException::withMessages(['Data instruksi tidak ditemukan']);
+        }
+        // dd($validator->validated());
+        $updatedInstruction = $this->instructionRepository->saveAttachment($formData, 'store');
+        return $updatedInstruction;
+    }
+
+    /**
+     * untuk menghapus attachment instruksi
+     */
+    public function deleteAttachment(array $formData) : Object
+    {
+        $validator = Validator::make($formData, [
+            'instruction_id' => 'required|string',
+            'index' => 'required|integer',
         ]);
 
         if ($validator->fails()) {
@@ -237,7 +262,134 @@ class InstructionService
             throw ValidationException::withMessages(['Data instruksi tidak ditemukan']);
         }
 
-        $updatedInstruction = $this->instructionRepository->saveAttachment($formData);
+        $updatedInstruction = $this->instructionRepository->saveAttachment($formData, 'delete');
+        return $updatedInstruction;
+    }
+
+    /**
+     * untuk menambah vendor invoice instruksi
+     */
+    public function addInvoice(array $formData) : Object
+    {
+        $validator = Validator::make($formData, [
+            'instruction_id' => 'required|string',
+            'invoice_number' => 'required|string',
+            'invoice_attachment' => 'required|mimes:jpg,jpeg,png,pdf|max:20000',
+            'invoice_supporting_document' => 'sometimes|nullable||mimes:jpg,jpeg,png,pdf|max:20000',
+        ],
+        [
+            'invoice_attachment.required' => 'Please upload a file',
+            'invoice_attachment.mimes' => 'Only jpeg, png and pdf images are allowed',
+            'invoice_attachment.max' => 'Sorry! Maximum allowed size for a file is 20MB',
+            // 'invoice_supporting_document.required' => 'Please upload a file',
+            'invoice_supporting_document.mimes' => 'Only jpeg, png and pdf images are allowed',
+            'invoice_supporting_document.max' => 'Sorry! Maximum allowed size for a file is 20MB',
+        ]);
+
+        if ($validator->fails()) {
+            $errors = $validator->errors();
+            $errMessageBag = $errors->toArray(); 
+            throw ValidationException::withMessages($errMessageBag);
+        }
+
+        $instruction = $this->instructionRepository->getById($formData['instruction_id']);
+        if (!$instruction) {
+            throw ValidationException::withMessages(['Data instruksi tidak ditemukan']);
+        }
+
+        $updatedInstruction = $this->instructionRepository->saveInvoice($formData, 'store');
+        return $updatedInstruction;
+    }
+
+    /**
+     * untuk memperbarui vendor invoice instruksi
+     */
+    public function updateInvoice(array $formData) : Object
+    {
+        $validator = Validator::make($formData, [
+            'instruction_id' => 'required|string',
+            'index' => 'required|integer',
+            'invoice_number' => 'required|string',
+            'invoice_attachment' => 'required|mimes:jpg,jpeg,png,pdf|max:20000',
+            'invoice_supporting_document' => 'sometimes|nullable||mimes:jpg,jpeg,png,pdf|max:20000',
+        ],
+        [
+            'invoice_attachment.required' => 'Please upload a file',
+            'invoice_attachment.mimes' => 'Only jpeg, png and pdf images are allowed',
+            'invoice_attachment.max' => 'Sorry! Maximum allowed size for a file is 20MB',
+            // 'invoice_supporting_document.required' => 'Please upload a file',
+            'invoice_supporting_document.mimes' => 'Only jpeg, png and pdf images are allowed',
+            'invoice_supporting_document.max' => 'Sorry! Maximum allowed size for a file is 20MB',
+        ]);
+
+        if ($validator->fails()) {
+            $errors = $validator->errors();
+            $errMessageBag = $errors->toArray(); 
+            throw ValidationException::withMessages($errMessageBag);
+        }
+
+        $instruction = $this->instructionRepository->getById($formData['instruction_id']);
+        if (!$instruction) {
+            throw ValidationException::withMessages(['Data instruksi tidak ditemukan']);
+        }
+
+        $updatedInstruction = $this->instructionRepository->saveInvoice($formData, 'update');
+        return $updatedInstruction;
+    }
+
+    /**
+     * untuk menghapus vendor invoice instruksi
+     */
+    public function deleteInvoice(array $formData) : Object
+    {
+        $validator = Validator::make($formData, [
+            'instruction_id' => 'required|string',
+            'index' => 'required|integer',
+        ]);
+
+        if ($validator->fails()) {
+            $errors = $validator->errors();
+            $errMessageBag = $errors->toArray(); 
+            throw ValidationException::withMessages($errMessageBag);
+        }
+
+        $instruction = $this->instructionRepository->getById($formData['instruction_id']);
+        if (!$instruction) {
+            throw ValidationException::withMessages(['Data instruksi tidak ditemukan']);
+        }
+
+        $updatedInstruction = $this->instructionRepository->saveInvoice($formData, 'delete');
+        return $updatedInstruction;
+    }
+
+    /**
+     * untuk memperbarui keterangan dibatalkannya instruksi
+     */
+    public function updateTermination(array $formData) : Object
+    {
+        $validator = Validator::make($formData, [
+            'instruction_id' => 'required|string',
+            'termination_reason' => 'required|string',
+            'attachment' => 'sometimes|nullable|mimes:jpg,jpeg,png,pdf|max:20000',
+        ],
+        [
+            // 'attachment.required' => 'Please upload a file',
+            'attachment.mimes' => 'Only jpeg, png and pdf images are allowed',
+            'attachment.max' => 'Sorry! Maximum allowed size for a file is 20MB',
+        ]);
+
+        if ($validator->fails()) {
+            $errors = $validator->errors();
+            $errMessageBag = $errors->toArray(); 
+            throw ValidationException::withMessages($errMessageBag);
+        }
+
+        $instruction = $this->instructionRepository->getById($formData['instruction_id']);
+        if (!$instruction) {
+            throw ValidationException::withMessages(['Data instruksi tidak ditemukan']);
+        }
+
+        $updatedInstruction = $this->instructionRepository->saveTermination($formData, auth()->user()['username']);
         return $updatedInstruction;
     }
 
@@ -330,6 +482,19 @@ class InstructionService
         return $draftInstruction;
     }
 
+    /** 
+     * untuk mengubah status instruksi menjadi in progress
+    */
+    public function setInProgress(string $instructionId) : Object
+    {
+        $instruction = $this->instructionRepository->getById($instructionId);
+        if (!$instruction) {
+            throw new InvalidArgumentException('Data instruksi tidak ditemukan');
+        }
+
+        $instruction = $this->instructionRepository->setInstructionStatus($instructionId, 'In Progress');
+        return $instruction;
+    }
 
     /** 
      * untuk mengubah status instruksi menjadi completed
@@ -341,32 +506,33 @@ class InstructionService
             throw new InvalidArgumentException('Data instruksi tidak ditemukan');
         }
 
-        $completedInstruction = $this->instructionRepository->setInstructionStatus($instructionId, 'Completed');
+        $invoices = $instruction->invoices;
+        if (count($invoices) > 0) {
+            $completedInstruction = $this->instructionRepository->setInstructionStatus($instructionId, 'Completed');
+        } else {
+            throw new InvalidArgumentException('Invoice instruksi belum ada');
+        }
+
         return $completedInstruction;
     }
 
     /** 
      * untuk mengubah status instruksi menjadi cancelled
     */
-    public function setCancelled(array $formData) : Object
+    public function setCancelled(string $instructionId) : Object
     {
-        $validator = Validator::make($formData['termination'], [
-            'termination_reason' => 'required|string|min:5',
-            'attachment' => 'required|file'
-        ]);
-
-        if ($validator->fails()) {
-            throw new InvalidArgumentException($validator->errors()->first());
-        }
-
-        $instruction = $this->instructionRepository->getById($formData['instruction_id']);
+        $instruction = $this->instructionRepository->getById($instructionId);
         if (!$instruction) {
             throw new InvalidArgumentException('Data instruksi tidak ditemukan');
         }
 
-        //TODO: update instruction termination
+        $termination = $instruction->termination;
+        if (count($termination) > 0) {
+            $cancelledInstruction = $this->instructionRepository->setInstructionStatus($instructionId, 'Cancelled');
+        } else {
+            throw new InvalidArgumentException('Alasan pembatalan belum ada');
+        }
 
-        $cancelledInstruction = $this->instructionRepository->setInstructionStatus($formData['instruction_id'], 'Cancelled');
         return $cancelledInstruction;
     }
 
