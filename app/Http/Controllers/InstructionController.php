@@ -526,4 +526,158 @@ class InstructionController extends Controller
             ], 422);
         }
     }
+
+    /**
+     * Tampilkan data internal
+     *
+     * @param  string $instructionId
+     * 
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getInternalData(string $instructionId) : JsonResponse
+    {
+        try {
+            $result = [
+                'status' => 200,
+                'internal_data' => $this->instructionService->getInternal($instructionId)
+            ];
+        } catch (Exception $err) {
+            $result = [
+                'status' => 200,
+                'message' => $err->getMessage()
+            ];
+        }
+
+        return response()->json($result, $result['status']);
+    }
+
+    /**
+     * Tambah attachment internal
+     *
+     * @param  \Illuminate\Http\Request  $request
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function addInternalAttachment(Request $request) : JsonResponse
+    {
+        $data = $request->all();
+
+        try {
+            $internal = $this->instructionService->addInternalAttachment($data);
+            return response()->json([
+                'status' => 200,
+                'message' => 'Instruction internal attachment added successfully',
+                'internal_data' => $internal
+            ], 200);
+        } catch (Exception $err) {
+            return response()->json([
+                'status' => 422,
+                'error' => $err->getTrace()[0]['args'][0]
+            ], 422);
+        }
+    }
+
+    /**
+     * Hapus attachment internal
+     *
+     * @param  \Illuminate\Http\Request  $request
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function deleteInternalAttachment(Request $request) : JsonResponse
+    {
+        $data = $request->all();
+
+        try {
+            $internal = $this->instructionService->deleteInternalAttachment($data);
+            return response()->json([
+                'status' => 200,
+                'message' => 'Instruction internal attachment deleted successfully',
+                'internal_data' => $internal
+            ], 200);
+        } catch (Exception $err) {
+            return response()->json([
+                'status' => 422,
+                'error' => $err->getTrace()[0]['args'][0]
+            ], 422);
+        }
+    }
+
+    /**
+     * Tambah internal note instruksi
+     *
+     * @param  \Illuminate\Http\Request  $request
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function addInternalNote(Request $request) : JsonResponse
+    {
+        $data = $request->all();
+
+        try {
+            $internal = $this->instructionService->addInternalNotes($data);
+            return response()->json([
+                'status' => 200,
+                'message' => 'Instruction internal notes added successfully',
+                'internal_data' => $internal
+            ], 200);
+        } catch (Exception $err) {
+            return response()->json([
+                'status' => 422,
+                'error' => $err->getTrace()[0]['args'][0]
+            ], 422);
+        }
+    }
+
+    /**
+     * Perbarui internal note instruksi
+     *
+     * @param  \Illuminate\Http\Request  $request
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function updateInternalNote(Request $request) : JsonResponse
+    {
+        $data = $request->all();
+
+        try {
+            $internal = $this->instructionService->updateInternalNotes($data);
+            return response()->json([
+                'status' => 200,
+                'message' => 'Instruction internal notes updated successfully',
+                'internal_data' => $internal
+            ], 200);
+        } catch (Exception $err) {
+            return response()->json([
+                'status' => 422,
+                'error' => $err->getTrace()[0]['args'][0]
+            ], 422);
+        }
+    }
+
+    /**
+     * Hapus internal note instruksi
+     *
+     * @param  \Illuminate\Http\Request  $request
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function deleteInternalNote(Request $request) : JsonResponse
+    {
+        $data = $request->all();
+
+        try {
+            $internal = $this->instructionService->deleteInternalNotes($data);
+            return response()->json([
+                'status' => 200,
+                'message' => 'Instruction internal notes deleted successfully',
+                'internal_data' => $internal
+            ], 200);
+        } catch (Exception $err) {
+            return response()->json([
+                'status' => 422,
+                'error' => $err->getTrace()[0]['args'][0]
+            ], 422);
+        }
+    }
 }

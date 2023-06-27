@@ -68,4 +68,15 @@ Route::group([
     Route::put('terminate/{id}', [InstructionController::class, 'setInstructionToCancelled']);      // Set status instruksi sebagai Cancelled, dengan syarat termination sudah ada
 
     Route::delete('delete/{id}', [InstructionController::class, 'deleteInstruction']);              // Hapus instruksi dengan parameter id instruksi di URI
+
+    Route::group([
+        'prefix' => 'internal'
+    ], function() {
+        Route::get('data/{id}', [InstructionController::class, 'getInternalData']);                 // Tampilkan data internal only sebuah instruksi
+        Route::put('addAttachment', [InstructionController::class, 'addInternalAttachment']);       // Aksi untuk menambah attachment internal only
+        Route::put('deleteAttachment', [InstructionController::class, 'deleteInternalAttachment']); // Aksi untuk menghapus attachment internal only
+        Route::put('addNote', [InstructionController::class, 'addInternalNote']);                   // Aksi untuk menambah note internal only
+        Route::put('updateNote', [InstructionController::class, 'updateInternalNote']);             // Aksi untuk menyunting note, syarat hanya user terkait yang diperbolehkan
+        Route::put('deleteNote', [InstructionController::class, 'deleteInternalNote']);             // Aksi untuk menghapus note, syarat hanya user terkait yang diperbolehkan
+    });
 });

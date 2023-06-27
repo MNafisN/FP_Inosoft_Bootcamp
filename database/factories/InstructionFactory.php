@@ -31,7 +31,7 @@ class InstructionFactory extends Factory
 
         return [
             'instruction_id' => fake()->unique()->numerify(
-                $instructionId . '-' . fake()->numberBetween(2020, 2023) . '-####'
+                $instructionId . '-' . fake()->numberBetween(2020, 2022) . '-####'
             ),
             'instruction_type' => $instructionType,
             'assigned_vendor' => fake()->streetName(),

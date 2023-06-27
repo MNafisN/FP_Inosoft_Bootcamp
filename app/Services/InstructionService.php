@@ -11,6 +11,7 @@ use App\Repositories\InternalRepository;
 use MongoDB\Exception\InvalidArgumentException;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
+use Exception;
 
 class InstructionService
 {
@@ -18,18 +19,33 @@ class InstructionService
     protected $customerRepository;
     protected $vendorRepository;
     protected $transactionRepository;
+    protected $internalRepository;
 
     public function __construct(
             InstructionRepository $instructionRepository,
             CustomerRepository $customerRepository,
             TransactionRepository $transactionRepository,
-            VendorRepository $vendorRepository
+            VendorRepository $vendorRepository,
+            InternalRepository $internalRepository
         )
     {
         $this->instructionRepository = $instructionRepository;
         $this->customerRepository = $customerRepository;
         $this->transactionRepository = $transactionRepository;
         $this->vendorRepository = $vendorRepository;
+        $this->internalRepository = $internalRepository;
+    }
+
+    /**
+     * untuk menyimpan log instruksi pada internal only
+     */
+    protected function log(string $instructionId, string $action) : void
+    {
+        $activity['instruction_id'] = $instructionId;
+        $activity['action'] = $action;
+        $activity['by'] = auth()->user()['username'];
+        $activity['date'] = now('+7:00');
+        $this->internalRepository->storeLog($activity);
     }
 
     /**
@@ -548,5 +564,158 @@ class InstructionService
         // $instructionId = $formData['instruction_id'];
         $this->instructionRepository->delete($instructionId);
         return $instructionId;
+    }
+
+    /**
+     * untuk mengambil data internal sesuai dengan instruksi yang ditampilkan
+     */
+    public function getInternal(string $instructionId) : ?Object
+    {
+        $internal = $this->internalRepository->getById($instructionId);
+        if ($internal->isEmpty()) {
+            throw new InvalidArgumentException('Data internal kosong, silahkan isi data internal terlebih dahulu pada instruksi ini');
+        }
+        return $internal;
+    }
+
+    /**
+     * untuk menambah attachment internal instruksi
+     */
+    public function addInternalAttachment(array $formData) : Object
+    {
+        $validator = Validator::make($formData, [
+            'instruction_id' => 'required|string',
+            'attachment' => 'sometimes|nullable|mimes:jpg,jpeg,png,pdf|max:20000',
+        ],
+        [
+            // 'attachment.required' => 'Please upload a file',
+            'attachment.mimes' => 'Only jpeg, png and pdf images are allowed',
+            'attachment.max' => 'Sorry! Maximum allowed size for a file is 20MB',
+        ]);
+
+        if ($validator->fails()) {
+            $errors = $validator->errors();
+            $errMessageBag = $errors->toArray(); 
+            throw ValidationException::withMessages($errMessageBag);
+        }
+
+        $internal = $this->internalRepository->getById($formData['instruction_id']);
+        if (!$internal) {
+            throw ValidationException::withMessages(['Data instruksi tidak ditemukan, attachment internal tidak dapat disimpan']);
+        }
+
+        $updatedInternal = $this->internalRepository->saveAttachment($formData, 'store');
+        return $updatedInternal;
+    }
+
+    /**
+     * untuk menghapus attachment instruksi
+     */
+    public function deleteInternalAttachment(array $formData) : Object
+    {
+        $validator = Validator::make($formData, [
+            'instruction_id' => 'required|string',
+            'index' => 'required|integer',
+        ]);
+
+        if ($validator->fails()) {
+            $errors = $validator->errors();
+            $errMessageBag = $errors->toArray(); 
+            throw ValidationException::withMessages($errMessageBag);
+        }
+
+        $internal = $this->internalRepository->getById($formData['instruction_id']);
+        if (!$internal) {
+            throw ValidationException::withMessages(['Data instruksi tidak ditemukan, attachment internal tidak dapat dihapus']);
+        }
+
+        $updatedInternal = $this->internalRepository->saveAttachment($formData, 'delete');
+        return $updatedInternal;
+    }
+
+    /**
+     * untuk menambah internal notes dari sebuah instruksi
+     */
+    public function addInternalNotes(array $formData) : Object
+    {
+        $validator = Validator::make($formData, [
+            'instruction_id' => 'required|string',
+            'note' => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            $errors = $validator->errors();
+            $errMessageBag = $errors->toArray(); 
+            throw ValidationException::withMessages($errMessageBag);
+        }
+
+        $internal = $this->internalRepository->getById($formData['instruction_id']);
+        if (!$internal) {
+            throw ValidationException::withMessages(['Data instruksi tidak ditemukan, note internal tidak dapat ditambahkan']);
+        }
+
+        $updatedInternal = $this->internalRepository->saveNotes($formData, 'store');
+        return $updatedInternal;
+    }
+
+    /**
+     * untuk memperbarui internal notes dari sebuah instruksi
+     */
+    public function updateInternalNotes(array $formData) : Object
+    {
+        $validator = Validator::make($formData, [
+            'instruction_id' => 'required|string',
+            'index' => 'required|integer',
+            'note' => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            $errors = $validator->errors();
+            $errMessageBag = $errors->toArray(); 
+            throw ValidationException::withMessages($errMessageBag);
+        }
+
+        $internal = $this->internalRepository->getById($formData['instruction_id']);
+        if (!$internal) {
+            throw ValidationException::withMessages(['Data instruksi tidak ditemukan, note internal tidak dapat disunting']);
+        }
+
+        try {
+            $formData['posted_by'] = auth()->user()['username'];
+            $updatedInternal = $this->internalRepository->saveNotes($formData, 'update');
+        } catch (Exception $err) {
+            throw ValidationException::withMessages([$err->getMessage()]);
+        }
+        return $updatedInternal;
+    }
+
+    /**
+     * untuk menghapus internal notes instruksi
+     */
+    public function deleteInternalNotes(array $formData) : Object
+    {
+        $validator = Validator::make($formData, [
+            'instruction_id' => 'required|string',
+            'index' => 'required|integer',
+        ]);
+
+        if ($validator->fails()) {
+            $errors = $validator->errors();
+            $errMessageBag = $errors->toArray(); 
+            throw ValidationException::withMessages($errMessageBag);
+        }
+
+        $internal = $this->internalRepository->getById($formData['instruction_id']);
+        if (!$internal) {
+            throw ValidationException::withMessages(['Data instruksi tidak ditemukan, note internal tidak dapat dihapus']);
+        }
+
+        try {
+            $formData['posted_by'] = auth()->user()['username'];
+            $updatedInternal = $this->internalRepository->saveNotes($formData, 'delete');
+        } catch (Exception $err) {
+            throw ValidationException::withMessages([$err->getMessage()]);
+        }
+        return $updatedInternal;
     }
 }
