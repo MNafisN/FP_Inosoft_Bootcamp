@@ -39,7 +39,7 @@ class InstructionService
     /**
      * untuk menyimpan log instruksi pada internal only
      */
-    protected function log(string $instructionId, string $action) : void
+    protected function storeActivity(string $instructionId, string $action) : void
     {
         $activity['instruction_id'] = $instructionId;
         $activity['action'] = $action;
@@ -224,13 +224,15 @@ class InstructionService
             throw ValidationException::withMessages(['ERROR VENDOR NOT AVAILABLE']);
         }
 
+        $this->storeActivity($newInstruction->instruction_id, '3rd Party Instruction Created');
+
         return $newInstruction;
     }
 
     /**
      * untuk menambah attachment instruksi
      */
-    public function addAttachment(array $formData) : Object
+    public function addAttachment(array $formData, string $fileName) : Object
     {
         $validator = Validator::make($formData, [
             'instruction_id' => 'required|string',
@@ -254,6 +256,7 @@ class InstructionService
         }
         // dd($validator->validated());
         $updatedInstruction = $this->instructionRepository->saveAttachment($formData, 'store');
+        $this->storeActivity($updatedInstruction->instruction_id, "3rd Party Instruction Attachment '" . $fileName . "' Uploaded");
         return $updatedInstruction;
     }
 
@@ -279,6 +282,7 @@ class InstructionService
         }
 
         $updatedInstruction = $this->instructionRepository->saveAttachment($formData, 'delete');
+        $this->storeActivity($updatedInstruction->instruction_id, 'A 3rd Party Instruction Attachment Deleted');
         return $updatedInstruction;
     }
 
@@ -314,6 +318,7 @@ class InstructionService
         }
 
         $updatedInstruction = $this->instructionRepository->saveInvoice($formData, 'store');
+        $this->storeActivity($updatedInstruction->instruction_id, "3rd Party Instruction Vendor Invoice Number '" . $updatedInstruction->invoice_number . "' Added");
         return $updatedInstruction;
     }
 
@@ -350,6 +355,7 @@ class InstructionService
         }
 
         $updatedInstruction = $this->instructionRepository->saveInvoice($formData, 'update');
+        $this->storeActivity($updatedInstruction->instruction_id, "3rd Party Instruction Vendor Invoice Number '" . $updatedInstruction->invoice_number . "' Modified");
         return $updatedInstruction;
     }
 
@@ -375,6 +381,7 @@ class InstructionService
         }
 
         $updatedInstruction = $this->instructionRepository->saveInvoice($formData, 'delete');
+        $this->storeActivity($updatedInstruction->instruction_id, "A 3rd Party Instruction Invoice Vendor Removed");
         return $updatedInstruction;
     }
 
@@ -481,6 +488,8 @@ class InstructionService
             throw ValidationException::withMessages(['ERROR VENDOR NOT AVAILABLE']);
         }
 
+        $this->storeActivity($updatedInstruction->instruction_id, "3rd Party Instruction Modified");
+
         return $updatedInstruction;
     }
 
@@ -529,6 +538,8 @@ class InstructionService
             throw new InvalidArgumentException('Invoice instruksi belum ada');
         }
 
+        $this->storeActivity($completedInstruction->instruction_id, "Receive All Invoice 3rd Party Instruction");
+
         return $completedInstruction;
     }
 
@@ -548,6 +559,8 @@ class InstructionService
         } else {
             throw new InvalidArgumentException('Alasan pembatalan belum ada');
         }
+
+        $this->storeActivity($cancelledInstruction->instruction_id, "3rd Party Instruction Cancelled");
 
         return $cancelledInstruction;
     }
@@ -571,10 +584,16 @@ class InstructionService
      */
     public function getInternal(string $instructionId) : ?Object
     {
-        $internal = $this->internalRepository->getById($instructionId);
-        if ($internal->isEmpty()) {
-            throw new InvalidArgumentException('Data internal kosong, silahkan isi data internal terlebih dahulu pada instruksi ini');
+        $instruction = $this->instructionRepository->getById($instructionId);
+        if (!$instruction) {
+            throw new InvalidArgumentException('Data instruksi tidak ditemukan');
         }
+
+        $internal = $this->internalRepository->getById($instructionId);
+        if (!$internal) {
+            $internal = $this->internalRepository->saveNew($instructionId);
+        }
+
         return $internal;
     }
 

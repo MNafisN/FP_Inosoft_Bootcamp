@@ -34,6 +34,22 @@ class InternalRepository
     }
 
     /**
+     * untuk menyimpan data internal baru jika belum dibuat untuk instruksi yang sudah ada
+     */
+    public function saveNew(string $instructionId) : Object
+    {
+        $internal = new $this->internal;
+
+        $internal->instruction_id = $instructionId;
+        $internal->internal_attachment = [];
+        $internal->internal_notes = [];
+        $internal->activity_log = [];
+
+        $internal->save();
+        return $internal->fresh();
+    }
+
+    /**
      * untuk menyimpan daftar attachment internal dalam sebuah instruksi
      */
     public function saveAttachment(array $data, string $action) : Object 

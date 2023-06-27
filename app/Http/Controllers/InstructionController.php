@@ -212,7 +212,7 @@ class InstructionController extends Controller
         // dd($request->attachment->isValid());
 
         try {
-            $instruction = $this->instructionService->addAttachment($data);
+            $instruction = $this->instructionService->addAttachment($data, $request->file('attachment')->getClientOriginalName());
             return response()->json([
                 'status' => 200,
                 'message' => 'Instruction attachment added successfully',
