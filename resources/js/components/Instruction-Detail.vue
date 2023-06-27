@@ -3,11 +3,11 @@
         <div class="row">
             <div class="col">
                 <span>Type</span>
-                <p class="fw-bold fs-5">Logistic Instruction</p>
+                <p class="fw-bold fs-4setengah">Logistic Instruction</p>
             </div>
             <div class="col">
                 <span>LI No</span>
-                <p class="fw-bold fs-5">LI-2020-0234</p>
+                <p class="fw-bold fs-4setengah">LI-2020-0234</p>
             </div>
             <div class="col">
                 <span>Transfer No</span>
@@ -15,7 +15,7 @@
             </div>
             <div class="col">
                 <span>Customer</span>
-                <p class="fw-bold fs-5">ADNOC-SFGD</p>
+                <p class="fw-bold fs-4setengah">ADNOC-SFGD</p>
             </div>
             <div class="col">
                 <span>Customer PO</span>
@@ -30,19 +30,19 @@
         <div class="row">
             <div class="col">
                 <span>Attention Of</span>
-                <p class="fw-bold fs-5">Priyest Faragon</p>
+                <p class="fw-bold fs-4setengah">Priyest Faragon</p>
             </div>
             <div class="col">
                 <span>Assigment Vendor</span>
-                <p class="fw-bold fs-5">AGILITY (ABU DHABI) PJSC</p>
+                <p class="fw-bold fs-4setengah">AGILITY (ABU DHABI) PJSC</p>
             </div>
             <div class="col">
                 <span>Vendor Quotation No.</span>
-                <p class="fw-bold fs-5">MITME-AGL-01 (Appendix 1)</p>
+                <p class="fw-bold fs-4setengah">MITME-AGL-01 (Appendix 1)</p>
             </div>
             <div class="col-6">
                 <span>Vendor Address</span>
-                <p class="fw-bold fs-5">Agility (Abu Dhabi) PJSC Branch, Mussafah Industrial Area. Street No. 10 Agility Logistic Park, Abu Dhabi, U.E.A</p>
+                <p class="fw-bold fs-4setengah">Agility (Abu Dhabi) PJSC Branch, Mussafah Industrial Area. Street No. 10 Agility Logistic Park, Abu Dhabi, U.E.A</p>
             </div>
         </div>
     </div>

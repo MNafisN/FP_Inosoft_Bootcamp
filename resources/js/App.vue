@@ -1,7 +1,7 @@
 <template>
     <div class="bg-info-subtle">
         <Header></Header>
-        <div class="m-4">
+        <div class="m-4 mb-0">
             <RouterView></RouterView>
         </div>
     </div>
