@@ -633,6 +633,7 @@ class InstructionService
             throw ValidationException::withMessages(['Data instruksi tidak ditemukan, attachment internal tidak dapat disimpan']);
         }
 
+        $formData['posted_by'] = auth()->user()['username'];
         $updatedInternal = $this->internalRepository->saveAttachment($formData, 'store');
         return $updatedInternal;
     }
