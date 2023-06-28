@@ -12,6 +12,7 @@ use MongoDB\Exception\InvalidArgumentException;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Exception;
+use Illuminate\Support\Carbon;
 
 class InstructionService
 {
@@ -44,7 +45,7 @@ class InstructionService
         $activity['instruction_id'] = $instructionId;
         $activity['action'] = $action;
         $activity['by'] = auth()->user()['username'];
-        $activity['date'] = now('+7:00');
+        $activity['date'] = (string)Carbon::now('+7:00');
         $this->internalRepository->storeLog($activity);
     }
 
@@ -130,7 +131,8 @@ class InstructionService
      */
     public function getById(string $instructionId) : Object
     {
-        $instruction = $this->instructionRepository->getById($instructionId);
+        $idDecoder = urldecode($instructionId);
+        $instruction = $this->instructionRepository->getById($idDecoder);
         if (!$instruction) {
             throw new InvalidArgumentException('Data instruksi tidak ditemukan');
         }
@@ -224,6 +226,7 @@ class InstructionService
             throw ValidationException::withMessages(['ERROR VENDOR NOT AVAILABLE']);
         }
 
+        $this->getInternal($newInstruction->instruction_id);
         $this->storeActivity($newInstruction->instruction_id, '3rd Party Instruction Created');
 
         return $newInstruction;
@@ -236,10 +239,10 @@ class InstructionService
     {
         $validator = Validator::make($formData, [
             'instruction_id' => 'required|string',
-            'attachment' => 'sometimes|nullable|mimes:jpg,jpeg,png,pdf|max:20000',
+            'attachment' => 'required|mimes:jpg,jpeg,png,pdf|max:20000',
         ],
         [
-            // 'attachment.required' => 'Please upload a file',
+            'attachment.required' => 'Please upload a file',
             'attachment.mimes' => 'Only jpeg, png and pdf images are allowed',
             'attachment.max' => 'Sorry! Maximum allowed size for a file is 20MB',
         ]);
@@ -318,7 +321,7 @@ class InstructionService
         }
 
         $updatedInstruction = $this->instructionRepository->saveInvoice($formData, 'store');
-        $this->storeActivity($updatedInstruction->instruction_id, "3rd Party Instruction Vendor Invoice Number '" . $updatedInstruction->invoice_number . "' Added");
+        $this->storeActivity($updatedInstruction->instruction_id, "3rd Party Instruction Vendor Invoice Number '" . $formData['invoice_number'] . "' Added");
         return $updatedInstruction;
     }
 
@@ -355,7 +358,7 @@ class InstructionService
         }
 
         $updatedInstruction = $this->instructionRepository->saveInvoice($formData, 'update');
-        $this->storeActivity($updatedInstruction->instruction_id, "3rd Party Instruction Vendor Invoice Number '" . $updatedInstruction->invoice_number . "' Modified");
+        $this->storeActivity($updatedInstruction->instruction_id, "3rd Party Instruction Vendor Invoice Number '" . $formData['invoice_number'] . "' Modified");
         return $updatedInstruction;
     }
 
@@ -498,7 +501,8 @@ class InstructionService
     */
     public function setDraft(string $instructionId) : Object
     {
-        $instruction = $this->instructionRepository->getById($instructionId);
+        $idDecoder = urldecode($instructionId);
+        $instruction = $this->instructionRepository->getById($idDecoder);
         if (!$instruction) {
             throw new InvalidArgumentException('Data instruksi tidak ditemukan');
         }
@@ -512,7 +516,8 @@ class InstructionService
     */
     public function setInProgress(string $instructionId) : Object
     {
-        $instruction = $this->instructionRepository->getById($instructionId);
+        $idDecoder = urldecode($instructionId);
+        $instruction = $this->instructionRepository->getById($idDecoder);
         if (!$instruction) {
             throw new InvalidArgumentException('Data instruksi tidak ditemukan');
         }
@@ -526,7 +531,8 @@ class InstructionService
     */
     public function setComplete(string $instructionId) : Object
     {
-        $instruction = $this->instructionRepository->getById($instructionId);
+        $idDecoder = urldecode($instructionId);
+        $instruction = $this->instructionRepository->getById($idDecoder);
         if (!$instruction) {
             throw new InvalidArgumentException('Data instruksi tidak ditemukan');
         }
@@ -535,7 +541,7 @@ class InstructionService
         if (count($invoices) > 0) {
             $completedInstruction = $this->instructionRepository->setInstructionStatus($instructionId, 'Completed');
         } else {
-            throw new InvalidArgumentException('Invoice instruksi belum ada');
+            throw new InvalidArgumentException('Belum ada vendor invoice yang dapat diterima');
         }
 
         $this->storeActivity($completedInstruction->instruction_id, "Receive All Invoice 3rd Party Instruction");
@@ -548,7 +554,8 @@ class InstructionService
     */
     public function setCancelled(string $instructionId) : Object
     {
-        $instruction = $this->instructionRepository->getById($instructionId);
+        $idDecoder = urldecode($instructionId);
+        $instruction = $this->instructionRepository->getById($idDecoder);
         if (!$instruction) {
             throw new InvalidArgumentException('Data instruksi tidak ditemukan');
         }
@@ -570,12 +577,14 @@ class InstructionService
      */
     public function delete(string $instructionId) : string
     {
-        $instruction = $this->instructionRepository->getById($instructionId);
+        $idDecoder = urldecode($instructionId);
+        $instruction = $this->instructionRepository->getById($idDecoder);
         if (!$instruction) {
             throw new InvalidArgumentException('Data instruksi tidak ditemukan');
         }
         // $instructionId = $formData['instruction_id'];
         $this->instructionRepository->delete($instructionId);
+        $this->internalRepository->delete($instructionId);
         return $instructionId;
     }
 
@@ -584,7 +593,8 @@ class InstructionService
      */
     public function getInternal(string $instructionId) : ?Object
     {
-        $instruction = $this->instructionRepository->getById($instructionId);
+        $idDecoder = urldecode($instructionId);
+        $instruction = $this->instructionRepository->getById($idDecoder);
         if (!$instruction) {
             throw new InvalidArgumentException('Data instruksi tidak ditemukan');
         }
@@ -604,10 +614,10 @@ class InstructionService
     {
         $validator = Validator::make($formData, [
             'instruction_id' => 'required|string',
-            'attachment' => 'sometimes|nullable|mimes:jpg,jpeg,png,pdf|max:20000',
+            'attachment' => 'required|mimes:jpg,jpeg,png,pdf|max:20000',
         ],
         [
-            // 'attachment.required' => 'Please upload a file',
+            'attachment.required' => 'Please upload a file',
             'attachment.mimes' => 'Only jpeg, png and pdf images are allowed',
             'attachment.max' => 'Sorry! Maximum allowed size for a file is 20MB',
         ]);
@@ -673,7 +683,13 @@ class InstructionService
             throw ValidationException::withMessages(['Data instruksi tidak ditemukan, note internal tidak dapat ditambahkan']);
         }
 
-        $updatedInternal = $this->internalRepository->saveNotes($formData, 'store');
+        try {
+            $formData['posted_by'] = auth()->user()['username'];
+            $updatedInternal = $this->internalRepository->saveNotes($formData, 'store');
+        } catch (Exception $err) {
+            throw ValidationException::withMessages([$err->getMessage()]);
+        }
+
         return $updatedInternal;
     }
 

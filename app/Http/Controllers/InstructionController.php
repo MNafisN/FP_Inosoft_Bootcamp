@@ -262,6 +262,7 @@ class InstructionController extends Controller
     public function addInstructionInvoice(Request $request) : JsonResponse
     {
         $data = $request->all();
+        // dd($request->invoice_supporting_document->isValid());
 
         try {
             $instruction = $this->instructionService->addInvoice($data);
@@ -543,7 +544,7 @@ class InstructionController extends Controller
             ];
         } catch (Exception $err) {
             $result = [
-                'status' => 200,
+                'status' => 404,
                 'message' => $err->getMessage()
             ];
         }

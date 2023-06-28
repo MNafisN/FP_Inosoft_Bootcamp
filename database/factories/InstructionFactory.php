@@ -20,8 +20,10 @@ class InstructionFactory extends Factory
         $instructionId = fake()->randomElement(['LI', 'SI']);
         if ($instructionId == 'LI') {
             $instructionType = 'Logistic Instruction';
+            $transactionCode = fake()->randomElement(['INSP-', 'TRF-']);
         } else {
             $instructionType = 'Service Instruction';
+            $transactionCode = 'INSP-';
         }
 
         $vendorAddress = [];
@@ -45,7 +47,7 @@ class InstructionFactory extends Factory
             'attachment' => [],
             'notes' => fake()->text(50),
             'transaction_code' => fake()->unique()->numerify(
-                'TRF-' . fake()->numberBetween(2020, 2023) . '-####'
+                $transactionCode . fake()->numberBetween(2020, 2023) . '-####'
             ),
             'invoices' => [],
             'termination' => [],

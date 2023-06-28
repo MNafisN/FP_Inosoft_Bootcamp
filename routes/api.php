@@ -72,7 +72,7 @@ Route::group([
     Route::group([
         'prefix' => 'internal'
     ], function() {
-        Route::get('data/{id}', [InstructionController::class, 'getInternalData']);                 // Tampilkan data internal only sebuah instruksi
+        Route::get('{id}', [InstructionController::class, 'getInternalData']);                      // Tampilkan data internal only sebuah instruksi
         Route::put('addAttachment', [InstructionController::class, 'addInternalAttachment']);       // Aksi untuk menambah attachment internal only
         Route::put('deleteAttachment', [InstructionController::class, 'deleteInternalAttachment']); // Aksi untuk menghapus attachment internal only
         Route::put('addNote', [InstructionController::class, 'addInternalNote']);                   // Aksi untuk menambah note internal only

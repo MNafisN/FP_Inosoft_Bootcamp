@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Models\Internal;
 
 use MongoDB\Exception\InvalidArgumentException;
+use Illuminate\Support\Carbon;
 
 class InternalRepository
 {
@@ -29,7 +30,7 @@ class InternalRepository
      */
     public function getById(string $instructionId) : ?Object
     {
-        $internal = $this->internal->where('instruction_id', $instructionId)->first();
+        $internal = $this->internal->where('instruction_id', substr($instructionId, 0, 12))->first();
         return $internal;
     }
 
@@ -58,8 +59,9 @@ class InternalRepository
         $attachmentList = $internal->internal_attachment;
 
         if ($action == 'store') {
-            $attachmentList[] = $data['attachment'];
-            $internal->date_added = now('+7:00');
+            $attachment['attachment'] = $data['attachment'];
+            $attachment['date_added'] = (string)Carbon::now('+7:00');
+            $attachmentList[] = $attachment;
         } else if ($action == 'delete') {
             array_splice($attachmentList, $data['index'], 1);
         }
@@ -86,13 +88,16 @@ class InternalRepository
             }
         } else {
             $note['note'] = $data['note'];
-            $note['posted_by'] = $data['posted_by'];
-            $note['date_posted'] = now('+7:00');
     
             if ($action == 'store') {
+                $note['posted_by'] = $data['posted_by'];
+                $note['date_posted'] = (string)Carbon::now('+7:00');
                 $noteList[] = $note;
             } else if ($action == 'update') {
                 if ($noteList[$data['index']]['posted_by'] == $data['posted_by']) {
+                    $note['posted_by'] = $noteList[$data['index']]['posted_by'];
+                    $note['date_posted'] = $noteList[$data['index']]['date_posted'];
+                    $note['date_modified'] = (string)Carbon::now('+7:00');
                     $noteList[$data['index']] = $note;
                 } else {
                     throw new InvalidArgumentException('User ini tidak berhak menyunting note user lain');
@@ -110,11 +115,19 @@ class InternalRepository
      */
     public function storeLog(array $data) : void
     {
-        $internal = $this->internal->where('instruction_id', $data['instruction_id'])->first();
+        $internal = $this->internal->where('instruction_id', substr($data['instruction_id'], 0, 12))->first();
         $newLogList = $internal->activity_log;
         $newLog = array_intersect_key($data, array_flip(['action', 'by', 'date']));
         $newLogList[] = $newLog;
         $internal->activity_log = $newLogList;
         $internal->save();
+    }
+
+    /**
+     * untuk menghapus data internal berdasarkan id
+     */
+    public function delete(string $instructionId) : void
+    {
+        $this->internal->where('instruction_id', substr($instructionId, 0, 12))->delete();
     }
 }
