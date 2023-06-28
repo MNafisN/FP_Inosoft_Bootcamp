@@ -17,11 +17,13 @@ class InstructionController extends Controller
         $this->instructionService = $instructionService;
     }
 
+
+
     /**
      * Menampilkan hasil dari fitur pencarian
-     * 
+     *
      * @param  string $query
-     * 
+     *
      * @return \Illuminate\Http\JsonResponse
      */
     public function searchInstruction(string $query) : JsonResponse
@@ -172,7 +174,22 @@ class InstructionController extends Controller
         return response()->json($result, $result['status']);
     }
 
+    public function getInstructionDetail(string $id)
+    {
+        try {
+            $result = [
+                'status' => 200,
+                'detail_instruction' => $this->instructionService->getInstructionDetail($id)
+            ];
+        } catch (Exception $err) {
+            $result = [
+                'status' => 404,
+                'error' => $err->getMessage()
+            ];
+        }
 
+        return response()->json($result, $result['status']);
+    }
     /**
      * Tambah instruksi baru
      *
@@ -360,7 +377,7 @@ class InstructionController extends Controller
      * Sediakan data untuk halaman perbarui instruksi yang sudah ada
      *
      * @param  string $instructionId
-     * 
+     *
      * @return \Illuminate\Http\JsonResponse
      */
     public function editInstruction(string $instructionId) : JsonResponse

@@ -32,6 +32,8 @@ class InstructionService
         $this->vendorRepository = $vendorRepository;
     }
 
+
+
     /**
      * untuk mengambil list instruction berdasarkan hasil pencarian
      */
@@ -194,7 +196,7 @@ class InstructionService
         }
 
         if (isset($errors)) {
-            $errMessageBag = $errors->toArray(); 
+            $errMessageBag = $errors->toArray();
             if (isset($costDetailErrors)) {
                 $errMessageBag['cost_detail'] = $costDetailErrors;
             }
@@ -209,6 +211,15 @@ class InstructionService
         }
 
         return $newInstruction;
+    }
+
+    public function getInstructionDetail(string $id) : ?object
+    {
+        $instruction = $this->instructionRepository->getById($id);
+        if (!$instruction) {
+            throw ValidationException::withMessages(['Data instruksi tidak ditemukan']);
+        }
+        return $instruction;
     }
 
     /**
@@ -228,7 +239,7 @@ class InstructionService
 
         if ($validator->fails()) {
             $errors = $validator->errors();
-            $errMessageBag = $errors->toArray(); 
+            $errMessageBag = $errors->toArray();
             throw ValidationException::withMessages($errMessageBag);
         }
 
@@ -253,7 +264,7 @@ class InstructionService
 
         if ($validator->fails()) {
             $errors = $validator->errors();
-            $errMessageBag = $errors->toArray(); 
+            $errMessageBag = $errors->toArray();
             throw ValidationException::withMessages($errMessageBag);
         }
 
@@ -288,7 +299,7 @@ class InstructionService
 
         if ($validator->fails()) {
             $errors = $validator->errors();
-            $errMessageBag = $errors->toArray(); 
+            $errMessageBag = $errors->toArray();
             throw ValidationException::withMessages($errMessageBag);
         }
 
@@ -324,7 +335,7 @@ class InstructionService
 
         if ($validator->fails()) {
             $errors = $validator->errors();
-            $errMessageBag = $errors->toArray(); 
+            $errMessageBag = $errors->toArray();
             throw ValidationException::withMessages($errMessageBag);
         }
 
@@ -349,7 +360,7 @@ class InstructionService
 
         if ($validator->fails()) {
             $errors = $validator->errors();
-            $errMessageBag = $errors->toArray(); 
+            $errMessageBag = $errors->toArray();
             throw ValidationException::withMessages($errMessageBag);
         }
 
@@ -380,7 +391,7 @@ class InstructionService
 
         if ($validator->fails()) {
             $errors = $validator->errors();
-            $errMessageBag = $errors->toArray(); 
+            $errMessageBag = $errors->toArray();
             throw ValidationException::withMessages($errMessageBag);
         }
 
@@ -446,7 +457,7 @@ class InstructionService
         }
 
         if (isset($errors)) {
-            $errMessageBag = $errors->toArray(); 
+            $errMessageBag = $errors->toArray();
             if (isset($costDetailErrors)) {
                 $errMessageBag['cost_detail'] = $costDetailErrors;
             }
@@ -468,7 +479,7 @@ class InstructionService
         return $updatedInstruction;
     }
 
-    /** 
+    /**
      * untuk mengubah status instruksi menjadi draft
     */
     public function setDraft(string $instructionId) : Object
@@ -482,7 +493,7 @@ class InstructionService
         return $draftInstruction;
     }
 
-    /** 
+    /**
      * untuk mengubah status instruksi menjadi in progress
     */
     public function setInProgress(string $instructionId) : Object
@@ -496,7 +507,7 @@ class InstructionService
         return $instruction;
     }
 
-    /** 
+    /**
      * untuk mengubah status instruksi menjadi completed
     */
     public function setComplete(string $instructionId) : Object
@@ -516,7 +527,7 @@ class InstructionService
         return $completedInstruction;
     }
 
-    /** 
+    /**
      * untuk mengubah status instruksi menjadi cancelled
     */
     public function setCancelled(string $instructionId) : Object
