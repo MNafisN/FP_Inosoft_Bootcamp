@@ -38,6 +38,76 @@ class InstructionService
         $this->internalRepository = $internalRepository;
     }
 
+    public function downloadAttachment(string $instructionId, string $fileName)
+    {
+        $idDecoder = urldecode($instructionId);
+        $fileDecoder = urldecode($fileName);
+        $instruction = $this->instructionRepository->getById($idDecoder);
+        if (!$instruction) {
+            throw new InvalidArgumentException('Data instruksi tidak ditemukan');
+        }
+
+        $file = $this->instructionRepository->downloadAttachment($idDecoder, '/attachments/', $fileDecoder);
+        // if (!$file) {
+        //     throw new InvalidArgumentException();
+        // }
+        return $file;
+    }
+
+    public function downloadInvoiceAttachment(string $instructionId, string $invoiceNumber, string $fileName)
+    {
+        $idDecoder = urldecode($instructionId);
+        $invoiceDecoder = urldecode($invoiceNumber);
+        $fileDecoder = urldecode($fileName);
+        $instruction = $this->instructionRepository->getById($idDecoder);
+        if (!$instruction) {
+            throw new InvalidArgumentException('Data instruksi tidak ditemukan');
+        }
+
+        $file = $this->instructionRepository->downloadAttachment($idDecoder, "/invoices/" . $invoiceDecoder . "/", $fileDecoder);
+        return $file;
+    }
+
+    public function downloadInvoiceSupportingDocument(string $instructionId, string $invoiceNumber, string $fileName)
+    {
+        $idDecoder = urldecode($instructionId);
+        $invoiceDecoder = urldecode($invoiceNumber);
+        $fileDecoder = urldecode($fileName);
+        $instruction = $this->instructionRepository->getById($idDecoder);
+        if (!$instruction) {
+            throw new InvalidArgumentException('Data instruksi tidak ditemukan');
+        }
+
+        $file = $this->instructionRepository->downloadAttachment($idDecoder, "/invoices/" . $invoiceDecoder . "/supporting_document/", $fileDecoder);
+        return $file;
+    }
+
+    public function downloadTerminationAttachment(string $instructionId, string $fileName)
+    {
+        $idDecoder = urldecode($instructionId);
+        $fileDecoder = urldecode($fileName);
+        $instruction = $this->instructionRepository->getById($idDecoder);
+        if (!$instruction) {
+            throw new InvalidArgumentException('Data instruksi tidak ditemukan');
+        }
+
+        $file = $this->instructionRepository->downloadAttachment($idDecoder, '/termination_attachment/', $fileDecoder);
+        return $file;
+    }
+
+    public function downloadInternalAttachment(string $instructionId, string $fileName)
+    {
+        $idDecoder = urldecode($instructionId);
+        $fileDecoder = urldecode($fileName);
+        $instruction = $this->instructionRepository->getById($idDecoder);
+        if (!$instruction) {
+            throw new InvalidArgumentException('Data instruksi tidak ditemukan');
+        }
+
+        $file = $this->internalRepository->downloadAttachment($idDecoder, $fileDecoder);
+        return $file;
+    }
+
     /**
      * untuk menyimpan log instruksi pada internal only
      */

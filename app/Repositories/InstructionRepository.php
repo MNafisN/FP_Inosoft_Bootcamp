@@ -14,6 +14,14 @@ class InstructionRepository
         $this->instruction = $instruction;
     }
 
+    /**
+     * untuk download file attachments
+     */
+    public function downloadAttachment(string $instructionId, string $path, string $fileName)
+    {
+        return Storage::download("/documents/instructions/" . substr($instructionId, 0, 12) . $path . $fileName, $fileName);
+    }
+
     /** 
      * untuk mengambil list instruksi dari hasil pencarian
      */
