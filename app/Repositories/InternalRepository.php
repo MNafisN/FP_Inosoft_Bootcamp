@@ -59,8 +59,8 @@ class InternalRepository
         $attachmentList = $internal->internal_attachment;
 
         if ($action == 'store') {
-            // dd($data['attachment']);
-            $attachment['attachment'] = $data['attachment'];
+            $data['attachment']->storeAs("/documents/instructions/" . substr($data['instruction_id'], 0, 12) . "/internal_attachments", $data['file_name']);
+            $attachment['attachment'] = $data['file_name'];
             $attachment['posted_by'] = $data['posted_by'];
             $attachment['date_added'] = (string)Carbon::now('+7:00');
             $attachmentList[] = $attachment;

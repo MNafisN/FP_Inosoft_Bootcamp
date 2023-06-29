@@ -8,6 +8,7 @@ use App\Repositories\TransactionRepository;
 use App\Repositories\VendorRepository;
 use App\Repositories\InternalRepository;
 
+use Illuminate\Http\Request;
 use MongoDB\Exception\InvalidArgumentException;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
@@ -161,7 +162,7 @@ class InstructionService
     /**
      * untuk menambahkan data instruction baru
      */
-    public function store(array $formData) : Object
+    public function store(array $formData, Request $request) : Object
     {
         $validator = Validator::make($formData, [
             'instruction_id' => 'required|string|unique:App\Models\Instruction,instruction_id',
@@ -219,6 +220,13 @@ class InstructionService
             throw ValidationException::withMessages($errMessageBag);
         }
 
+        $document = $request->file('attachment');
+
+        foreach ($formData['attachment'] as $key => $file) {
+            $formData['attachment'][$key] = $document[$key];
+            $formData['file_name'][$key] = $document[$key]->getClientOriginalName();
+        }
+
         $newInstruction = $this->instructionRepository->save($formData);
 
         $storeVendorData = $this->vendorRepository->save(array_intersect_key($validator->validated(), array_flip(['assigned_vendor', 'vendor_address', 'invoice_to'])));
@@ -233,9 +241,22 @@ class InstructionService
     }
 
     /**
+     * untuk mengambil detil data sebuah instruksi
+     */
+    public function getInstructionDetail(string $id) : ?Object
+    {
+        $instructionId = urldecode($id);        
+        $instruction = $this->instructionRepository->getById($instructionId);
+        if (!$instruction) {
+            throw ValidationException::withMessages(['Data instruksi tidak ditemukan']);
+        }
+        return $instruction;
+    }
+
+    /**
      * untuk menambah attachment instruksi
      */
-    public function addAttachment(array $formData, string $fileName) : Object
+    public function addAttachment(array $formData, Request $request) : Object
     {
         $validator = Validator::make($formData, [
             'instruction_id' => 'required|string',
@@ -257,7 +278,13 @@ class InstructionService
         if (!$instruction) {
             throw ValidationException::withMessages(['Data instruksi tidak ditemukan']);
         }
-        // dd($validator->validated());
+
+        $document = $request->file('attachment');
+        $fileName = $document->getClientOriginalName();
+
+        $formData['attachment'] = $document;
+        $formData['file_name'] = $fileName;
+
         $updatedInstruction = $this->instructionRepository->saveAttachment($formData, 'store');
         $this->storeActivity($updatedInstruction->instruction_id, "3rd Party Instruction Attachment '" . $fileName . "' Uploaded");
         return $updatedInstruction;
@@ -292,7 +319,7 @@ class InstructionService
     /**
      * untuk menambah vendor invoice instruksi
      */
-    public function addInvoice(array $formData) : Object
+    public function addInvoice(array $formData, Request $request) : Object
     {
         $validator = Validator::make($formData, [
             'instruction_id' => 'required|string',
@@ -320,6 +347,14 @@ class InstructionService
             throw ValidationException::withMessages(['Data instruksi tidak ditemukan']);
         }
 
+        $invoiceAttachment = $request->file('invoice_attachment');
+        $formData['invoice_attachment'] = $invoiceAttachment;
+
+        if ($request->hasFile('invoice_supporting_document')) {
+            $supportingDocument = $request->file("invoice_supporting_document");
+            $formData['invoice_supporting_document'] = $supportingDocument;    
+        }
+
         $updatedInstruction = $this->instructionRepository->saveInvoice($formData, 'store');
         $this->storeActivity($updatedInstruction->instruction_id, "3rd Party Instruction Vendor Invoice Number '" . $formData['invoice_number'] . "' Added");
         return $updatedInstruction;
@@ -328,7 +363,7 @@ class InstructionService
     /**
      * untuk memperbarui vendor invoice instruksi
      */
-    public function updateInvoice(array $formData) : Object
+    public function updateInvoice(array $formData, Request $request) : Object
     {
         $validator = Validator::make($formData, [
             'instruction_id' => 'required|string',
@@ -355,6 +390,14 @@ class InstructionService
         $instruction = $this->instructionRepository->getById($formData['instruction_id']);
         if (!$instruction) {
             throw ValidationException::withMessages(['Data instruksi tidak ditemukan']);
+        }
+
+        $invoiceAttachment = $request->file('invoice_attachment');
+        $formData['invoice_attachment'] = $invoiceAttachment;
+
+        if ($request->hasFile('invoice_supporting_document')) {
+            $supportingDocument = $request->file("invoice_supporting_document");
+            $formData['invoice_supporting_document'] = $supportingDocument;    
         }
 
         $updatedInstruction = $this->instructionRepository->saveInvoice($formData, 'update');
@@ -391,7 +434,7 @@ class InstructionService
     /**
      * untuk memperbarui keterangan dibatalkannya instruksi
      */
-    public function updateTermination(array $formData) : Object
+    public function updateTermination(array $formData, Request $request) : Object
     {
         $validator = Validator::make($formData, [
             'instruction_id' => 'required|string',
@@ -415,6 +458,12 @@ class InstructionService
             throw ValidationException::withMessages(['Data instruksi tidak ditemukan']);
         }
 
+        $document = $request->file('attachment');
+        $fileName = $document->getClientOriginalName();
+
+        $formData['attachment'] = $document;
+        $formData['file_name'] = $fileName;
+
         $updatedInstruction = $this->instructionRepository->saveTermination($formData, auth()->user()['username']);
         return $updatedInstruction;
     }
@@ -422,7 +471,7 @@ class InstructionService
     /**
      * untuk memodifikasi data instruction yang sudah ada
      */
-    public function update(array $formData) : Object
+    public function update(array $formData, Request $request) : Object
     {
         $validator = Validator::make($formData, [
             'instruction_id' => 'required|string',
@@ -482,6 +531,13 @@ class InstructionService
         $instruction = $this->instructionRepository->getById($formData['instruction_id']);
         if (!$instruction) {
             throw ValidationException::withMessages(['Data instruksi tidak ditemukan']);
+        }
+
+        $document = $request->file('attachment');
+
+        foreach ($formData['attachment'] as $key => $file) {
+            $formData['attachment'][$key] = $document[$key];
+            $formData['file_name'][$key] = $document[$key]->getClientOriginalName();
         }
 
         $updatedInstruction = $this->instructionRepository->save($formData);
@@ -610,7 +666,7 @@ class InstructionService
     /**
      * untuk menambah attachment internal instruksi
      */
-    public function addInternalAttachment(array $formData) : Object
+    public function addInternalAttachment(array $formData, Request $request) : Object
     {
         $validator = Validator::make($formData, [
             'instruction_id' => 'required|string',
@@ -633,6 +689,11 @@ class InstructionService
             throw ValidationException::withMessages(['Data instruksi tidak ditemukan, attachment internal tidak dapat disimpan']);
         }
 
+        $document = $request->file('attachment');
+        $fileName = $document->getClientOriginalName();
+
+        $formData['attachment'] = $document;
+        $formData['file_name'] = $fileName;
         $formData['posted_by'] = auth()->user()['username'];
         $updatedInternal = $this->internalRepository->saveAttachment($formData, 'store');
         return $updatedInternal;

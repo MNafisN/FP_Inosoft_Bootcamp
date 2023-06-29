@@ -185,7 +185,7 @@ class InstructionController extends Controller
         $data = $request->all();
 
         try {
-            $instruction = $this->instructionService->store($data);
+            $instruction = $this->instructionService->store($data, $request);
             return response()->json([
                 'status' => 201,
                 'message' => 'Instruction added successfully',
@@ -197,6 +197,26 @@ class InstructionController extends Controller
                 'error' => $err->getTrace()[0]['args'][0]
             ], 422);
         }
+    }
+
+    /**
+     * Tampilkan detil instruksi
+     */
+    public function getInstructionDetail(string $id) : JsonResponse
+    {
+        try {
+            $result = [
+                'status' => 200,
+                'detail_instruction' => $this->instructionService->getInstructionDetail($id)
+            ];
+        } catch (Exception $err) {
+            $result = [
+                'status' => 404,
+                'error' => $err->getMessage()
+            ];
+        }
+
+        return response()->json($result, $result['status']);
     }
 
     /**
@@ -212,7 +232,7 @@ class InstructionController extends Controller
         // dd($request->attachment->isValid());
 
         try {
-            $instruction = $this->instructionService->addAttachment($data, $request->file('attachment')->getClientOriginalName());
+            $instruction = $this->instructionService->addAttachment($data, $request);
             return response()->json([
                 'status' => 200,
                 'message' => 'Instruction attachment added successfully',
@@ -265,7 +285,7 @@ class InstructionController extends Controller
         // dd($request->invoice_supporting_document->isValid());
 
         try {
-            $instruction = $this->instructionService->addInvoice($data);
+            $instruction = $this->instructionService->addInvoice($data, $request);
             return response()->json([
                 'status' => 200,
                 'message' => 'Instruction invoice added successfully',
@@ -291,7 +311,7 @@ class InstructionController extends Controller
         $data = $request->all();
 
         try {
-            $instruction = $this->instructionService->updateInvoice($data);
+            $instruction = $this->instructionService->updateInvoice($data, $request);
             return response()->json([
                 'status' => 200,
                 'message' => 'Instruction invoice updated successfully',
@@ -343,7 +363,7 @@ class InstructionController extends Controller
         $data = $request->all();
 
         try {
-            $instruction = $this->instructionService->updateTermination($data);
+            $instruction = $this->instructionService->updateTermination($data, $request);
             return response()->json([
                 'status' => 200,
                 'message' => 'Instruction termination updated successfully',
@@ -394,7 +414,7 @@ class InstructionController extends Controller
         $data = $request->all();
 
         try {
-            $instruction = $this->instructionService->update($data);
+            $instruction = $this->instructionService->update($data, $request);
             return response()->json([
                 'status' => 200,
                 'message' => 'Instruction updated successfully',
@@ -564,7 +584,7 @@ class InstructionController extends Controller
         $data = $request->all();
 
         try {
-            $internal = $this->instructionService->addInternalAttachment($data);
+            $internal = $this->instructionService->addInternalAttachment($data, $request);
             return response()->json([
                 'status' => 200,
                 'message' => 'Instruction internal attachment added successfully',

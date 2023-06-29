@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\Instruction;
+use Illuminate\Support\Facades\Storage;
 
 class InstructionRepository
 {
@@ -89,7 +90,10 @@ class InstructionRepository
         $instruction->customer_contact = $data['customer_contact'];
         $instruction->cust_po_number = $data['cust_po_number'];
         $instruction->cost_detail = $data['cost_detail'];
-        $instruction->attachment = $data['attachment'];
+        foreach ($data['attachment'] as $key => $file) {
+            $data['attachment'][$key]->storeAs("/documents/instructions/" . substr($data['instruction_id'], 0, 12) . "/attachments", $data['file_name'][$key]);
+        }
+        $instruction->attachment = $data['file_name'];
         $instruction->notes = $data['notes'];
         $instruction->transaction_code = $data['transaction_code'];
         $instruction->invoices = $data['invoices'];
@@ -109,13 +113,15 @@ class InstructionRepository
         $attachmentList = $instruction->attachment;
 
         if ($action == 'store') {
-            $attachmentList[] = $data['attachment'];
+            // Storage::putFile("/documents/instructions/" . $data['instruction_id'] . "/" . $data['file_name'], $data['attachment'],);
+            $data['attachment']->storeAs("/documents/instructions/" . substr($data['instruction_id'], 0, 12) . "/attachments", $data['file_name']);
+            $attachmentList[] = $data['file_name'];
         } else if ($action == 'delete') {
             array_splice($attachmentList, $data['index'], 1);
         }
         
         $instruction->attachment = $attachmentList;
-        // dd($instruction);
+
         $instruction->save();
         return $instruction->fresh();
     }
@@ -132,14 +138,27 @@ class InstructionRepository
             array_splice($invoiceList, $data['index'], 1);
         } else {
             $invoice['invoice_number'] = $data['invoice_number'];
-            $invoice['invoice_attachment'] = $data['invoice_attachment'];
-            $invoice['invoice_supporting_document'] = $data['invoice_supporting_document'];
-    
+            $invoice['invoice_attachment'] = $data['invoice_attachment']->getClientOriginalName();
+            if (isset($data['invoice_supporting_document'])) {
+                $invoice['invoice_supporting_document'] = $data['invoice_supporting_document']->getClientOriginalName();
+            } else { $invoice['invoice_supporting_document'] = $data['invoice_supporting_document']; }
+
             if ($action == 'store') {
                 $invoiceList[] = $invoice;
             } else if ($action == 'update') {
                 $invoiceList[$data['index']] = $invoice;
-            }    
+            }
+
+            $data['invoice_attachment']->storeAs(
+                "/documents/instructions/" . substr($data['instruction_id'], 0, 12) . "/invoices/" . $data['invoice_number'],
+                $data['invoice_attachment']->getClientOriginalName()
+            );
+            if (isset($invoice['invoice_supporting_document'])) {
+                $data['invoice_supporting_document']->storeAs(
+                    "/documents/instructions/" . substr($data['instruction_id'], 0, 12) . "/invoices/" . $data['invoice_number'] . "/supporting_document",
+                    $data['invoice_supporting_document']->getClientOriginalName()
+                );
+            }
         }
         
         $instruction->invoices = $invoiceList;
@@ -155,7 +174,11 @@ class InstructionRepository
         $instruction = $this->getById($data['instruction_id']);
         $termination['canceled_by'] = $by;
         $termination['termination_reason'] = $data['termination_reason'];
-        $termination['attachment'] = $data['attachment'];
+        $data['attachment']->storeAs(
+            "/documents/instructions/" . substr($data['instruction_id'], 0, 12) . "/termination_attachment",
+            $data['file_name']
+        );
+        $termination['attachment'] = $data['file_name'];
 
         $instruction->termination = $termination;
         $instruction->save();
