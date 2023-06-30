@@ -66,8 +66,7 @@ class InstructionRepository
      */
     public function save(array $data) : Object
     {
-        $instructionCheck = $this->getById($data['instruction_id']);
-        if ($instructionCheck) {
+        if (array_key_exists('instruction_id', $data)) {
             $instruction = $this->getById($data['instruction_id']);
             $revision = substr($data['instruction_id'], -3);
             $revisionNumber = substr($revision, -2);
@@ -86,7 +85,9 @@ class InstructionRepository
         } else {
             $instruction = new $this->instruction;
 
-            $instruction->instruction_id = $data['instruction_id'];
+            if ($data['instruction_type'] == "Logistic Instruction") { $instruction->nextLId(); }
+            else if ($data['instruction_type'] == "Service Instruction") { $instruction->nextSId(); }
+            // $instruction->instruction_id = $data['instruction_id'];
             $instruction->instruction_type = $data['instruction_type'];    
         }
 
@@ -98,9 +99,17 @@ class InstructionRepository
         $instruction->customer_contact = $data['customer_contact'];
         $instruction->cust_po_number = $data['cust_po_number'];
         $instruction->cost_detail = $data['cost_detail'];
-        foreach ($data['attachment'] as $key => $file) {
-            $data['attachment'][$key]->storeAs("/documents/instructions/" . substr($data['instruction_id'], 0, 12) . "/attachments", $data['file_name'][$key]);
+
+        if (array_key_exists('instruction_id', $data)) {
+            foreach ($data['attachment'] as $key => $file) {
+                $data['attachment'][$key]->storeAs("/documents/instructions/" . substr($data['instruction_id'], 0, 12) . "/attachments", $data['file_name'][$key]);
+            }
+        } else {
+            foreach ($data['attachment'] as $key => $file) {
+                $data['attachment'][$key]->storeAs("/documents/instructions/" . $instruction->instruction_id . "/attachments", $data['file_name'][$key]);
+            }
         }
+
         $instruction->attachment = $data['file_name'];
         $instruction->notes = $data['notes'];
         $instruction->transaction_code = $data['transaction_code'];

@@ -235,7 +235,7 @@ class InstructionService
     public function store(array $formData, Request $request) : Object
     {
         $validator = Validator::make($formData, [
-            'instruction_id' => 'required|string|unique:App\Models\Instruction,instruction_id',
+            // 'instruction_id' => 'required|string|unique:App\Models\Instruction,instruction_id',
             'instruction_type' => 'required|string',
             'assigned_vendor' => 'required',
             'vendor_address' => 'required',
