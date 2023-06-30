@@ -244,7 +244,7 @@ class InstructionService
             'invoice_to' => 'sometimes|required',
             'customer_contact' => 'sometimes|required',
             'cust_po_number' => 'nullable|required',
-            'cost_detail' => 'required',
+            'cost_detail' => 'nullable',
             'attachment.*' => 'sometimes|nullable|mimes:jpg,jpeg,png,pdf|max:20000',
             'notes' => 'nullable',
             'transaction_code' => 'sometimes|required',
@@ -664,7 +664,7 @@ class InstructionService
         }
 
         $invoices = $instruction->invoices;
-        if (count($invoices) > 0) {
+        if (is_countable($invoices) && count($invoices) > 0) {
             $completedInstruction = $this->instructionRepository->setInstructionStatus($instructionId, 'Completed');
         } else {
             throw new InvalidArgumentException('Belum ada vendor invoice yang dapat diterima');
@@ -687,7 +687,7 @@ class InstructionService
         }
 
         $termination = $instruction->termination;
-        if (count($termination) > 0) {
+        if (is_countable($termination) && count($termination) > 0) {
             $cancelledInstruction = $this->instructionRepository->setInstructionStatus($instructionId, 'Cancelled');
         } else {
             throw new InvalidArgumentException('Alasan pembatalan belum ada');
