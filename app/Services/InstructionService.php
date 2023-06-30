@@ -244,7 +244,7 @@ class InstructionService
             'invoice_to' => 'sometimes|required',
             'customer_contact' => 'sometimes|required',
             'cust_po_number' => 'nullable|required',
-            'cost_detail' => 'nullable',
+            'cost_detail' => 'required',
             'attachment.*' => 'sometimes|nullable|mimes:jpg,jpeg,png,pdf|max:20000',
             'notes' => 'nullable',
             'transaction_code' => 'sometimes|required',
