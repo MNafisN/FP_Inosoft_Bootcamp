@@ -38,6 +38,76 @@ class InstructionService
         $this->internalRepository = $internalRepository;
     }
 
+    public function downloadAttachment(string $instructionId, string $fileName)
+    {
+        $idDecoder = urldecode($instructionId);
+        $fileDecoder = urldecode($fileName);
+        $instruction = $this->instructionRepository->getById($idDecoder);
+        if (!$instruction) {
+            throw new InvalidArgumentException('Data instruksi tidak ditemukan');
+        }
+
+        $file = $this->instructionRepository->downloadAttachment($idDecoder, '/attachments/', $fileDecoder);
+        // if (!$file) {
+        //     throw new InvalidArgumentException();
+        // }
+        return $file;
+    }
+
+    public function downloadInvoiceAttachment(string $instructionId, string $invoiceNumber, string $fileName)
+    {
+        $idDecoder = urldecode($instructionId);
+        $invoiceDecoder = urldecode($invoiceNumber);
+        $fileDecoder = urldecode($fileName);
+        $instruction = $this->instructionRepository->getById($idDecoder);
+        if (!$instruction) {
+            throw new InvalidArgumentException('Data instruksi tidak ditemukan');
+        }
+
+        $file = $this->instructionRepository->downloadAttachment($idDecoder, "/invoices/" . $invoiceDecoder . "/", $fileDecoder);
+        return $file;
+    }
+
+    public function downloadInvoiceSupportingDocument(string $instructionId, string $invoiceNumber, string $fileName)
+    {
+        $idDecoder = urldecode($instructionId);
+        $invoiceDecoder = urldecode($invoiceNumber);
+        $fileDecoder = urldecode($fileName);
+        $instruction = $this->instructionRepository->getById($idDecoder);
+        if (!$instruction) {
+            throw new InvalidArgumentException('Data instruksi tidak ditemukan');
+        }
+
+        $file = $this->instructionRepository->downloadAttachment($idDecoder, "/invoices/" . $invoiceDecoder . "/supporting_document/", $fileDecoder);
+        return $file;
+    }
+
+    public function downloadTerminationAttachment(string $instructionId, string $fileName)
+    {
+        $idDecoder = urldecode($instructionId);
+        $fileDecoder = urldecode($fileName);
+        $instruction = $this->instructionRepository->getById($idDecoder);
+        if (!$instruction) {
+            throw new InvalidArgumentException('Data instruksi tidak ditemukan');
+        }
+
+        $file = $this->instructionRepository->downloadAttachment($idDecoder, '/termination_attachment/', $fileDecoder);
+        return $file;
+    }
+
+    public function downloadInternalAttachment(string $instructionId, string $fileName)
+    {
+        $idDecoder = urldecode($instructionId);
+        $fileDecoder = urldecode($fileName);
+        $instruction = $this->instructionRepository->getById($idDecoder);
+        if (!$instruction) {
+            throw new InvalidArgumentException('Data instruksi tidak ditemukan');
+        }
+
+        $file = $this->internalRepository->downloadAttachment($idDecoder, $fileDecoder);
+        return $file;
+    }
+
     /**
      * untuk menyimpan log instruksi pada internal only
      */
@@ -165,7 +235,7 @@ class InstructionService
     public function store(array $formData, Request $request) : Object
     {
         $validator = Validator::make($formData, [
-            'instruction_id' => 'required|string|unique:App\Models\Instruction,instruction_id',
+            // 'instruction_id' => 'required|string|unique:App\Models\Instruction,instruction_id',
             'instruction_type' => 'required|string',
             'assigned_vendor' => 'required',
             'vendor_address' => 'required',
@@ -594,7 +664,7 @@ class InstructionService
         }
 
         $invoices = $instruction->invoices;
-        if (count($invoices) > 0) {
+        if (is_countable($invoices) && count($invoices) > 0) {
             $completedInstruction = $this->instructionRepository->setInstructionStatus($instructionId, 'Completed');
         } else {
             throw new InvalidArgumentException('Belum ada vendor invoice yang dapat diterima');
@@ -617,7 +687,7 @@ class InstructionService
         }
 
         $termination = $instruction->termination;
-        if (count($termination) > 0) {
+        if (is_countable($termination) && count($termination) > 0) {
             $cancelledInstruction = $this->instructionRepository->setInstructionStatus($instructionId, 'Cancelled');
         } else {
             throw new InvalidArgumentException('Alasan pembatalan belum ada');

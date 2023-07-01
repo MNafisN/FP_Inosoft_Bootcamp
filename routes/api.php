@@ -39,6 +39,12 @@ Route::group([
     'prefix' => 'instruction',
     'middleware' => 'auth:api'
 ], function() {
+    Route::get('download/{id}/{file_name}', [InstructionController::class, 'downloadAttachment']);
+    Route::get('download/{id}/invoice/{invoice_no}/{file_name}', [InstructionController::class, 'downloadInvoiceAttachment']);
+    Route::get('download/{id}/invoice/supporting/{invoice_no}/{file_name}', [InstructionController::class, 'downloadInvoiceSupportingDocument']);
+    Route::get('download/{id}/termination/{file_name}', [InstructionController::class, 'downloadTerminationAttachment']);
+    Route::get('download/{id}/internal/{file_name}', [InstructionController::class, 'downloadInternalAttachment']);
+    
     Route::get('search/{query}', [InstructionController::class, 'searchInstruction']);              // Tampilkan list instruksi hasil search
     
     Route::get('list', [InstructionController::class, 'getInstructionList']);
@@ -50,7 +56,7 @@ Route::group([
     Route::get('addNew', [InstructionController::class, 'addNewInstruction']);                      // Penyedia data untuk form tambah instruksi baru
     Route::post('add', [InstructionController::class, 'addInstruction']);                           // Aksi untuk simpan data form instruksi baru
 
-    Route::get('{id}', [InstructionController::class, 'getInstructionDetail']);                     // TODO
+    Route::get('{id}', [InstructionController::class, 'getInstructionDetail']);                     // Penyedia data tampilkan detail instruksi
 
     Route::put('addAttachment', [InstructionController::class, 'addInstructionAttachment']);        // Aksi untuk menambah attachment sebuah instruksi di halaman detail instruksi
     Route::put('deleteAttachment', [InstructionController::class, 'deleteInstructionAttachment']);  // Aksi untuk menghapus attachment sebuah instruksi di halaman detail instruksi

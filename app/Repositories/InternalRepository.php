@@ -6,6 +6,7 @@ use App\Models\Internal;
 
 use MongoDB\Exception\InvalidArgumentException;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Storage;
 
 class InternalRepository
 {
@@ -14,6 +15,11 @@ class InternalRepository
     public function __construct(Internal $internal)
     {
         $this->internal = $internal;
+    }
+
+    public function downloadAttachment(string $instructionId, string $fileName)
+    {
+        return Storage::download("/documents/instructions/" . substr($instructionId, 0, 12) . "/internal_attachments/" . $fileName, $fileName);
     }
 
     /** 

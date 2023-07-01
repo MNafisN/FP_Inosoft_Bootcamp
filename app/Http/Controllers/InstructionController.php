@@ -17,6 +17,104 @@ class InstructionController extends Controller
         $this->instructionService = $instructionService;
     }
 
+    public function downloadAttachment(Request $request)
+    {
+        // return response()->download(storage_path('/app/public/documents/instructions/LI-2023-0003/attachments/Project_Assignment_3_Backend (B5).pdf'), 'Project_Assignment_3_Backend (B5).pdf');
+        $instructionId = $request->id;
+        $fileName = $request->file_name;
+        try {
+            $result = [
+                'status' => 200,
+                'data' => $this->instructionService->downloadAttachment($instructionId, $fileName)
+            ];
+            return $result['data'];
+        } catch (Exception $err) {
+            $result = [
+                'status' => 404,
+                'error' => $err->getMessage()
+            ];
+        }
+        return response()->json($result, $result['status']);
+    }
+
+    public function downloadInvoiceAttachment(Request $request)
+    {
+        $instructionId = $request->id;
+        $invoiceNumber = $request->invoice_no;
+        $fileName = $request->file_name;
+        try {
+            $result = [
+                'status' => 200,
+                'data' => $this->instructionService->downloadInvoiceAttachment($instructionId, $invoiceNumber, $fileName)
+            ];
+            return $result['data'];
+        } catch (Exception $err) {
+            $result = [
+                'status' => 404,
+                'error' => $err->getMessage()
+            ];
+        }
+        return response()->json($result, $result['status']);
+    }
+    
+    public function downloadInvoiceSupportingDocument(Request $request)
+    {
+        $instructionId = $request->id;
+        $invoiceNumber = $request->invoice_no;
+        $fileName = $request->file_name;
+        try {
+            $result = [
+                'status' => 200,
+                'data' => $this->instructionService->downloadInvoiceSupportingDocument($instructionId, $invoiceNumber, $fileName)
+            ];
+            return $result['data'];
+        } catch (Exception $err) {
+            $result = [
+                'status' => 404,
+                'error' => $err->getMessage()
+            ];
+        }
+        return response()->json($result, $result['status']);
+    }
+
+    public function downloadTerminationAttachment(Request $request)
+    {
+        $instructionId = $request->id;
+        $fileName = $request->file_name;
+        try {
+            $result = [
+                'status' => 200,
+                'data' => $this->instructionService->downloadTerminationAttachment($instructionId, $fileName)
+            ];
+            return $result['data'];
+        } catch (Exception $err) {
+            $result = [
+                'status' => 404,
+                'error' => $err->getMessage()
+            ];
+        }
+        return response()->json($result, $result['status']);
+    }
+
+    public function downloadInternalAttachment(Request $request)
+    {
+        $instructionId = $request->id;
+        $fileName = $request->file_name;
+        try {
+            $result = [
+                'status' => 200,
+                'data' => $this->instructionService->downloadInternalAttachment($instructionId, $fileName)
+            ];
+            return $result['data'];
+        } catch (Exception $err) {
+            $result = [
+                'status' => 404,
+                'error' => $err->getMessage()
+            ];
+        }
+        return response()->json($result, $result['status']);
+    }
+
     /**
      * Menampilkan hasil dari fitur pencarian
      * 
