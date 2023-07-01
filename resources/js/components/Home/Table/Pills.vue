@@ -50,7 +50,7 @@ export default {
     color: white;
 }
 
-.In-Progress {
+.Progress {
     background-color: #e2ebf9;
     color: #7087a9;
     outline: 1px solid #c2c9d4;
