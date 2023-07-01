@@ -13,7 +13,7 @@ class InstructionController extends Controller
 
     public function __construct(InstructionService $instructionService)
     {
-        // $this->middleware('auth:api');
+        $this->middleware('auth:api');
         $this->instructionService = $instructionService;
     }
 
@@ -56,7 +56,7 @@ class InstructionController extends Controller
         }
         return response()->json($result, $result['status']);
     }
-
+    
     public function downloadInvoiceSupportingDocument(Request $request)
     {
         $instructionId = $request->id;
@@ -122,7 +122,7 @@ class InstructionController extends Controller
      * 
      * @return \Illuminate\Http\JsonResponse
      */
-    public function searchInstruction(string $query): JsonResponse
+    public function searchInstruction(string $query) : JsonResponse
     {
         try {
             $instructions = $this->instructionService->getSearched($query);
@@ -143,7 +143,7 @@ class InstructionController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function getInstructionList(): JsonResponse
+    public function getInstructionList() : JsonResponse
     {
         try {
             $result = [
@@ -165,7 +165,7 @@ class InstructionController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function getInstructionInProgressList(): JsonResponse
+    public function getInstructionInProgressList() : JsonResponse
     {
         try {
             $result = [
@@ -187,7 +187,7 @@ class InstructionController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function getInstructionDraftList(): JsonResponse
+    public function getInstructionDraftList() : JsonResponse
     {
         try {
             $result = [
@@ -209,7 +209,7 @@ class InstructionController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function getOpenInstructionList(): JsonResponse
+    public function getOpenInstructionList() : JsonResponse
     {
         try {
             $result = [
@@ -231,7 +231,7 @@ class InstructionController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function getCompletedInstructionList(): JsonResponse
+    public function getCompletedInstructionList() : JsonResponse
     {
         try {
             $result = [
@@ -253,7 +253,7 @@ class InstructionController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function addNewInstruction(): JsonResponse
+    public function addNewInstruction() : JsonResponse
     {
         try {
             $result = [
@@ -278,7 +278,7 @@ class InstructionController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function addInstruction(Request $request): JsonResponse
+    public function addInstruction(Request $request) : JsonResponse
     {
         $data = $request->all();
 
@@ -300,7 +300,7 @@ class InstructionController extends Controller
     /**
      * Tampilkan detil instruksi
      */
-    public function getInstructionDetail(string $id): JsonResponse
+    public function getInstructionDetail(string $id) : JsonResponse
     {
         try {
             $result = [
@@ -324,7 +324,7 @@ class InstructionController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function addInstructionAttachment(Request $request): JsonResponse
+    public function addInstructionAttachment(Request $request) : JsonResponse
     {
         $data = $request->all();
         // dd($request->attachment->isValid());
@@ -351,7 +351,7 @@ class InstructionController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function deleteInstructionAttachment(Request $request): JsonResponse
+    public function deleteInstructionAttachment(Request $request) : JsonResponse
     {
         $data = $request->all();
 
@@ -377,7 +377,7 @@ class InstructionController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function addInstructionInvoice(Request $request): JsonResponse
+    public function addInstructionInvoice(Request $request) : JsonResponse
     {
         $data = $request->all();
         // dd($request->invoice_supporting_document->isValid());
@@ -404,7 +404,7 @@ class InstructionController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function updateInstructionInvoice(Request $request): JsonResponse
+    public function updateInstructionInvoice(Request $request) : JsonResponse
     {
         $data = $request->all();
 
@@ -430,7 +430,7 @@ class InstructionController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function deleteInstructionInvoice(Request $request): JsonResponse
+    public function deleteInstructionInvoice(Request $request) : JsonResponse
     {
         $data = $request->all();
 
@@ -456,7 +456,7 @@ class InstructionController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function addInstructionTermination(Request $request): JsonResponse
+    public function addInstructionTermination(Request $request) : JsonResponse
     {
         $data = $request->all();
 
@@ -482,7 +482,7 @@ class InstructionController extends Controller
      * 
      * @return \Illuminate\Http\JsonResponse
      */
-    public function editInstruction(string $instructionId): JsonResponse
+    public function editInstruction(string $instructionId) : JsonResponse
     {
         try {
             $result = [
@@ -507,7 +507,7 @@ class InstructionController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function updateInstruction(Request $request): JsonResponse
+    public function updateInstruction(Request $request) : JsonResponse
     {
         $data = $request->all();
 
@@ -533,7 +533,7 @@ class InstructionController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function setInstructionToDraft(string $instructionId): JsonResponse
+    public function setInstructionToDraft(string $instructionId) : JsonResponse
     {
         try {
             $instruction = $this->instructionService->setDraft($instructionId);
@@ -557,7 +557,7 @@ class InstructionController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function setInstructionToInProgress(string $instructionId): JsonResponse
+    public function setInstructionToInProgress(string $instructionId) : JsonResponse
     {
         try {
             $instruction = $this->instructionService->setInProgress($instructionId);
@@ -581,7 +581,7 @@ class InstructionController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function setInstructionToCompleted(string $instructionId): JsonResponse
+    public function setInstructionToCompleted(string $instructionId) : JsonResponse
     {
         try {
             $instruction = $this->instructionService->setComplete($instructionId);
@@ -605,7 +605,7 @@ class InstructionController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function setInstructionToCancelled(string $instructionId): JsonResponse
+    public function setInstructionToCancelled(string $instructionId) : JsonResponse
     {
         try {
             $instruction = $this->instructionService->setCancelled($instructionId);
@@ -630,13 +630,13 @@ class InstructionController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function deleteInstruction(string $instructionId): JsonResponse
+    public function deleteInstruction(string $instructionId) : JsonResponse
     {
         try {
             $instruction = $this->instructionService->delete($instructionId);
             return response()->json([
                 'status' => 200,
-                'message' => $instruction . " Deleted successfully"
+                'message' => $instruction." Deleted successfully"
             ]);
         } catch (Exception $err) {
             return response()->json([
@@ -653,7 +653,7 @@ class InstructionController extends Controller
      * 
      * @return \Illuminate\Http\JsonResponse
      */
-    public function getInternalData(string $instructionId): JsonResponse
+    public function getInternalData(string $instructionId) : JsonResponse
     {
         try {
             $result = [
@@ -677,7 +677,7 @@ class InstructionController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function addInternalAttachment(Request $request): JsonResponse
+    public function addInternalAttachment(Request $request) : JsonResponse
     {
         $data = $request->all();
 
@@ -703,7 +703,7 @@ class InstructionController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function deleteInternalAttachment(Request $request): JsonResponse
+    public function deleteInternalAttachment(Request $request) : JsonResponse
     {
         $data = $request->all();
 
@@ -729,7 +729,7 @@ class InstructionController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function addInternalNote(Request $request): JsonResponse
+    public function addInternalNote(Request $request) : JsonResponse
     {
         $data = $request->all();
 
@@ -755,7 +755,7 @@ class InstructionController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function updateInternalNote(Request $request): JsonResponse
+    public function updateInternalNote(Request $request) : JsonResponse
     {
         $data = $request->all();
 
@@ -781,7 +781,7 @@ class InstructionController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function deleteInternalNote(Request $request): JsonResponse
+    public function deleteInternalNote(Request $request) : JsonResponse
     {
         $data = $request->all();
 

@@ -23,12 +23,12 @@ use App\Models\Instruction;
 
 Route::group([
     'prefix' => 'auth'
-], function () {
+], function() {
     Route::post('register', [AuthController::class, 'register']);
     Route::post('login', [AuthController::class, 'login']);
     Route::group([
         'middleware' => 'auth:api'
-    ], function () {
+    ], function() {
         Route::get('data', [AuthController::class, 'data']);
         Route::post('refresh', [AuthController::class, 'refresh']);
         Route::post('logout', [AuthController::class, 'logout']);
@@ -37,16 +37,16 @@ Route::group([
 
 Route::group([
     'prefix' => 'instruction',
-    // 'middleware' => 'auth:api'
-], function () {
+    'middleware' => 'auth:api'
+], function() {
     Route::get('download/{id}/{file_name}', [InstructionController::class, 'downloadAttachment']);
     Route::get('download/{id}/invoice/{invoice_no}/{file_name}', [InstructionController::class, 'downloadInvoiceAttachment']);
     Route::get('download/{id}/invoice/supporting/{invoice_no}/{file_name}', [InstructionController::class, 'downloadInvoiceSupportingDocument']);
     Route::get('download/{id}/termination/{file_name}', [InstructionController::class, 'downloadTerminationAttachment']);
     Route::get('download/{id}/internal/{file_name}', [InstructionController::class, 'downloadInternalAttachment']);
-
+    
     Route::get('search/{query}', [InstructionController::class, 'searchInstruction']);              // Tampilkan list instruksi hasil search
-
+    
     Route::get('list', [InstructionController::class, 'getInstructionList']);
     Route::get('list/inProgress', [InstructionController::class, 'getInstructionInProgressList']);
     Route::get('list/draft', [InstructionController::class, 'getInstructionDraftList']);
@@ -77,7 +77,7 @@ Route::group([
 
     Route::group([
         'prefix' => 'internal'
-    ], function () {
+    ], function() {
         Route::get('{id}', [InstructionController::class, 'getInternalData']);                      // Tampilkan data internal only sebuah instruksi
         Route::put('addAttachment', [InstructionController::class, 'addInternalAttachment']);       // Aksi untuk menambah attachment internal only
         Route::put('deleteAttachment', [InstructionController::class, 'deleteInternalAttachment']); // Aksi untuk menghapus attachment internal only
