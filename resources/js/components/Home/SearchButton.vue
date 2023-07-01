@@ -1,6 +1,13 @@
 <template>
     <Button :icon="searchIcon" @click="clickActive()" class="h-100 me-2">
-        <input v-if="active" type="text" class="input" />
+        <div id="DataTables_Table_3_filter" class="dataTables_filter">
+            <input
+                v-if="active"
+                type="text"
+                class="input"
+                aria-controls="DataTables_Table_3"
+            />
+        </div>
     </Button>
 </template>
 <script>
