@@ -3,10 +3,10 @@
     <div class="p-2">
         <div class="row bg-secondary text-white">
             <div class="col fg-1">Description</div>
-            <div class="col fg-2">QTY</div>
+            <div :class="'col fg-2 ' + (type === 'detail' ? 'text-end' : '')">QTY</div>
             <div class="col fg-3">UOM</div>
-            <div class="col fg-4">Unit Price</div>
-            <div class="col fg-5">GST(%)</div>
+            <div :class="'col fg-4 ' + (type === 'detail' ? 'text-end' : '')">Unit Price</div>
+            <div :class="'col fg-5 ' + (type === 'detail' ? 'text-end' : '')">GST(%)</div>
             <div class="col fg-6"></div>
             <div class="col fg-7">Currency</div>
             <div class="col fg-8 text-end">Val Amount</div>
@@ -15,8 +15,10 @@
             <div class="col fg-11">Charge To</div>
             <div class="col fg-12"></div>
         </div>
-        <CostTable v-for="(n, i) in listCostTable" :index="i" />
-        <div class="d-flex justify-content-end">
+        <CostTable v-for="(n, i) in listCostTable" :index="i" :type="type" />
+        <UsdTotal v-if="UsdCheck" :type="type" />
+        <AudTotal v-if="AudCheck" :type="type" :UsdCheck="UsdCheck" />
+        <div v-if="!UsdCheck && !AudCheck && type !== 'detail'" class="d-flex py-2 justify-content-end w-100">
             <div class="plus bg-secondary" @click="plus">
                 <div class="i-plus"></div>
             </div>
@@ -26,9 +28,14 @@
 
 <script>
 import CostTable from './CostTable.vue';
+import UsdTotal from './UsdTotal.vue';
+import AudTotal from './AudTotal.vue';
 export default {
     name: 'cost-detail-create',
-    components: { CostTable },
+    components: { CostTable, UsdTotal, AudTotal },
+    props: {
+        type: String
+    },
     methods: {
         plus() {
             this.$store.commit('addCostList')
@@ -40,6 +47,12 @@ export default {
         },
         listCostTable() {
             return this.$store.getters.listCostTable
+        },
+        AudCheck() {
+            return this.$store.getters.AudCheck
+        },
+        UsdCheck() {
+            return this.$store.getters.UsdCheck
         }
     }
 }
@@ -76,7 +89,7 @@ export default {
 }
 
 .fg-7 {
-    flex-grow: 0.7;
+    flex-grow: 0.8;
 }
 
 .fg-8 {
@@ -115,6 +128,5 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-right: -0.25rem;
-    margin-top: 0.5rem;
+    margin-right: -5px;
 }</style>
