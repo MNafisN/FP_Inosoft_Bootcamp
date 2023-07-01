@@ -43,16 +43,37 @@
     background-repeat: no-repeat;
 }
 .i-attachment{
-    width: 20px;
-    height: 20px;
+    width: 15px;
+    height: 15px;
     background: url(svg/attachment.svg);
     background-repeat: no-repeat;
     background-size: contain;
 }
 .i-delete{
+    width: 15px;
+    height: 15px;
+    background: url(svg/delete.svg);
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+.i-back{
+    width: 15px;
+    height: 15px;
+    background: url(svg/back.svg);
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+.i-modify{
+    width: 15px;
+    height: 15px;
+    background: url(svg/modify.svg);
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+.i-terminate{
     width: 20px;
     height: 20px;
-    background: url(svg/delete.svg);
+    background: url(svg/terminate.svg);
     background-size: contain;
     background-repeat: no-repeat;
 }

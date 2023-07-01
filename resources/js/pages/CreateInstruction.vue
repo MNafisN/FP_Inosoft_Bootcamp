@@ -1,35 +1,34 @@
 <template>
     <Title></Title>
     <div class="bg-white w-100 rounded shadow p-3">
-        <InstructionCreate></InstructionCreate>
-        <br>
-        <CostDetailCreate></CostDetailCreate>
-        <br>
-        <Attachment />
+        <InstructionDetail />
+        <br />
+        <CostDetail />
+        <br />
+        <AttachmentAndNotes />
     </div>
-    <br>
-    <div class="bg-white w-100 rounded shadow p-3">
-        <div class="w-25">
-            <label for="link_to">Link To</label>
-            <Dropdown input="Select Item" :list="['satu', 'dua', 'tiga']" />
-        </div>
-    </div>
-    <br>
-    <div class="bg-white w-100 rounded-top shadow p-3 d-flex justify-content-end align-items-center gap-4">
-        <span>Cancle</span>
-        <button class="btn border">Save as Draft</button>
-        <button class="btn btn-secondary">Submit</button>
-    </div>
+    <br />
+    <LinkTo />
+    <br />
+    <SubmitInstruction />
 </template>
 
 <script>
-import Title from '../components/Title.vue';
-import InstructionCreate from '../components/Instruction-Create.vue';
-import CostDetailCreate from '../components/CostDetail-Create.vue';
-import Attachment from '../components/Attachment.vue';
-import Dropdown from '../components/Dropdown.vue';
+import Title from "../components/Title.vue";
+import InstructionDetail from "../components/Instruction/InstructionDetail.vue";
+import CostDetail from "../components/Instruction/CostDetail.vue";
+import AttachmentAndNotes from "../components/Instruction/AttachmentAndNotes.vue";
+import SubmitInstruction from "../components/Instruction/SubmitInstruction.vue";
+import LinkTo from "../components/Instruction/LinkTo.vue";
 export default {
-    name: 'CreateInstruction',
-    components: { Title, InstructionCreate, CostDetailCreate, Attachment, Dropdown }
-}
+    name: "CreateInstruction",
+    components: {
+        Title,
+        InstructionDetail,
+        CostDetail,
+        AttachmentAndNotes,
+        SubmitInstruction,
+        LinkTo
+    },
+};
 </script>

@@ -1,16 +1,68 @@
 <template>
-    <div>
+    <div v-if="type === 'detail'" class="border p-2">
+        <div class="row">
+            <div class="col">
+                <span>Type</span>
+                <p class="fw-bold">{{ instructionDetail.instruction_type }}</p>
+            </div>
+            <div class="col">
+                <span>LI No</span>
+                <p class="fw-bold">{{ instructionDetail.transaction_code }}</p>
+            </div>
+            <div class="col">
+                <span>Transfer No</span>
+                <div class="p-2 bg-info-subtle text-center">FSFS-2020-0234</div>
+            </div>
+            <div class="col">
+                <span>Customer</span>
+                <p class="fw-bold">{{ instructionDetail.customer_contact }}</p>
+            </div>
+            <div class="col">
+                <span>Customer PO</span>
+                <p class="fw-bold">{{ instructionDetail.cust_po_number }}</p>
+            </div>
+            <div class="col">
+                <span>Status</span>
+                <div class="rounded-pill bg-info-subtle w-50 h-fit">
+                    <p class="mx-auto my-0 text-center fs-7 py-1">{{ instructionDetail.instruction_status }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <span>Attention Of</span>
+                <p class="fw-bold">{{ instructionDetail.attention_of }}</p>
+            </div>
+            <div class="col">
+                <span>Assigment Vendor</span>
+                <p class="fw-bold">{{ instructionDetail.assigned_vendor }}</p>
+            </div>
+            <div class="col">
+                <span>Vendor Quotation No.</span>
+                <p class="fw-bold">{{ instructionDetail.quotation_number }}</p>
+            </div>
+            <div class="col-6">
+                <span>Vendor Address</span>
+                <p class="fw-bold">
+                    {{ instructionDetail.vendor_address }}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div v-else>
         <div class="row">
             <div class="col-2">
                 <Dropdown
                     :selected="instructionDetail.instruction_type"
                     :list="['Logistic Instruction', 'Service Intruction']"
+                    :disable="type === 'edit'"
                 />
             </div>
             <div class="col-8"></div>
             <div class="col-2 d-flex justify-content-end">
                 <div class="rounded-pill bg-info-subtle w-50 h-fit">
-                    <p class="mx-auto my-0 text-center">Draft</p>
+                    <p class="mx-auto my-0 text-center">{{ instructionDetail.instruction_status }}</p>
                 </div>
             </div>
         </div>
@@ -43,7 +95,11 @@
                     type="text"
                     class="form-control"
                     placeholder="Enter Quotation"
-                    :value="instructionDetail.quotation_number === 0 ? '' : instructionDetail.quotation_number"
+                    :value="
+                        instructionDetail.quotation_number === 0
+                            ? ''
+                            : instructionDetail.quotation_number
+                    "
                     required
                 />
             </div>
@@ -102,6 +158,9 @@ export default {
         return {
             contohList: ["satu", "dua", "tiga", "empat"],
         };
+    },
+    props: {
+        type: String,
     },
     computed: {
         instructionDetail() {
