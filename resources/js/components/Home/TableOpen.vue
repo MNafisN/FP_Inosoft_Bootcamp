@@ -1,46 +1,53 @@
 <template>
     <CreateButton class="mb-3" />
-    <DataTable class="table table-hover display" :options="options">
-        <thead>
-            <tr class="table-secondary">
-                <th>Instruction ID</th>
-                <th>Link To</th>
-                <th class="text-center">Instuction Type</th>
-                <th>Assigned Vendor</th>
-                <th>Issued Date</th>
-                <th>Attention Of</th>
-                <th>Quotation No.</th>
-                <th>Customer PO</th>
-                <th class="text-center">Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr v-for="(item, index) in filteredData" :key="index">
-                <td scope="row">{{ item.instruction_id }}</td>
-                <td>{{ item.invoice_to }}</td>
-                <td class="text-center">
-                    <Type :type="item.instruction_type" />
-                </td>
-                <td>{{ item.assigned_vendor }}</td>
-                <td>{{ item.date_issued }}</td>
-                <td>{{ item.attention_of }}</td>
-                <td>{{ item.quotation_number }}</td>
-                <td>{{ item.customer_PO_number }}</td>
-                <td><Pills :type="item.instruction_status" /></td>
-            </tr>
-        </tbody>
-    </DataTable>
+    <template v-if="listInt && listInt.length">
+        <DataTable class="table table-hover display" :options="options">
+            <thead>
+                <tr class="table-secondary">
+                    <th>Instruction ID</th>
+                    <th>Link To</th>
+                    <th class="text-center">Instuction Type</th>
+                    <th>Assigned Vendor</th>
+                    <th>Issued Date</th>
+                    <th>Attention Of</th>
+                    <th>Quotation No.</th>
+                    <th>Customer PO</th>
+                    <th class="text-center">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="(item, index) in listInt" :key="index">
+                    <td scope="row">{{ item.instruction_id }}</td>
+                    <td>{{ item.transaction_code }}</td>
+                    <td class="text-center">
+                        <Type :type="item.instruction_type" />
+                    </td>
+                    <td>{{ item.assigned_vendor }}</td>
+                    <td>{{ formatDate(item.created_at) }}</td>
+                    <td>{{ item.attention_of }}</td>
+                    <td>{{ item.quotation_number }}</td>
+                    <td>{{ item.cust_po_number }}</td>
+                    <td><Pills :type="item.instruction_status" /></td>
+                </tr>
+            </tbody>
+        </DataTable>
+    </template>
+    <template v-else>
+        <Skeleton />
+    </template>
 </template>
 
 <script>
+import { reactive, toRefs, ref } from "vue";
+
 import DataTable from "datatables.net-vue3";
 import DataTablesCore from "datatables.net-bs5";
+import moment from "moment";
 
 import CreateButton from "./CreateButton.vue";
 import Type from "./Table/Type.vue";
 import Pills from "./Table/Pills.vue";
-
-import dataMock from "../../data";
+import Skeleton from "./Table/TableSkeleton.vue";
 
 DataTable.use(DataTablesCore);
 
@@ -62,28 +69,37 @@ const options = {
 };
 
 export default {
+    setup() {
+        const state = reactive({ listInt: [] });
+
+        axios
+            .get("http://127.0.0.1:8000/api/instruction/list/open")
+            .then((response) => {
+                state.listInt = response.data.data;
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+
+        return { ...toRefs(state) };
+    },
     components: {
         DataTable,
         CreateButton,
         Type,
         Pills,
+        Skeleton,
     },
     data() {
         return {
-            data: dataMock,
+            data: [],
             columns: columns,
             options: options,
         };
     },
-    computed: {
-        filteredData() {
-            return this.data.filter((item) => {
-                const instructionStatus = item.instruction_status;
-                return (
-                    instructionStatus === "Draft" ||
-                    instructionStatus === "In-Progress"
-                );
-            });
+    methods: {
+        formatDate(dateString) {
+            return moment(dateString).format("DD/MM/YY");
         },
     },
 };
