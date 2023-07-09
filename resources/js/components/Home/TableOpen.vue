@@ -1,79 +1,111 @@
 <template>
     <CreateButton class="mb-3" />
-    <table class="table table-hover">
-        <thead>
-            <tr class="table-secondary">
-                <th scope="col">Instruction ID</th>
-                <th scope="col">Link To</th>
-                <th scope="col">Instuction Type</th>
-                <th scope="col">Assigned Vendor</th>
-                <th scope="col">Issued Date</th>
-                <th scope="col">Attention Of</th>
-                <th scope="col">Quotation No.</th>
-                <th scope="col">Customer PO</th>
-                <th scope="col">Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <th scope="row">1</th>
-                <td>Mark</td>
-                <td><Type :type="'si'" /></td>
-                <td>Otto</td>
-                <td>Mark</td>
-                <td>Otto</td>
-                <td>Mark</td>
-                <td>Otto</td>
-                <td><Pills :type="'Draft'" /></td>
-            </tr>
-            <tr>
-                <th scope="row">1</th>
-                <td>Mark</td>
-                <td><Type :type="'si'" /></td>
-                <td>Otto</td>
-                <td>Mark</td>
-                <td>Otto</td>
-                <td>Mark</td>
-                <td>Otto</td>
-                <td><Pills :type="'Draft'" /></td>
-            </tr>
-            <tr>
-                <th scope="row">1</th>
-                <td>Mark</td>
-                <td><Type :type="'si'" /></td>
-                <td>Otto</td>
-                <td>Mark</td>
-                <td>Otto</td>
-                <td>Mark</td>
-                <td>Otto</td>
-                <td><Pills :type="'In-Progress'" /></td>
-            </tr>
-            <tr>
-                <th scope="row">1</th>
-                <td>Mark</td>
-                <td><Type :type="'si'" /></td>
-                <td>Otto</td>
-                <td>Mark</td>
-                <td>Otto</td>
-                <td>Mark</td>
-                <td>Otto</td>
-                <td><Pills :type="'In-Progress'" /></td>
-            </tr>
-        </tbody>
-    </table>
+    <template v-if="listInt && listInt.length">
+        <DataTable class="table table-hover display" :options="options">
+            <thead>
+                <tr class="table-secondary">
+                    <th>Instruction ID</th>
+                    <th>Link To</th>
+                    <th class="text-center">Instuction Type</th>
+                    <th>Assigned Vendor</th>
+                    <th>Issued Date</th>
+                    <th>Attention Of</th>
+                    <th>Quotation No.</th>
+                    <th>Customer PO</th>
+                    <th class="text-center">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="(item, index) in listInt" :key="index">
+                    <td scope="row">{{ item.instruction_id }}</td>
+                    <td>{{ item.transaction_code }}</td>
+                    <td class="text-center">
+                        <Type :type="item.instruction_type" />
+                    </td>
+                    <td>{{ item.assigned_vendor }}</td>
+                    <td>{{ formatDate(item.created_at) }}</td>
+                    <td>{{ item.attention_of }}</td>
+                    <td>{{ item.quotation_number }}</td>
+                    <td>{{ item.cust_po_number }}</td>
+                    <td><Pills :type="item.instruction_status" /></td>
+                </tr>
+            </tbody>
+        </DataTable>
+    </template>
+    <template v-else>
+        <Skeleton />
+    </template>
 </template>
 
 <script>
+import { reactive, toRefs, ref } from "vue";
+
+import DataTable from "datatables.net-vue3";
+import DataTablesCore from "datatables.net-bs5";
+import moment from "moment";
+
 import CreateButton from "./CreateButton.vue";
 import Type from "./Table/Type.vue";
 import Pills from "./Table/Pills.vue";
+import Skeleton from "./Table/TableSkeleton.vue";
+
+DataTable.use(DataTablesCore);
+
+const columns = [
+    { data: "instruction_id", title: "Instruction ID" },
+    { data: "invoice_to", title: "Link To" },
+    { data: "instruction_type", title: "Instruction Type", components: Type },
+    { data: "assigned_vendor", title: "Assigned Vendor" },
+    { data: "date_issued", title: "Issued date" },
+    { data: "attention_of", title: "Attention Of" },
+    { data: "quotation_number", title: "Quotation No." },
+    { data: "customer_PO_number", title: "Customer PO" },
+    { data: "instruction_status", title: "Status" },
+];
+
+const options = {
+    // searching: false,
+    // paging: false,
+};
+
 export default {
+    setup() {
+        const state = reactive({ listInt: [] });
+
+        axios
+            .get("http://127.0.0.1:8000/api/instruction/list/open")
+            .then((response) => {
+                state.listInt = response.data.data;
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+
+        return { ...toRefs(state) };
+    },
     components: {
+        DataTable,
         CreateButton,
         Type,
         Pills,
+        Skeleton,
+    },
+    data() {
+        return {
+            data: [],
+            columns: columns,
+            options: options,
+        };
+    },
+    methods: {
+        formatDate(dateString) {
+            return moment(dateString).format("DD/MM/YY");
+        },
     },
 };
 </script>
 
-<style></style>
+<style>
+@import "bootstrap";
+@import "datatables.net-bs5";
+</style>
