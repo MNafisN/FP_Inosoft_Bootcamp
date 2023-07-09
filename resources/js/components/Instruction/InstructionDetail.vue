@@ -23,7 +23,7 @@
             </div>
             <div class="col">
                 <span>Status</span>
-                <div class="rounded-pill bg-info-subtle w-50 h-fit">
+                <div :class="`${instructionDetail.instruction_status === 'Completed' ? 'text-bg-success' : 'bg-info-subtle'} rounded-pill w-50 h-fit`">
                     <p class="mx-auto my-0 text-center fs-7 py-1">{{ instructionDetail.instruction_status }}</p>
                 </div>
             </div>

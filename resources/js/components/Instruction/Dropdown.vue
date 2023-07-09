@@ -9,16 +9,8 @@
             @click="dropdown"
         />
         <div class="i-dropdown"></div>
-        <div
-            :class="
-                'position-absolute z-2 w-100 border border-2 rounded bg-white ' +
-                visible
-            "
-        >
-            <div
-                v-if="searchable"
-                class="border-bottom p-2 d-flex align-items-center gap-1"
-            >
+        <div :class="`position-absolute z-2 w-100 border border-2 rounded bg-white ${visible} ${upper ? 'upper' : null}`">
+            <div v-if="searchable" class="border-bottom p-2 d-flex align-items-center gap-1">
                 <div class="i-search"></div>
                 <input
                     type="text"
@@ -52,9 +44,9 @@
             </p>
         </div>
     </div>
-    <div :class="visible + 'window'" @click="dropdown"></div>
-    <div :class="modal + ' showModal'">
-        <div class="addInvoice">
+    <div :class="visible + ' window'" @click="dropdown"></div>
+    <div :class="modal + ' modal-background'">
+        <div class="modal-wrapper">
             <div class="d-flex m-1 pointer" @click="showModal">
                 <p class="mb-0 me-1 text-white">close</p>
                 <div class="i-close"></div>
@@ -100,6 +92,7 @@ export default {
         searchable: Boolean,
         addNew: Boolean,
         disable: Boolean,
+        upper: Boolean
     },
     emits: ['sendValue'],
     methods: {
@@ -150,41 +143,18 @@ li:hover {
     background-color: #e9baff;
 }
 .window {
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
+    height: 100%;
     top: 0;
     left: 0;
-    position: absolute;
+    position: fixed;
     z-index: 1;
-}
-.showModal {
-    width: 100vw;
-    height: 100vh;
-    position: absolute;
-    background-color: #00000073;
-    top: 0;
-    left: 0;
-    z-index: 99;
 }
 .invoiceButton {
     height: 35px;
 }
-.addInvoice {
-    position: absolute;
-    width: 600px;
-    height: 400px;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-}
-.submit {
-    width: 200px;
-    height: 50px;
-}
-.pointer {
-    cursor: pointer;
+.upper{
+    top: 0;
+    transform: translateY(-100%);
 }
 </style>

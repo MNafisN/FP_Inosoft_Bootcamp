@@ -2,7 +2,7 @@
     <div class="bg-white w-100 rounded shadow p-3 d-flex gap-2 align-items-end">
         <div class="w-25">
             <label for="link_to" class="fs-7">Link To</label>
-            <Dropdown input="Select Item" :selected="linkTo" :list="['satu', 'dua', 'tiga']" @send-value="(value)=> updateLinkTo(value)" />
+            <Dropdown input="Select Item" :selected="linkTo" :list="['satu', 'dua', 'tiga']" :upper="true" @send-value="(value)=> updateLinkTo(value)" />
         </div>
         <div>
             <button class="btn btn-danger fs-7 remove" @click="removeLinkTo">Remove Link</button>
@@ -34,9 +34,6 @@ export default {
 </script>
 
 <style scoped>
-.fs-7{
-    font-size: 0.8rem;
-}
 .remove{
     height: 38px;
     width: 120px;
