@@ -6,7 +6,7 @@
         <div class="col">
             <div class="d-flex align-items-center gap-1">
                 <div class="i-attachment"></div>
-                <span>{{ invoice.invoice_attachment.name }}</span>
+                <span>{{ invoice.invoice_attachment?.name }}</span>
             </div>
         </div>
         <div class="col d-flex">
@@ -16,13 +16,13 @@
             <div class="dropdown">
                 <button class="bulet bg-scondary-suble border-0 dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-e></button>
                 <ul class="dropdown-menu">
-                    <li v-for="data in invoice.supportingDocument" class="dropdown-item">{{ data.name }}</li>
+                    <li v-for="data in invoice.supporting_document" class="dropdown-item">{{ data.name }}</li>
                 </ul>
             </div>
         </div>
         <div class="col-1 d-flex align-items-center justify-content-end gap-3">
-            <div class="i-delete"></div>
-            <div class="i-modify"></div>
+            <div v-if="!isDisable" class="i-delete pointer" @click="deleteInvoice"></div>
+            <div v-if="!isDisable" class="i-modify pointer" @click="$emit('modify')"></div>
         </div>
     </div>
 </template>
@@ -31,13 +31,20 @@
 export default {
     name: "vendor-invoice-list",
     props: {
-        invoice: Object
+        invoice: Object,
+        index: Number,
+        isDisable: Boolean
     },
     computed: {
         supportingDocument() {
             return this.invoice.supporting_document.length
         }
     },
+    methods: {
+        deleteInvoice() {
+            this.$store.commit('deleteInvoice', this.index)
+        },
+    }
 }
 </script>
 

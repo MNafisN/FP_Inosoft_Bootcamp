@@ -2,16 +2,31 @@
     <div
         class="bg-white w-100 rounded-top shadow p-3 d-flex justify-content-end align-items-center gap-4"
     >
-        <span class="fs-7">Cancle</span>
-        <button class="btn border fw-medium fs-7 draft">Save as Draft</button>
-        <button class="btn btn-secondary fw-medium fs-7 submit">Submit</button>
+        <router-link to="/app" class="text-black text-decoration-none">
+            <span class="fs-7">Cancle</span>
+        </router-link>
+        <button class="btn border fw-medium fs-7 draft" @click="draft">Save as Draft</button>
+        <button class="btn btn-secondary fw-medium fs-7 submit" @click="submit">Submit</button>
     </div>
 </template>
 
-<style scoped>
-.fs-7{
-    font-size: 0.8rem;
+<script>
+export default {
+    name: 'submit-instruction',
+    methods: {
+        submit() {
+            this.$store.dispatch('submitInstruction')
+            this.$router.push('/app')
+        },
+        draft() {
+            this.$store.dispatch('saveAsDraft')
+            this.$router.push('/app')
+        }
+    }
 }
+</script>
+
+<style scoped>
 .draft{
     width: 150px;
     height: 40px;

@@ -4,39 +4,19 @@
     </div>
     <div class="bg-white w-100 shadow p-3">
         <div class="row">
-            <div class="col-5">
+            <div class="col-5 pb-3 pembatas">
                 <span>Attachment</span>
             </div>
             <div class="col-7">
                 <span>Notes</span>
             </div>
         </div>
-        <br>
         <div class="row">
-            <div class="col-5">
-                <AttachmentFile v-for="file in attachmentData" :file="file" />
-                <input
-                    type="file"
-                    id="attachmentInternal"
-                    class="d-none"
-                    @change="e=> upload(e.target.files[0])"
-                />
-                <label for="attachmentInternal" class="btn btn-secondary my-2 w-180px">
-                    <div v-if="!isUpload">
-                        <div class="i-plus d-inline-block me-1"></div>
-                        <span> Add Attachment</span>
-                    </div>
-                    <div v-else class="d-flex align-items-center gap-2 justify-content-center">
-                        <div class="loader d-inline-block"></div>
-                        <span class="fw-semibold">Uploading...</span>
-                    </div>
-                </label>
+            <div class="col-5 pembatas">
+                <AttachmentFile id-name="attachmentInternalOnly" :files="attachmentData" @upload="addFile" @delete-by-index="deleteFile" />
             </div>
             <div class="col-7">
-                <button class="btn btn-secondary my-2 w-180px">
-                    <div class="i-plus d-inline-block me-1"></div>
-                    <span> Add Internal Notes</span>
-                </button>
+                <InternalNotes />
             </div>
         </div>
     </div>
@@ -44,56 +24,33 @@
 
 <script>
 import AttachmentFile from './AttachmentFile.vue'
+import InternalNotes from './InternalNotes.vue'
 export default {
     name: 'internal-only',
     data() {
         return {
-            isUpload: false
+            isUpload: false,
         }
     },
-    components: { AttachmentFile },
+    components: { AttachmentFile, InternalNotes },
     computed: {
         attachmentData() {
-            return this.$store.getters.getAttachmentInternalList
+            return this.$store.getters.getAttachmentInternalOnly
         }
     },
     methods: {
-        upload(file) {
-            this.isUpload = true
-            setTimeout(()=>{
-                this.$store.commit("uploadAttachmentInternal", {
-                    name: file.name,
-                    info: "test",
-                    link: "test",
-                })
-                this.isUpload = false
-            }, 2000)
+        addFile(file) {
+            this.$store.commit('addAttachmentInternalOnly', file)
         },
-
+        deleteFile(index) {
+            this.$store.commit('deleteAttachmentInternalOnly', index)
+        }
     }
 }
 </script>
 
 <style scoped>
-.w-180px{
-    width: 180px;
-}
-.loader {
-  border: 4px solid #ffffffc7;
-  border-left-color: transparent;
-  width: 25px;
-  height: 25px;
-  border-radius: 50%;
-  animation: spin89345 1s linear infinite;
-}
-
-@keyframes spin89345 {
-  0% {
-    transform: rotate(0deg);
-  }
-
-  100% {
-    transform: rotate(360deg);
-  }
+.pembatas{
+    border-right: 1px dashed black;
 }
 </style>

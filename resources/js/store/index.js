@@ -36,43 +36,12 @@ const store = createStore({
                 ],
                 notes: null,
                 transaction_code: "",
-                invoices: [
-                    {
-                        invoice_no: "AAL-008",
-                        invoice_attachment: {
-                            name: "AAL-008",
-                            link: ""
-                        },
-                        supporting_document: [
-                            {
-                                name: 'ABC-001',
-                                link: ""
-                            },
-                            {
-                                name: 'ABC-001',
-                                link: ""
-                            },
-                        ]
-                    },
-                    {
-                        invoice_no: "AAL-008",
-                        invoice_attachment: {
-                            name: "AAL-008",
-                            link: ""
-                        },
-                        supporting_document: [
-                            {
-                                name: 'ABC-001',
-                                link: ""
-                            },
-                            {
-                                name: 'ABC-001',
-                                link: ""
-                            },
-                        ]
-                    },
-                ],
-                termination: [],
+                invoices: [],
+                termination: {
+                    user: "User",
+                    description: "Test",
+                    attachment: []
+                },
                 instruction_status: "Draft",
             },
             link_to: "",
@@ -84,11 +53,20 @@ const store = createStore({
                         link: "",
                     },
                 ],
-                notes: []
+                notes: [
+                    {
+                        value: "ini adalah contoh untuk notes",
+                        user: "User",
+                        time: "08/07/23 05:12 PM"
+                    }
+                ]
             }
         };
     },
     getters: {
+        getStatus(state) {
+            return state.instructionData.instruction_status
+        },
         listCostTable(state) {
             return state.instructionData.cost_detail.length;
         },
@@ -203,14 +181,29 @@ const store = createStore({
         getLinkTo(state) {
             return state.link_to
         },
-        getVendorInvoiceData(state) {
+        getVendorInvoiceAll(state) {
             return state.instructionData.invoices
         },
-        getAttachmentInternalList(state) {
+        getVendorInvoice: (state)=> (index)=> {
+            return state.instructionData.invoices[index]
+        },
+        getAttachmentInternalOnly(state) {
             return state.internalOnly.attachment
+        },
+        getNotesInternalOnlyAll(state) {
+            return state.internalOnly.notes
+        },
+        getNotesInternalOnly: (state)=> (index)=> {
+            return state.internalOnly.notes[index].value
+        },
+        getAttachmentTerminate(state) {
+            return state.instructionData.termination.attachment
         }
     },
     mutations: {
+        updateStatus(state, payload) {
+            state.instructionData.instruction_status = payload
+        },
         addCostList(state) {
             state.instructionData.cost_detail.push({
                 cost_description: "",
@@ -285,6 +278,42 @@ const store = createStore({
         uploadAttachmentInternal(state, payload) {
             state.internalOnly.attachment.push(payload)
         },
+        addInvoices(state, payload) {
+            state.instructionData.invoices.push(payload)
+        },
+        deleteInvoice(state, i) {
+            state.instructionData.invoices.splice(i,1)
+        },
+        updateInvoice(state, payload) {
+            state.instructionData.invoices[payload.index] = payload.invoice
+            console.log('edit invoice');
+        },
+        addAttachmentInternalOnly(state, payload) {
+            state.internalOnly.attachment.push(payload)
+        },
+        deleteAttachmentInternalOnly(state, i) {
+            state.internalOnly.attachment.splice(i, 1)
+        },
+        addNotesInternalOnly(state, payload) {
+            state.internalOnly.notes.push(payload)
+        },
+        deleteNotesInternalOnly(state, i) {
+            state.internalOnly.notes.splice(i, 1)
+        },
+        updateNotesInternalOnly(state, payload) {
+            state.internalOnly.notes[payload.index] = payload.data
+        },
+        addAttachmentTerminate(state, payload) {
+            state.instructionData.termination.attachment.push(payload)
+        },
+        deleteAttachmentTerminate(state, i) {
+            state.instructionData.termination.attachment.splice(i, 1)
+        },
+        terminateInstruction(state, payload) {
+            state.instructionData.termination.user = payload.user
+            state.instructionData.termination.description = payload.description
+            state.instructionData.instruction_status = "Canceled"
+        }
     },
     actions: {
     },
