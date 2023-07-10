@@ -39,6 +39,8 @@ Route::group([
     'prefix' => 'instruction',
     'middleware' => 'auth:api'
 ], function() {
+    Route::get('/exportExcel', [InstructionController::class, 'exportExcel']);
+
     Route::get('download/{id}/{file_name}', [InstructionController::class, 'downloadAttachment']);
     Route::get('download/{id}/invoice/{invoice_no}/{file_name}', [InstructionController::class, 'downloadInvoiceAttachment']);
     Route::get('download/{id}/invoice/supporting/{invoice_no}/{file_name}', [InstructionController::class, 'downloadInvoiceSupportingDocument']);

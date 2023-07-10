@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Models\Instruction;
 use Illuminate\Support\Facades\Storage;
+use App\Exports\InstructionExport;
 
 class InstructionRepository
 {
@@ -12,6 +13,14 @@ class InstructionRepository
     public function __construct(Instruction $instruction)
     {
         $this->instruction = $instruction;
+    }
+
+    /**
+     * untuk export file excel daftar instruksi
+     */
+    public function export()
+    {
+        return (new InstructionExport)->download('instructions.xlsx');
     }
 
     /**

@@ -17,6 +17,19 @@ class InstructionController extends Controller
         $this->instructionService = $instructionService;
     }
 
+    public function exportExcel()
+    {
+        try {
+            $instructions = $this->instructionService->exportExcel();
+            return $instructions;
+        } catch (Exception $err) {
+            return response()->json([
+                'status' => 404,
+                'error' => $err->getMessage()
+            ], 404);
+        }
+    }
+
     public function downloadAttachment(Request $request)
     {
         // return response()->download(storage_path('/app/public/documents/instructions/LI-2023-0003/attachments/Project_Assignment_3_Backend (B5).pdf'), 'Project_Assignment_3_Backend (B5).pdf');

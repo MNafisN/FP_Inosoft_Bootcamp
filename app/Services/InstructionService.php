@@ -38,6 +38,12 @@ class InstructionService
         $this->internalRepository = $internalRepository;
     }
 
+    public function exportExcel()
+    {
+        $instructions = $this->instructionRepository->export();
+        return $instructions;
+    }
+
     public function downloadAttachment(string $instructionId, string $fileName)
     {
         $idDecoder = urldecode($instructionId);

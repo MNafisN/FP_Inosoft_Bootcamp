@@ -46,12 +46,12 @@ class InstructionFactory extends Factory
             'cost_detail' => [],
             'attachment' => [],
             'notes' => fake()->text(50),
-            'transaction_code' => fake()->unique()->numerify(
+            'transaction_code' => fake()->numerify(
                 $transactionCode . fake()->numberBetween(2020, 2023) . '-####'
             ),
             'invoices' => [],
             'termination' => [],
-            'instruction_status' => 'Draft',
+            'instruction_status' => fake()->randomElement(['Draft', 'In Progress', 'Cancelled', 'Completed']),
         ];
     }
 }
