@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Models\Instruction;
 use Illuminate\Support\Facades\Storage;
+use App\Exports\InstructionExport;
 
 class InstructionRepository
 {
@@ -15,11 +16,19 @@ class InstructionRepository
     }
 
     /**
+     * untuk export file excel daftar instruksi
+     */
+    public function export()
+    {
+        return (new InstructionExport)->download('instructions.xlsx');
+    }
+
+    /**
      * untuk download file attachments
      */
     public function downloadAttachment(string $instructionId, string $path, string $fileName)
     {
-        return Storage::download("/documents/instructions/" . substr($instructionId, 0, 12) . $path . $fileName, $fileName);
+        return Storage::download("/documents/instructions/" . $instructionId . $path . $fileName, $fileName);
     }
 
     /** 
@@ -57,7 +66,8 @@ class InstructionRepository
      */
     public function getById(string $instructionId) : ?Object
     {
-        $instruction = $this->instruction->where('instruction_id', $instructionId)->first();
+        $id = substr($instructionId, 0, 12);
+        $instruction = $this->instruction->where('instruction_id', 'LIKE', '%'.$id.'%')->first();
         return $instruction;
     }
 
@@ -68,7 +78,7 @@ class InstructionRepository
     {
         if (array_key_exists('instruction_id', $data)) {
             $instruction = $this->getById($data['instruction_id']);
-            $revision = substr($data['instruction_id'], -3);
+            $revision = substr($instruction->instruction_id, -3);
             $revisionNumber = substr($revision, -2);
             if (str_contains($revision, 'R')) {
                 $revisionNumber++;

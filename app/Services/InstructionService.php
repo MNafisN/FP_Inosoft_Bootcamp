@@ -38,6 +38,12 @@ class InstructionService
         $this->internalRepository = $internalRepository;
     }
 
+    public function exportExcel()
+    {
+        $instructions = $this->instructionRepository->export();
+        return $instructions;
+    }
+
     public function downloadAttachment(string $instructionId, string $fileName)
     {
         $idDecoder = urldecode($instructionId);
@@ -356,6 +362,7 @@ class InstructionService
         $formData['file_name'] = $fileName;
 
         $updatedInstruction = $this->instructionRepository->saveAttachment($formData, 'store');
+        $this->getInternal($updatedInstruction->instruction_id);
         $this->storeActivity($updatedInstruction->instruction_id, "3rd Party Instruction Attachment '" . $fileName . "' Uploaded");
         return $updatedInstruction;
     }
@@ -382,6 +389,7 @@ class InstructionService
         }
 
         $updatedInstruction = $this->instructionRepository->saveAttachment($formData, 'delete');
+        $this->getInternal($updatedInstruction->instruction_id);
         $this->storeActivity($updatedInstruction->instruction_id, 'A 3rd Party Instruction Attachment Deleted');
         return $updatedInstruction;
     }
@@ -426,6 +434,7 @@ class InstructionService
         }
 
         $updatedInstruction = $this->instructionRepository->saveInvoice($formData, 'store');
+        $this->getInternal($updatedInstruction->instruction_id);
         $this->storeActivity($updatedInstruction->instruction_id, "3rd Party Instruction Vendor Invoice Number '" . $formData['invoice_number'] . "' Added");
         return $updatedInstruction;
     }
@@ -471,6 +480,7 @@ class InstructionService
         }
 
         $updatedInstruction = $this->instructionRepository->saveInvoice($formData, 'update');
+        $this->getInternal($updatedInstruction->instruction_id);
         $this->storeActivity($updatedInstruction->instruction_id, "3rd Party Instruction Vendor Invoice Number '" . $formData['invoice_number'] . "' Modified");
         return $updatedInstruction;
     }
@@ -497,6 +507,7 @@ class InstructionService
         }
 
         $updatedInstruction = $this->instructionRepository->saveInvoice($formData, 'delete');
+        $this->getInternal($updatedInstruction->instruction_id);
         $this->storeActivity($updatedInstruction->instruction_id, "A 3rd Party Instruction Invoice Vendor Removed");
         return $updatedInstruction;
     }
@@ -617,6 +628,7 @@ class InstructionService
             throw ValidationException::withMessages(['ERROR VENDOR NOT AVAILABLE']);
         }
 
+        $this->getInternal($updatedInstruction->instruction_id);
         $this->storeActivity($updatedInstruction->instruction_id, "3rd Party Instruction Modified");
 
         return $updatedInstruction;
@@ -670,6 +682,7 @@ class InstructionService
             throw new InvalidArgumentException('Belum ada vendor invoice yang dapat diterima');
         }
 
+        $this->getInternal($completedInstruction->instruction_id);
         $this->storeActivity($completedInstruction->instruction_id, "Receive All Invoice 3rd Party Instruction");
 
         return $completedInstruction;
@@ -693,6 +706,7 @@ class InstructionService
             throw new InvalidArgumentException('Alasan pembatalan belum ada');
         }
 
+        $this->getInternal($cancelledInstruction->instruction_id);
         $this->storeActivity($cancelledInstruction->instruction_id, "3rd Party Instruction Cancelled");
 
         return $cancelledInstruction;
