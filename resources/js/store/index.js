@@ -1,21 +1,22 @@
+import axios from "axios";
 import { createStore } from "vuex";
 
 const store = createStore({
     state() {
         return {
             instructionData: {
-                instruction_id: "test",
+                instruction_id: "",
                 instruction_type: "Logistic Instruction",
-                assigned_vendor: "test",
-                vendor_address: "vendor vendoran",
-                attention_of: "anu",
+                assigned_vendor: "",
+                vendor_address: "",
+                attention_of: "",
                 quotation_number: 0,
-                invoice_to: "yg maha kuasa",
-                customer_contact: "08sakteruse",
-                cust_po_number: "abc-123",
+                invoice_to: "",
+                customer_contact: "",
+                cust_po_number: "",
                 cost_detail: [
                     {
-                        cost_description: "test",
+                        cost_description: "",
                         quantity: 0,
                         unit_of_measurement: "SHP",
                         unit_price: 0,
@@ -44,7 +45,6 @@ const store = createStore({
                 },
                 instruction_status: "Draft",
             },
-            link_to: "",
             internalOnly: {
                 attachment: [
                     {
@@ -60,6 +60,11 @@ const store = createStore({
                         time: "08/07/23 05:12 PM"
                     }
                 ]
+            },
+            formData: {
+                customers: [],
+                transactions: [],
+                vendors: []
             }
         };
     },
@@ -82,6 +87,9 @@ const store = createStore({
                 cust_po_number: state.instructionData.cust_po_number,
                 instruction_status: state.instructionData.instruction_status
             };
+        },
+        getTransactionCode(state) {
+            return state.instructionData.transaction_code
         },
         getCostData: (state) => (index) => {
             return state.instructionData.cost_detail[index];
@@ -178,9 +186,6 @@ const store = createStore({
                 }
             )
         },
-        getLinkTo(state) {
-            return state.link_to
-        },
         getVendorInvoiceAll(state) {
             return state.instructionData.invoices
         },
@@ -198,11 +203,38 @@ const store = createStore({
         },
         getAttachmentTerminate(state) {
             return state.instructionData.termination.attachment
+        },
+        getFormData(state) {
+            return state.formData
         }
     },
     mutations: {
         updateStatus(state, payload) {
             state.instructionData.instruction_status = payload
+        },
+        updateInstructionType(state, payload) {            
+            state.instructionData.instruction_type = payload
+        },
+        updateAssignedVendor(state, payload) {
+            state.instructionData.assigned_vendor = payload
+        },
+        updateVendorAddress(state, payload) {
+            state.instructionData.vendor_address = payload
+        },
+        updateAttentionOf(state, payload) {
+            state.instructionData.attention_of = payload
+        },
+        updateQuotationNumber(state, payload) {
+            state.instructionData.quotation_number = payload
+        },
+        updateInvoiceTo(state, payload) {
+            state.instructionData.invoice_to = payload
+        },
+        updateCustomerContract(state, payload) {
+            state.instructionData.customer_contact = payload
+        },
+        updatePoNumber(state, payload) {
+            state.instructionData.cust_po_number = payload
         },
         addCostList(state) {
             state.instructionData.cost_detail.push({
@@ -313,9 +345,17 @@ const store = createStore({
             state.instructionData.termination.user = payload.user
             state.instructionData.termination.description = payload.description
             state.instructionData.instruction_status = "Canceled"
+        },
+        setFormData(state, payload) {
+            state.formData = payload
         }
     },
     actions: {
+        async getFormData(context) {
+            const data = (await axios.get('http://127.0.0.1:8000/api/instruction/addNew')).data
+            context.commit('setFormData', await data.form_data)
+            console.log(data);
+        }
     },
 });
 
