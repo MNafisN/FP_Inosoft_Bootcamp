@@ -30,5 +30,8 @@ export default {
         SubmitInstruction,
         LinkTo
     },
+    mounted() {
+        this.$store.dispatch('getFormData')
+    }
 };
 </script>
