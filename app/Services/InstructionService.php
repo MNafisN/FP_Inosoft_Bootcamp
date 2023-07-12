@@ -7,6 +7,7 @@ use App\Repositories\CustomerRepository;
 use App\Repositories\TransactionRepository;
 use App\Repositories\VendorRepository;
 use App\Repositories\InternalRepository;
+use App\Repositories\AttachmentRepository;
 
 use Illuminate\Http\Request;
 use MongoDB\Exception\InvalidArgumentException;
@@ -22,13 +23,15 @@ class InstructionService
     protected $vendorRepository;
     protected $transactionRepository;
     protected $internalRepository;
+    protected $attachmentRepository;
 
     public function __construct(
             InstructionRepository $instructionRepository,
             CustomerRepository $customerRepository,
             TransactionRepository $transactionRepository,
             VendorRepository $vendorRepository,
-            InternalRepository $internalRepository
+            InternalRepository $internalRepository,
+            AttachmentRepository $attachmentRepository
         )
     {
         $this->instructionRepository = $instructionRepository;
@@ -36,6 +39,7 @@ class InstructionService
         $this->transactionRepository = $transactionRepository;
         $this->vendorRepository = $vendorRepository;
         $this->internalRepository = $internalRepository;
+        $this->attachmentRepository = $attachmentRepository;
     }
 
     public function exportExcel()
@@ -44,75 +48,120 @@ class InstructionService
         return $instructions;
     }
 
-    public function downloadAttachment(string $instructionId, string $fileName)
+    public function uploadFile(array $data)
     {
-        $idDecoder = urldecode($instructionId);
-        $fileDecoder = urldecode($fileName);
-        $instruction = $this->instructionRepository->getById($idDecoder);
-        if (!$instruction) {
-            throw new InvalidArgumentException('Data instruksi tidak ditemukan');
+        $validator = Validator::make($data, [
+            'attachment' => 'required|mimes:jpg,jpeg,png,pdf|max:20000',
+        ],
+        [
+            'attachment.required' => 'Please upload a file',
+            'attachment.mimes' => 'Only jpeg, png and pdf images are allowed',
+            'attachment.max' => 'Sorry! Maximum allowed size for a file is 20MB',
+        ]);
+
+        if ($validator->fails()) {
+            throw new InvalidArgumentException($validator->errors()->first());
         }
 
-        $file = $this->instructionRepository->downloadAttachment($idDecoder, '/attachments/', $fileDecoder);
-        // if (!$file) {
-        //     throw new InvalidArgumentException();
-        // }
+        $data['posted_by'] = auth()->user()['username'];
+        $data['file_name'] = pathinfo($data['attachment']->getClientOriginalName(), PATHINFO_FILENAME) . date('YmdHis') . "." . $data['attachment']->getClientOriginalExtension();
+        $attachment = $this->attachmentRepository->saveNew($data);
+
+        return $attachment;
+    }
+
+    public function downloadFile(string $fileName)
+    {
+        $fileDecoder = urldecode($fileName);
+        $attachment = $this->attachmentRepository->getByName($fileDecoder);
+        if (!$attachment) {
+            throw new InvalidArgumentException('File not found');
+        }
+        $file = $this->attachmentRepository->download($fileDecoder);
         return $file;
     }
 
-    public function downloadInvoiceAttachment(string $instructionId, string $invoiceNumber, string $fileName)
+    public function deleteFile(string $fileName): string
     {
-        $idDecoder = urldecode($instructionId);
-        $invoiceDecoder = urldecode($invoiceNumber);
         $fileDecoder = urldecode($fileName);
-        $instruction = $this->instructionRepository->getById($idDecoder);
-        if (!$instruction) {
-            throw new InvalidArgumentException('Data instruksi tidak ditemukan');
+        $attachment = $this->attachmentRepository->getByName($fileDecoder);
+        if (!$attachment) {
+            throw new InvalidArgumentException('File not found');
         }
-
-        $file = $this->instructionRepository->downloadAttachment($idDecoder, "/invoices/" . $invoiceDecoder . "/", $fileDecoder);
-        return $file;
+        // dd($attachment->file_name);
+        $this->attachmentRepository->delete($attachment->file_name);
+        return $attachment->file_name;
     }
 
-    public function downloadInvoiceSupportingDocument(string $instructionId, string $invoiceNumber, string $fileName)
-    {
-        $idDecoder = urldecode($instructionId);
-        $invoiceDecoder = urldecode($invoiceNumber);
-        $fileDecoder = urldecode($fileName);
-        $instruction = $this->instructionRepository->getById($idDecoder);
-        if (!$instruction) {
-            throw new InvalidArgumentException('Data instruksi tidak ditemukan');
-        }
+    // public function downloadAttachment(string $instructionId, string $fileName)
+    // {
+    //     $idDecoder = urldecode($instructionId);
+    //     $fileDecoder = urldecode($fileName);
+    //     $instruction = $this->instructionRepository->getById($idDecoder);
+    //     if (!$instruction) {
+    //         throw new InvalidArgumentException('Data instruksi tidak ditemukan');
+    //     }
 
-        $file = $this->instructionRepository->downloadAttachment($idDecoder, "/invoices/" . $invoiceDecoder . "/supporting_document/", $fileDecoder);
-        return $file;
-    }
+    //     $file = $this->instructionRepository->downloadAttachment($idDecoder, '/attachments/', $fileDecoder);
+    //     // if (!$file) {
+    //     //     throw new InvalidArgumentException();
+    //     // }
+    //     return $file;
+    // }
 
-    public function downloadTerminationAttachment(string $instructionId, string $fileName)
-    {
-        $idDecoder = urldecode($instructionId);
-        $fileDecoder = urldecode($fileName);
-        $instruction = $this->instructionRepository->getById($idDecoder);
-        if (!$instruction) {
-            throw new InvalidArgumentException('Data instruksi tidak ditemukan');
-        }
+    // public function downloadInvoiceAttachment(string $instructionId, string $invoiceNumber, string $fileName)
+    // {
+    //     $idDecoder = urldecode($instructionId);
+    //     $invoiceDecoder = urldecode($invoiceNumber);
+    //     $fileDecoder = urldecode($fileName);
+    //     $instruction = $this->instructionRepository->getById($idDecoder);
+    //     if (!$instruction) {
+    //         throw new InvalidArgumentException('Data instruksi tidak ditemukan');
+    //     }
 
-        $file = $this->instructionRepository->downloadAttachment($idDecoder, '/termination_attachment/', $fileDecoder);
-        return $file;
-    }
+    //     $file = $this->instructionRepository->downloadAttachment($idDecoder, "/invoices/" . $invoiceDecoder . "/", $fileDecoder);
+    //     return $file;
+    // }
 
-    public function downloadInternalAttachment(string $instructionId, string $fileName)
-    {
-        $idDecoder = urldecode($instructionId);
-        $fileDecoder = urldecode($fileName);
-        $instruction = $this->instructionRepository->getById($idDecoder);
-        if (!$instruction) {
-            throw new InvalidArgumentException('Data instruksi tidak ditemukan');
-        }
+    // public function downloadInvoiceSupportingDocument(string $instructionId, string $invoiceNumber, string $fileName)
+    // {
+    //     $idDecoder = urldecode($instructionId);
+    //     $invoiceDecoder = urldecode($invoiceNumber);
+    //     $fileDecoder = urldecode($fileName);
+    //     $instruction = $this->instructionRepository->getById($idDecoder);
+    //     if (!$instruction) {
+    //         throw new InvalidArgumentException('Data instruksi tidak ditemukan');
+    //     }
 
-        $file = $this->internalRepository->downloadAttachment($idDecoder, $fileDecoder);
-        return $file;
-    }
+    //     $file = $this->instructionRepository->downloadAttachment($idDecoder, "/invoices/" . $invoiceDecoder . "/supporting_document/", $fileDecoder);
+    //     return $file;
+    // }
+
+    // public function downloadTerminationAttachment(string $instructionId, string $fileName)
+    // {
+    //     $idDecoder = urldecode($instructionId);
+    //     $fileDecoder = urldecode($fileName);
+    //     $instruction = $this->instructionRepository->getById($idDecoder);
+    //     if (!$instruction) {
+    //         throw new InvalidArgumentException('Data instruksi tidak ditemukan');
+    //     }
+
+    //     $file = $this->instructionRepository->downloadAttachment($idDecoder, '/termination_attachment/', $fileDecoder);
+    //     return $file;
+    // }
+
+    // public function downloadInternalAttachment(string $instructionId, string $fileName)
+    // {
+    //     $idDecoder = urldecode($instructionId);
+    //     $fileDecoder = urldecode($fileName);
+    //     $instruction = $this->instructionRepository->getById($idDecoder);
+    //     if (!$instruction) {
+    //         throw new InvalidArgumentException('Data instruksi tidak ditemukan');
+    //     }
+
+    //     $file = $this->internalRepository->downloadAttachment($idDecoder, $fileDecoder);
+    //     return $file;
+    // }
 
     /**
      * untuk menyimpan log instruksi pada internal only
@@ -251,17 +300,12 @@ class InstructionService
             'customer_contact' => 'sometimes|required',
             'cust_po_number' => 'nullable|required',
             'cost_detail' => 'required',
-            'attachment.*' => 'sometimes|nullable|mimes:jpg,jpeg,png,pdf|max:20000',
+            'attachment.*' => 'sometimes|nullable',
             'notes' => 'nullable',
             'transaction_code' => 'sometimes|required',
             'invoices' => 'sometimes|nullable',
             'termination' => 'sometimes|nullable',
             'instruction_status' => 'required'
-        ],
-        [
-            // 'attachment.*.required' => 'Please upload a file',
-            'attachment.*.mimes' => 'Only jpeg, png and pdf images are allowed',
-            'attachment.*.max' => 'Sorry! Maximum allowed size for a file is 20MB',
         ]);
 
         if ($formData['cost_detail']) {
@@ -296,11 +340,14 @@ class InstructionService
             throw ValidationException::withMessages($errMessageBag);
         }
 
-        $document = $request->file('attachment');
-
-        foreach ($formData['attachment'] as $key => $file) {
-            $formData['attachment'][$key] = $document[$key];
-            $formData['file_name'][$key] = $document[$key]->getClientOriginalName();
+        if ($formData['attachment'] != null) {
+            $document = $request->file('attachment');
+            foreach ($formData['attachment'] as $key => $file) {
+                // $formData['attachment'][$key] = $document[$key];
+                $formData['file_name'][$key]['file_name'] = $document[$key]->getClientOriginalName();
+                $formData['file_name'][$key]['posted_by'] = auth()->user()['username'];
+                $formData['file_name'][$key]['created_at'] = (string)Carbon::now('+7:00');
+            }
         }
 
         $newInstruction = $this->instructionRepository->save($formData);
@@ -336,12 +383,7 @@ class InstructionService
     {
         $validator = Validator::make($formData, [
             'instruction_id' => 'required|string',
-            'attachment' => 'required|mimes:jpg,jpeg,png,pdf|max:20000',
-        ],
-        [
-            'attachment.required' => 'Please upload a file',
-            'attachment.mimes' => 'Only jpeg, png and pdf images are allowed',
-            'attachment.max' => 'Sorry! Maximum allowed size for a file is 20MB',
+            'attachment' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -355,15 +397,13 @@ class InstructionService
             throw ValidationException::withMessages(['Data instruksi tidak ditemukan']);
         }
 
-        $document = $request->file('attachment');
-        $fileName = $document->getClientOriginalName();
-
-        $formData['attachment'] = $document;
-        $formData['file_name'] = $fileName;
+        $formData['file_name']['file_name'] = $formData['attachment']->getClientOriginalName();
+        $formData['file_name']['posted_by'] = auth()->user()['username'];
+        $formData['file_name']['created_at'] = (string)Carbon::now('+7:00');
 
         $updatedInstruction = $this->instructionRepository->saveAttachment($formData, 'store');
         $this->getInternal($updatedInstruction->instruction_id);
-        $this->storeActivity($updatedInstruction->instruction_id, "3rd Party Instruction Attachment '" . $fileName . "' Uploaded");
+        $this->storeActivity($updatedInstruction->instruction_id, "A 3rd Party Instruction Attachment '" . $formData['attachment']->getClientOriginalName() . "' Uploaded");
         return $updatedInstruction;
     }
 
@@ -402,16 +442,8 @@ class InstructionService
         $validator = Validator::make($formData, [
             'instruction_id' => 'required|string',
             'invoice_number' => 'required|string',
-            'invoice_attachment' => 'required|mimes:jpg,jpeg,png,pdf|max:20000',
-            'invoice_supporting_document' => 'sometimes|nullable||mimes:jpg,jpeg,png,pdf|max:20000',
-        ],
-        [
-            'invoice_attachment.required' => 'Please upload a file',
-            'invoice_attachment.mimes' => 'Only jpeg, png and pdf images are allowed',
-            'invoice_attachment.max' => 'Sorry! Maximum allowed size for a file is 20MB',
-            // 'invoice_supporting_document.required' => 'Please upload a file',
-            'invoice_supporting_document.mimes' => 'Only jpeg, png and pdf images are allowed',
-            'invoice_supporting_document.max' => 'Sorry! Maximum allowed size for a file is 20MB',
+            'invoice_attachment' => 'required',
+            'invoice_supporting_document.*' => 'sometimes|nullable',
         ]);
 
         if ($validator->fails()) {
@@ -425,12 +457,18 @@ class InstructionService
             throw ValidationException::withMessages(['Data instruksi tidak ditemukan']);
         }
 
-        $invoiceAttachment = $request->file('invoice_attachment');
-        $formData['invoice_attachment'] = $invoiceAttachment;
+        $formData['invoice_attachment_name']['file_name'] = $formData['invoice_attachment']->getClientOriginalName();
+        $formData['invoice_attachment_name']['posted_by'] = auth()->user()['username'];
+        $formData['invoice_attachment_name']['created_at'] = (string)Carbon::now('+7:00');
 
-        if ($request->hasFile('invoice_supporting_document')) {
-            $supportingDocument = $request->file("invoice_supporting_document");
-            $formData['invoice_supporting_document'] = $supportingDocument;    
+        if ($formData['invoice_supporting_document'] != null) {
+            $document = $request->file('invoice_supporting_document');
+            foreach ($formData['invoice_supporting_document'] as $key => $file) {
+                // $formData['attachment'][$key] = $document[$key];
+                $formData['invoice_supporting_document_name'][$key]['file_name'] = $document[$key]->getClientOriginalName();
+                $formData['invoice_supporting_document_name'][$key]['posted_by'] = auth()->user()['username'];
+                $formData['invoice_supporting_document_name'][$key]['created_at'] = (string)Carbon::now('+7:00');
+            }
         }
 
         $updatedInstruction = $this->instructionRepository->saveInvoice($formData, 'store');
@@ -448,16 +486,8 @@ class InstructionService
             'instruction_id' => 'required|string',
             'index' => 'required|integer',
             'invoice_number' => 'required|string',
-            'invoice_attachment' => 'required|mimes:jpg,jpeg,png,pdf|max:20000',
-            'invoice_supporting_document' => 'sometimes|nullable||mimes:jpg,jpeg,png,pdf|max:20000',
-        ],
-        [
-            'invoice_attachment.required' => 'Please upload a file',
-            'invoice_attachment.mimes' => 'Only jpeg, png and pdf images are allowed',
-            'invoice_attachment.max' => 'Sorry! Maximum allowed size for a file is 20MB',
-            // 'invoice_supporting_document.required' => 'Please upload a file',
-            'invoice_supporting_document.mimes' => 'Only jpeg, png and pdf images are allowed',
-            'invoice_supporting_document.max' => 'Sorry! Maximum allowed size for a file is 20MB',
+            'invoice_attachment' => 'required',
+            'invoice_supporting_document.*' => 'sometimes|nullable',
         ]);
 
         if ($validator->fails()) {
@@ -471,12 +501,18 @@ class InstructionService
             throw ValidationException::withMessages(['Data instruksi tidak ditemukan']);
         }
 
-        $invoiceAttachment = $request->file('invoice_attachment');
-        $formData['invoice_attachment'] = $invoiceAttachment;
+        $formData['invoice_attachment_name']['file_name'] = $formData['invoice_attachment']->getClientOriginalName();
+        $formData['invoice_attachment_name']['posted_by'] = auth()->user()['username'];
+        $formData['invoice_attachment_name']['created_at'] = (string)Carbon::now('+7:00');
 
-        if ($request->hasFile('invoice_supporting_document')) {
-            $supportingDocument = $request->file("invoice_supporting_document");
-            $formData['invoice_supporting_document'] = $supportingDocument;    
+        if ($formData['invoice_supporting_document'] != null) {
+            $document = $request->file('invoice_supporting_document');
+            foreach ($formData['invoice_supporting_document'] as $key => $file) {
+                // $formData['attachment'][$key] = $document[$key];
+                $formData['invoice_supporting_document_name'][$key]['file_name'] = $document[$key]->getClientOriginalName();
+                $formData['invoice_supporting_document_name'][$key]['posted_by'] = auth()->user()['username'];
+                $formData['invoice_supporting_document_name'][$key]['created_at'] = (string)Carbon::now('+7:00');
+            }
         }
 
         $updatedInstruction = $this->instructionRepository->saveInvoice($formData, 'update');
@@ -520,12 +556,7 @@ class InstructionService
         $validator = Validator::make($formData, [
             'instruction_id' => 'required|string',
             'termination_reason' => 'required|string',
-            'attachment' => 'sometimes|nullable|mimes:jpg,jpeg,png,pdf|max:20000',
-        ],
-        [
-            // 'attachment.required' => 'Please upload a file',
-            'attachment.mimes' => 'Only jpeg, png and pdf images are allowed',
-            'attachment.max' => 'Sorry! Maximum allowed size for a file is 20MB',
+            'attachment' => 'sometimes|nullable',
         ]);
 
         if ($validator->fails()) {
@@ -539,11 +570,9 @@ class InstructionService
             throw ValidationException::withMessages(['Data instruksi tidak ditemukan']);
         }
 
-        $document = $request->file('attachment');
-        $fileName = $document->getClientOriginalName();
-
-        $formData['attachment'] = $document;
-        $formData['file_name'] = $fileName;
+        $formData['file_name']['file_name'] = $formData['attachment']->getClientOriginalName();
+        $formData['file_name']['posted_by'] = auth()->user()['username'];
+        $formData['file_name']['created_at'] = (string)Carbon::now('+7:00');
 
         $updatedInstruction = $this->instructionRepository->saveTermination($formData, auth()->user()['username']);
         return $updatedInstruction;
@@ -564,17 +593,12 @@ class InstructionService
             'customer_contact' => 'sometimes|required',
             'cust_po_number' => 'nullable|required',
             'cost_detail' => 'required',
-            'attachment.*' => 'sometimes|nullable|mimes:jpg,jpeg,png,pdf|max:20000',
+            'attachment.*' => 'sometimes|nullable',
             'notes' => 'nullable',
             'transaction_code' => 'sometimes|required',
             'invoices' => 'sometimes|nullable',
             'termination' => 'sometimes|nullable',
             'instruction_status' => 'required'
-        ],
-        [
-            // 'attachment.*.required' => 'Please upload a file',
-            'attachment.*.mimes' => 'Only jpeg, png and pdf images are allowed',
-            'attachment.*.max' => 'Sorry! Maximum allowed size for a file is 20MB',
         ]);
 
         if ($formData['cost_detail']) {
@@ -614,12 +638,15 @@ class InstructionService
             throw ValidationException::withMessages(['Data instruksi tidak ditemukan']);
         }
 
-        $document = $request->file('attachment');
-
-        foreach ($formData['attachment'] as $key => $file) {
-            $formData['attachment'][$key] = $document[$key];
-            $formData['file_name'][$key] = $document[$key]->getClientOriginalName();
-        }
+        if ($formData['attachment'] != null) {
+            $document = $request->file('attachment');
+            foreach ($formData['attachment'] as $key => $file) {
+                // $formData['attachment'][$key] = $document[$key];
+                $formData['file_name'][$key]['file_name'] = $document[$key]->getClientOriginalName();
+                $formData['file_name'][$key]['posted_by'] = auth()->user()['username'];
+                $formData['file_name'][$key]['created_at'] = (string)Carbon::now('+7:00');
+            }
+        } else { $formData['file_name'] = null; }
 
         $updatedInstruction = $this->instructionRepository->save($formData);
 
@@ -754,12 +781,7 @@ class InstructionService
     {
         $validator = Validator::make($formData, [
             'instruction_id' => 'required|string',
-            'attachment' => 'required|mimes:jpg,jpeg,png,pdf|max:20000',
-        ],
-        [
-            'attachment.required' => 'Please upload a file',
-            'attachment.mimes' => 'Only jpeg, png and pdf images are allowed',
-            'attachment.max' => 'Sorry! Maximum allowed size for a file is 20MB',
+            'attachment' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -773,11 +795,7 @@ class InstructionService
             throw ValidationException::withMessages(['Data instruksi tidak ditemukan, attachment internal tidak dapat disimpan']);
         }
 
-        $document = $request->file('attachment');
-        $fileName = $document->getClientOriginalName();
-
-        $formData['attachment'] = $document;
-        $formData['file_name'] = $fileName;
+        $formData['file_name'] = $formData['attachment']->getClientOriginalName();
         $formData['posted_by'] = auth()->user()['username'];
         $updatedInternal = $this->internalRepository->saveAttachment($formData, 'store');
         return $updatedInternal;

@@ -17,6 +17,12 @@ class InstructionController extends Controller
         $this->instructionService = $instructionService;
     }
 
+    protected function handleComplexError(Exception $err) 
+    {
+        // return $err->getTrace()[0]['args'][0];
+        return $err->getTrace()[0];
+    }
+
     public function exportExcel()
     {
         try {
@@ -30,15 +36,26 @@ class InstructionController extends Controller
         }
     }
 
-    public function downloadAttachment(Request $request)
+    public function uploadFile(Request $request): JsonResponse
     {
-        // return response()->download(storage_path('/app/public/documents/instructions/LI-2023-0003/attachments/Project_Assignment_3_Backend (B5).pdf'), 'Project_Assignment_3_Backend (B5).pdf');
-        $instructionId = $request->id;
-        $fileName = $request->file_name;
+        $data = $request->all();
+        try {
+            return response()->json([
+                'file' => $this->instructionService->uploadFile($data)
+            ], 201);
+        } catch (Exception $err) {
+            return response()->json([
+                'error' => $err->getMessage()
+            ], 422);
+        }
+    }
+
+    public function downloadFile(string $fileName)
+    {
         try {
             $result = [
                 'status' => 200,
-                'data' => $this->instructionService->downloadAttachment($instructionId, $fileName)
+                'data' => $this->instructionService->downloadFile($fileName)
             ];
             return $result['data'];
         } catch (Exception $err) {
@@ -50,17 +67,13 @@ class InstructionController extends Controller
         return response()->json($result, $result['status']);
     }
 
-    public function downloadInvoiceAttachment(Request $request)
+    public function deleteFile(string $fileName)
     {
-        $instructionId = $request->id;
-        $invoiceNumber = $request->invoice_no;
-        $fileName = $request->file_name;
         try {
             $result = [
                 'status' => 200,
-                'data' => $this->instructionService->downloadInvoiceAttachment($instructionId, $invoiceNumber, $fileName)
+                'message' => $this->instructionService->deleteFile($fileName) . " Deleted Successfully"
             ];
-            return $result['data'];
         } catch (Exception $err) {
             $result = [
                 'status' => 404,
@@ -69,64 +82,104 @@ class InstructionController extends Controller
         }
         return response()->json($result, $result['status']);
     }
+
+    // public function downloadAttachment(Request $request)
+    // {
+    //     // return response()->download(storage_path('/app/public/documents/instructions/LI-2023-0003/attachments/Project_Assignment_3_Backend (B5).pdf'), 'Project_Assignment_3_Backend (B5).pdf');
+    //     $instructionId = $request->id;
+    //     $fileName = $request->file_name;
+    //     try {
+    //         $result = [
+    //             'status' => 200,
+    //             'data' => $this->instructionService->downloadAttachment($instructionId, $fileName)
+    //         ];
+    //         return $result['data'];
+    //     } catch (Exception $err) {
+    //         $result = [
+    //             'status' => 404,
+    //             'error' => $err->getMessage()
+    //         ];
+    //     }
+    //     return response()->json($result, $result['status']);
+    // }
+
+    // public function downloadInvoiceAttachment(Request $request)
+    // {
+    //     $instructionId = $request->id;
+    //     $invoiceNumber = $request->invoice_no;
+    //     $fileName = $request->file_name;
+    //     try {
+    //         $result = [
+    //             'status' => 200,
+    //             'data' => $this->instructionService->downloadInvoiceAttachment($instructionId, $invoiceNumber, $fileName)
+    //         ];
+    //         return $result['data'];
+    //     } catch (Exception $err) {
+    //         $result = [
+    //             'status' => 404,
+    //             'error' => $err->getMessage()
+    //         ];
+    //     }
+    //     return response()->json($result, $result['status']);
+    // }
     
-    public function downloadInvoiceSupportingDocument(Request $request)
-    {
-        $instructionId = $request->id;
-        $invoiceNumber = $request->invoice_no;
-        $fileName = $request->file_name;
-        try {
-            $result = [
-                'status' => 200,
-                'data' => $this->instructionService->downloadInvoiceSupportingDocument($instructionId, $invoiceNumber, $fileName)
-            ];
-            return $result['data'];
-        } catch (Exception $err) {
-            $result = [
-                'status' => 404,
-                'error' => $err->getMessage()
-            ];
-        }
-        return response()->json($result, $result['status']);
-    }
+    // public function downloadInvoiceSupportingDocument(Request $request)
+    // {
+    //     $instructionId = $request->id;
+    //     $invoiceNumber = $request->invoice_no;
+    //     $fileName = $request->file_name;
+    //     try {
+    //         $result = [
+    //             'status' => 200,
+    //             'data' => $this->instructionService->downloadInvoiceSupportingDocument($instructionId, $invoiceNumber, $fileName)
+    //         ];
+    //         return $result['data'];
+    //     } catch (Exception $err) {
+    //         $result = [
+    //             'status' => 404,
+    //             'error' => $err->getMessage()
+    //         ];
+    //     }
+    //     return response()->json($result, $result['status']);
+    // }
 
-    public function downloadTerminationAttachment(Request $request)
-    {
-        $instructionId = $request->id;
-        $fileName = $request->file_name;
-        try {
-            $result = [
-                'status' => 200,
-                'data' => $this->instructionService->downloadTerminationAttachment($instructionId, $fileName)
-            ];
-            return $result['data'];
-        } catch (Exception $err) {
-            $result = [
-                'status' => 404,
-                'error' => $err->getMessage()
-            ];
-        }
-        return response()->json($result, $result['status']);
-    }
+    // public function downloadTerminationAttachment(Request $request)
+    // {
+    //     $instructionId = $request->id;
+    //     $fileName = $request->file_name;
+    //     try {
+    //         $result = [
+    //             'status' => 200,
+    //             'data' => $this->instructionService->downloadTerminationAttachment($instructionId, $fileName)
+    //         ];
+    //         return $result['data'];
+    //     } catch (Exception $err) {
+    //         $result = [
+    //             'status' => 404,
+    //             'error' => $err->getMessage()
+    //         ];
+    //     }
+    //     return response()->json($result, $result['status']);
+    // }
 
-    public function downloadInternalAttachment(Request $request)
-    {
-        $instructionId = $request->id;
-        $fileName = $request->file_name;
-        try {
-            $result = [
-                'status' => 200,
-                'data' => $this->instructionService->downloadInternalAttachment($instructionId, $fileName)
-            ];
-            return $result['data'];
-        } catch (Exception $err) {
-            $result = [
-                'status' => 404,
-                'error' => $err->getMessage()
-            ];
-        }
-        return response()->json($result, $result['status']);
-    }
+    // public function downloadInternalAttachment(Request $request)
+    // {
+    //     $instructionId = $request->id;
+    //     $fileName = $request->file_name;
+    //     try {
+    //         $result = [
+    //             'status' => 200,
+    //             'data' => $this->instructionService->downloadInternalAttachment($instructionId, $fileName)
+    //         ];
+    //         return $result['data'];
+    //     } catch (Exception $err) {
+    //         $result = [
+    //             'status' => 404,
+    //             'error' => $err->getMessage()
+    //         ];
+    //     }
+    //     return response()->json($result, $result['status']);
+    // }
 
     /**
      * Menampilkan hasil dari fitur pencarian
@@ -305,7 +358,7 @@ class InstructionController extends Controller
         } catch (Exception $err) {
             return response()->json([
                 'status' => 422,
-                'error' => $err->getTrace()[0]['args'][0]
+                'error' => $this->handleComplexError($err)
             ], 422);
         }
     }
@@ -352,7 +405,7 @@ class InstructionController extends Controller
         } catch (Exception $err) {
             return response()->json([
                 'status' => 422,
-                'error' => $err->getTrace()[0]['args'][0]
+                'error' => $this->handleComplexError($err)
             ], 422);
         }
     }
@@ -378,7 +431,7 @@ class InstructionController extends Controller
         } catch (Exception $err) {
             return response()->json([
                 'status' => 422,
-                'error' => $err->getTrace()[0]['args'][0]
+                'error' => $this->handleComplexError($err)
             ], 422);
         }
     }
@@ -405,7 +458,7 @@ class InstructionController extends Controller
         } catch (Exception $err) {
             return response()->json([
                 'status' => 422,
-                'error' => $err->getTrace()[0]['args'][0]
+                'error' => $this->handleComplexError($err)
             ], 422);
         }
     }
@@ -431,7 +484,7 @@ class InstructionController extends Controller
         } catch (Exception $err) {
             return response()->json([
                 'status' => 422,
-                'error' => $err->getTrace()[0]['args'][0]
+                'error' => $this->handleComplexError($err)
             ], 422);
         }
     }
@@ -457,7 +510,7 @@ class InstructionController extends Controller
         } catch (Exception $err) {
             return response()->json([
                 'status' => 422,
-                'error' => $err->getTrace()[0]['args'][0]
+                'error' => $this->handleComplexError($err)
             ], 422);
         }
     }
@@ -483,7 +536,7 @@ class InstructionController extends Controller
         } catch (Exception $err) {
             return response()->json([
                 'status' => 422,
-                'error' => $err->getTrace()[0]['args'][0]
+                'error' => $this->handleComplexError($err)
             ], 422);
         }
     }
@@ -534,7 +587,7 @@ class InstructionController extends Controller
         } catch (Exception $err) {
             return response()->json([
                 'status' => 422,
-                'error' => $err->getTrace()[0]['args'][0]
+                'error' => $this->handleComplexError($err)
             ], 422);
         }
     }
@@ -704,7 +757,7 @@ class InstructionController extends Controller
         } catch (Exception $err) {
             return response()->json([
                 'status' => 422,
-                'error' => $err->getTrace()[0]['args'][0]
+                'error' => $this->handleComplexError($err)
             ], 422);
         }
     }
@@ -730,7 +783,7 @@ class InstructionController extends Controller
         } catch (Exception $err) {
             return response()->json([
                 'status' => 422,
-                'error' => $err->getTrace()[0]['args'][0]
+                'error' => $this->handleComplexError($err)
             ], 422);
         }
     }
@@ -756,7 +809,7 @@ class InstructionController extends Controller
         } catch (Exception $err) {
             return response()->json([
                 'status' => 422,
-                'error' => $err->getTrace()[0]['args'][0]
+                'error' => $this->handleComplexError($err)
             ], 422);
         }
     }
@@ -782,7 +835,7 @@ class InstructionController extends Controller
         } catch (Exception $err) {
             return response()->json([
                 'status' => 422,
-                'error' => $err->getTrace()[0]['args'][0]
+                'error' => $this->handleComplexError($err)
             ], 422);
         }
     }
@@ -808,7 +861,7 @@ class InstructionController extends Controller
         } catch (Exception $err) {
             return response()->json([
                 'status' => 422,
-                'error' => $err->getTrace()[0]['args'][0]
+                'error' => $this->handleComplexError($err)
             ], 422);
         }
     }
