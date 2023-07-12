@@ -57,6 +57,7 @@
                     :selected="instructionDetail.instruction_type"
                     :list="['Logistic Instruction', 'Service Intruction']"
                     :disable="type === 'edit'"
+                    @send-value="updateInstructionType()"
                 />
             </div>
             <div class="col-8"></div>
@@ -74,7 +75,8 @@
                     input="Enter Vendor"
                     :searchable="true"
                     :selected="instructionDetail.assigned_vendor"
-                    :list="contohList"
+                    :list="vendorName"
+                    @send-value="updateAssignedVendor"
                 />
             </div>
             <div class="col">
@@ -86,6 +88,7 @@
                     placeholder="Enter Attention Of"
                     :value="instructionDetail.attention_of"
                     required
+                    @change="(e)=>updateAttentionOf(e.target.value)"
                 />
             </div>
             <div class="col">
@@ -101,6 +104,7 @@
                             : instructionDetail.quotation_number
                     "
                     required
+                    @change="(e)=>updateQuotationNumber(e.target.value)"
                 />
             </div>
             <div class="col border-right-dashed">
@@ -111,6 +115,7 @@
                     :add-new="true"
                     :selected="instructionDetail.invoice_to"
                     :list="['MITO']"
+                    @send-value="updateInvoiceTo"
                 />
             </div>
             <div class="col">
@@ -119,7 +124,8 @@
                     input="Select Customer"
                     :searchable="true"
                     :selected="instructionDetail.customer_contact"
-                    :list="contohList"
+                    :list="customer"
+                    @send-value="updateCustomerContract"
                 />
             </div>
         </div>
@@ -132,7 +138,8 @@
                     type="vendor-address"
                     :searchable="true"
                     :selected="instructionDetail.vendor_address"
-                    :list="contohList"
+                    :list="vendorAddress"
+                    @send-value="updateVendorAddress"
                 />
             </div>
             <div class="col-2">
@@ -143,6 +150,7 @@
                     class="form-control"
                     placeholder="Enter Customer PO"
                     :value="instructionDetail.cust_po_number"
+                    @change="(e)=>updatePoNumber(e.target.value)"
                 />
             </div>
         </div>
@@ -166,6 +174,45 @@ export default {
         instructionDetail() {
             return this.$store.getters.getInstructionDetail;
         },
+        FormData() {
+            return this.$store.getters.getFormData
+        },
+        customer() {
+            return this.FormData.customers.flatMap((x)=> x.cust_name)
+        },
+        vendorName() {
+            return this.FormData.vendors?.flatMap((x)=> x.vendor_name)
+        },
+        vendorAddress() {
+            const vendor = this.FormData.vendors?.filter((x)=>{ return x.vendor_name === this.instructionDetail.assigned_vendor})
+            return vendor[0]?.vendor_address
+        },
     },
+    methods: {
+        updateInstructionType(payload) {
+            this.$store.commit('updateInstructionType', payload)
+        },
+        updateAssignedVendor(payload) {
+            this.$store.commit('updateAssignedVendor', payload)
+        },
+        updateVendorAddress(payload) {
+            this.$store.commit('updateVendorAddress', payload)
+        },
+        updateAttentionOf(payload) {
+            this.$store.commit('updateAttentionOf', payload)
+        },
+        updateQuotationNumber(payload) {
+            this.$store.commit('updateQuotationNumber', payload)
+        },
+        updateInvoiceTo(payload) {
+            this.$store.commit('updateInvoiceTo', payload)
+        },
+        updateCustomerContract(payload) {
+            this.$store.commit('updateCustomerContract', payload)
+        },
+        updatePoNumber(payload) {
+            this.$store.commit('updatePoNumber', payload)
+        },
+    }
 };
 </script>

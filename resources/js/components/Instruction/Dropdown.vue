@@ -97,11 +97,11 @@ export default {
     emits: ['sendValue'],
     methods: {
         hidden(i) {
-            return this.$props.list[i]
-                .toLowerCase()
-                .search(this.$data.search) === -1
-                ? "d-none"
-                : "active";
+            if(this.list[i].toLowerCase().search(this.search.toLowerCase()) === -1) {
+                return "d-none"
+            } else {
+                return "active"
+            }
         },
         searchList(value) {
             this.$data.search = value;
