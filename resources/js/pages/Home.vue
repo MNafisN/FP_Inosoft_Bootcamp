@@ -1,6 +1,6 @@
 <template>
     <Title></Title>
-    <div class="bg-white w-100 rounded shadow p-3">
+    <div class="bg-white w-100 rounded shadow p-3 mb-5">
         <ul class="nav tab align-items-center">
             <li
                 v-for="tab in tabs"

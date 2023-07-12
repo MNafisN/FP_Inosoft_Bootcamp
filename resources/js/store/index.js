@@ -61,6 +61,7 @@ const store = createStore({
                     }
                 ]
             },
+            termination: {},
             formData: {
                 customers: [],
                 transactions: [],
@@ -204,6 +205,9 @@ const store = createStore({
         getAttachmentTerminate(state) {
             return state.instructionData.termination.attachment
         },
+        getTermination(state) {
+            return state.termination;
+        },
         getFormData(state) {
             return state.formData
         }
@@ -345,6 +349,9 @@ const store = createStore({
             state.instructionData.termination.user = payload.user
             state.instructionData.termination.description = payload.description
             state.instructionData.instruction_status = "Canceled"
+        },
+        setTermination(state, payload) {
+            state.termination = payload;
         },
         setFormData(state, payload) {
             state.formData = payload
