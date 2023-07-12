@@ -28,10 +28,15 @@
                         <td>{{ item.attention_of }}</td>
                         <td>{{ item.quotation_number }}</td>
                         <td>
-                            <Invoice :invoice="item.invoices" />
+                            <Invoice :invoice="item.invoices" :id="item.instruction_id" />
                         </td>
                         <td>{{ item.cust_po_number }}</td>
-                        <td><Pills :type="item.instruction_status" /></td>
+                        <td>
+                            <Pills
+                                :type="item.instruction_status"
+                                :termination="item.termination"
+                            />
+                        </td>
                     </tr>
                 </tbody>
             </DataTable>

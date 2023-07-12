@@ -11,13 +11,14 @@
     </button>
     <ul class="dropdown-menu">
         <li>
-            <a
+            <div
                 class="dropdown-item"
-                href="#"
                 v-for="(item, index) in invoice"
                 :key="index"
-                >{{ item.invoice_number }}</a
+                @click="downloadFile(item)"
             >
+                {{ item.invoice_attachment }}
+            </div>
         </li>
     </ul>
 </template>
@@ -28,10 +29,33 @@ export default {
         invoice: {
             type: Object,
         },
+        id: {
+            type: String,
+        },
     },
     computed: {
         countInvoice() {
             return this.invoice.length;
+        },
+    },
+    methods: {
+        async downloadFile(item) {
+            const url = `http://127.0.0.1:8000/api/instruction/download/${this.id}/invoice/${item.invoice_number}/${item.invoice_attachment}`;
+
+            try {
+                const link = document.createElement("a");
+                link.href = url;
+                link.setAttribute("download", item.invoice_attachment);
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+            } catch (error) {
+                // Handle the error
+                console.error(
+                    "An error occurred while downloading the file:",
+                    error
+                );
+            }
         },
     },
 };

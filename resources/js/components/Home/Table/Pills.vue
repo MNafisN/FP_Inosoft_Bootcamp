@@ -8,6 +8,7 @@
             v-if="type === 'Cancelled'"
             class="position-absolute top-50 translate-middle-y bg-primary rounded-circle clicked-icon"
             role="button"
+            @click="functionClick()"
             data-bs-toggle="modal"
             data-bs-target="#exampleModal"
         >
@@ -33,6 +34,15 @@ export default {
         type: {
             type: String,
             required: true,
+        },
+        termination: {
+            type: Object,
+            required: false,
+        },
+    },
+    methods: {
+        functionClick() {
+            this.$store.commit('setTermination', this.termination);
         },
     },
 };

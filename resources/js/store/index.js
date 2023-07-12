@@ -60,7 +60,8 @@ const store = createStore({
                         time: "08/07/23 05:12 PM"
                     }
                 ]
-            }
+            },
+            termination: {},
         };
     },
     getters: {
@@ -198,7 +199,10 @@ const store = createStore({
         },
         getAttachmentTerminate(state) {
             return state.instructionData.termination.attachment
-        }
+        },
+        getTermination(state) {
+            return state.termination;
+        },
     },
     mutations: {
         updateStatus(state, payload) {
@@ -313,7 +317,10 @@ const store = createStore({
             state.instructionData.termination.user = payload.user
             state.instructionData.termination.description = payload.description
             state.instructionData.instruction_status = "Canceled"
-        }
+        },
+        setTermination(state, payload) {
+            state.termination = payload;
+        },
     },
     actions: {
     },
