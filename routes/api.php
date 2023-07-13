@@ -39,13 +39,17 @@ Route::group([
     'prefix' => 'instruction',
     'middleware' => 'auth:api'
 ], function() {
-    Route::get('/exportExcel', [InstructionController::class, 'exportExcel']);
+    Route::get('/exportExcel', [InstructionController::class, 'exportExcel']);                      // Export daftar instruksi menjadi bentuk file Excel
 
-    Route::get('download/{id}/{file_name}', [InstructionController::class, 'downloadAttachment']);
-    Route::get('download/{id}/invoice/{invoice_no}/{file_name}', [InstructionController::class, 'downloadInvoiceAttachment']);
-    Route::get('download/{id}/invoice/supporting/{invoice_no}/{file_name}', [InstructionController::class, 'downloadInvoiceSupportingDocument']);
-    Route::get('download/{id}/termination/{file_name}', [InstructionController::class, 'downloadTerminationAttachment']);
-    Route::get('download/{id}/internal/{file_name}', [InstructionController::class, 'downloadInternalAttachment']);
+    // Route::get('download/{id}/{file_name}', [InstructionController::class, 'downloadAttachment']);
+    // Route::get('download/{id}/invoice/{invoice_no}/{file_name}', [InstructionController::class, 'downloadInvoiceAttachment']);
+    // Route::get('download/{id}/invoice/supporting/{invoice_no}/{file_name}', [InstructionController::class, 'downloadInvoiceSupportingDocument']);
+    // Route::get('download/{id}/termination/{file_name}', [InstructionController::class, 'downloadTerminationAttachment']);
+    // Route::get('download/{id}/internal/{file_name}', [InstructionController::class, 'downloadInternalAttachment']);
+
+    Route::post('uploadFile', [InstructionController::class, 'uploadFile']);                        // Aksi untuk unggah file
+    Route::get('downloadFile/{file_name}', [InstructionController::class, 'downloadFile']);         // Aksi untuk download file
+    Route::delete('deleteFile/{file_name}', [InstructionController::class, 'deleteFile']);          // Aksi untuk hapus file
     
     Route::get('search/{query}', [InstructionController::class, 'searchInstruction']);              // Tampilkan list instruksi hasil search
     

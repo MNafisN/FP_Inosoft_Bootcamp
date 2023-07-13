@@ -70,14 +70,14 @@ class Instruction extends Model
     private static function getID(string $type)
     {
         if ($type == 'LI') {
-            $seq = DB::connection('mongodb')->getCollection('instructions')->findOneAndUpdate(
+            $seq = DB::connection('mongodb')->getCollection('instructions_count')->findOneAndUpdate(
                 ['ref' => 'ref'],
                 ['$inc' => ['li_seq' => 1]],
                 ['new' => true, 'upsert' => true, 'returnDocument' => FindOneAndUpdate::RETURN_DOCUMENT_AFTER]
             );
             return $seq->li_seq;
         } else if ($type == 'SI') {
-            $seq = DB::connection('mongodb')->getCollection('instructions')->findOneAndUpdate(
+            $seq = DB::connection('mongodb')->getCollection('instructions_count')->findOneAndUpdate(
                 ['ref' => 'ref'],
                 ['$inc' => ['si_seq' => 1]],
                 ['new' => true, 'upsert' => true, 'returnDocument' => FindOneAndUpdate::RETURN_DOCUMENT_AFTER]

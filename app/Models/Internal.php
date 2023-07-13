@@ -27,7 +27,7 @@ class Internal extends Model
      * 
      * @return  Jenssegers\Mongodb\Relations\HasOne
      */
-    public function Vendor() : HasOne
+    public function Instruction() : HasOne
     {
         return $this->hasOne(Instruction::class, 'instruction_id', 'instruction_id');
     }

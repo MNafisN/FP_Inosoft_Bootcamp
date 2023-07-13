@@ -17,10 +17,10 @@ class InternalRepository
         $this->internal = $internal;
     }
 
-    public function downloadAttachment(string $instructionId, string $fileName)
-    {
-        return Storage::download("/documents/instructions/" . substr($instructionId, 0, 12) . "/internal_attachments/" . $fileName, $fileName);
-    }
+    // public function downloadAttachment(string $instructionId, string $fileName)
+    // {
+    //     return Storage::download("/documents/instructions/" . substr($instructionId, 0, 12) . "/internal_attachments/" . $fileName, $fileName);
+    // }
 
     /** 
      * untuk mengambil semua list internal
@@ -65,7 +65,7 @@ class InternalRepository
         $attachmentList = $internal->internal_attachment;
 
         if ($action == 'store') {
-            $data['attachment']->storeAs("/documents/instructions/" . substr($data['instruction_id'], 0, 12) . "/internal_attachments", $data['file_name']);
+            // $data['attachment']->storeAs("/documents/instructions/" . substr($data['instruction_id'], 0, 12) . "/internal_attachments", $data['file_name']);
             $attachment['attachment'] = $data['file_name'];
             $attachment['posted_by'] = $data['posted_by'];
             $attachment['date_added'] = (string)Carbon::now('+7:00');
