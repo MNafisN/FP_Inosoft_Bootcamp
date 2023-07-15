@@ -95,7 +95,7 @@
                 <label for="quotation-no">Quotation No.</label>
                 <input
                     id="quotation-no"
-                    type="text"
+                    type="number"
                     class="form-control"
                     placeholder="Enter Quotation"
                     :value="

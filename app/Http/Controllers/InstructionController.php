@@ -20,7 +20,7 @@ class InstructionController extends Controller
     protected function handleComplexError(Exception $err) 
     {
         // return $err->getTrace()[0]['args'][0];
-        return $err->getTrace()[0];
+        return $err->getTrace();
     }
 
     public function exportExcel()

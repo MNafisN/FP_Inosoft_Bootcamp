@@ -10,7 +10,13 @@
         </div>
         <div class="row">
             <div class="col-5">
-                <AttachmentFile id-name="attachmentFile" :files="attachmentList" :is-disable="isDisable" @upload="addAttachment" />
+                <AttachmentFile
+                    id-name="attachmentFile"
+                    :files="attachmentList"
+                    :is-disable="isDisable"
+                    @upload="addAttachment"
+                    @delete-by-index="deleteAttachment"
+                />
             </div>
             <div class="col-7">
                 <textarea
@@ -29,24 +35,29 @@ export default {
     name: "attachment",
     data() {
         return {
-            isUpload: false
-        }
+            isUpload: false,
+        };
     },
     components: { AttachmentFile },
     methods: {
         addAttachment(file) {
             console.log(file);
-            this.$store.commit('addAttachment', file)
+            this.$store.commit("addAttachment", file);
+        },
+        deleteAttachment(index) {
+            this.$store.dispatch('deleteAttachmentInstruction', index)
         }
     },
     computed: {
         attachmentList() {
-            return this.$store.getters.getAttachmentList
+            return this.$store.getters.getAttachmentList;
         },
         isDisable() {
-            return this.$store.getters.getStatus === 'Completed' || this.$store.getters.getStatus === 'Canceled'
-        }
+            return (
+                this.$store.getters.getStatus === "Completed" ||
+                this.$store.getters.getStatus === "Canceled"
+            );
+        },
     },
 };
 </script>
-

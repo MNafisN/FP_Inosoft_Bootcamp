@@ -60,7 +60,7 @@ class AttachmentRepository
         $data['attachment']->storeAs("/documents/", $data['file_name']);
         $attachment->file_name = $data['file_name'];
         $attachment->posted_by = $data['posted_by'];
-        $attachment->created_at = (string)Carbon::now('+7:00');
+        $attachment->created_at = (string)Carbon::now('+7:00')->toDateTimeString();
 
         $attachment->save();
         return $attachment->fresh();

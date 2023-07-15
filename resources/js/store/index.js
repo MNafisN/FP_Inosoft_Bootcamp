@@ -10,7 +10,7 @@ const store = createStore({
                 assigned_vendor: "",
                 vendor_address: "",
                 attention_of: "",
-                quotation_number: 0,
+                quotation_number: null,
                 invoice_to: "",
                 customer_contact: "",
                 cust_po_number: "",
@@ -18,7 +18,7 @@ const store = createStore({
                     {
                         cost_description: "",
                         quantity: 0,
-                        unit_of_measurement: "SHP",
+                        unit_of_measurement: "PCS",
                         unit_price: 0,
                         GST_percentage: 0,
                         currency: "",
@@ -28,20 +28,14 @@ const store = createStore({
                         charge_to: "",
                     },
                 ],
-                attachment: [
-                    {
-                        name: "file1.jpg",
-                        info: "by Irfan Faqih on 26/04/22 11:43 AM",
-                        link: "",
-                    },
-                ],
+                attachment: [],
                 notes: null,
                 transaction_code: "",
                 invoices: [],
                 termination: {
-                    user: "User",
-                    description: "Test",
-                    attachment: []
+                    // user: "User",
+                    // description: "Test",
+                    // attachment: []
                 },
                 instruction_status: "Draft",
             },
@@ -66,7 +60,7 @@ const store = createStore({
                 customers: [],
                 transactions: [],
                 vendors: []
-            }
+            },
         };
     },
     getters: {
@@ -213,6 +207,7 @@ const store = createStore({
         }
     },
     mutations: {
+// update instruction
         updateStatus(state, payload) {
             state.instructionData.instruction_status = payload
         },
@@ -229,7 +224,7 @@ const store = createStore({
             state.instructionData.attention_of = payload
         },
         updateQuotationNumber(state, payload) {
-            state.instructionData.quotation_number = payload
+            state.instructionData.quotation_number = parseInt(payload)
         },
         updateInvoiceTo(state, payload) {
             state.instructionData.invoice_to = payload
@@ -240,6 +235,8 @@ const store = createStore({
         updatePoNumber(state, payload) {
             state.instructionData.cust_po_number = payload
         },
+
+// cost list
         addCostList(state) {
             state.instructionData.cost_detail.push({
                 cost_description: "",
@@ -302,18 +299,24 @@ const store = createStore({
             data.total =
                 Math.round((data.vat_amount + data.sub_total) * 100) / 100;
         },
+
+// attachment instruction
         addAttachment(state, payload) {
             state.instructionData.attachment.push(payload);
         },
+        deleteAttachment(state, i) {
+            state.instructionData.attachment.splice(i, 1)
+        },
+
+// link to
         updateLinkTo(state, payload) {
-            state.link_to = payload
+            state.instructionData.transaction_code = payload
         },
         removeLinkTo(state) {
-            state.link_to = ""
+            state.instructionData.transaction_code = ""
         },
-        uploadAttachmentInternal(state, payload) {
-            state.internalOnly.attachment.push(payload)
-        },
+
+// invoice
         addInvoices(state, payload) {
             state.instructionData.invoices.push(payload)
         },
@@ -324,12 +327,16 @@ const store = createStore({
             state.instructionData.invoices[payload.index] = payload.invoice
             console.log('edit invoice');
         },
+
+// attachment internal only
         addAttachmentInternalOnly(state, payload) {
             state.internalOnly.attachment.push(payload)
         },
         deleteAttachmentInternalOnly(state, i) {
             state.internalOnly.attachment.splice(i, 1)
         },
+
+// notes internal only
         addNotesInternalOnly(state, payload) {
             state.internalOnly.notes.push(payload)
         },
@@ -339,12 +346,16 @@ const store = createStore({
         updateNotesInternalOnly(state, payload) {
             state.internalOnly.notes[payload.index] = payload.data
         },
+
+// attachment terminate
         addAttachmentTerminate(state, payload) {
             state.instructionData.termination.attachment.push(payload)
         },
         deleteAttachmentTerminate(state, i) {
             state.instructionData.termination.attachment.splice(i, 1)
         },
+
+// termination
         terminateInstruction(state, payload) {
             state.instructionData.termination.user = payload.user
             state.instructionData.termination.description = payload.description
@@ -353,6 +364,8 @@ const store = createStore({
         setTermination(state, payload) {
             state.termination = payload;
         },
+
+
         setFormData(state, payload) {
             state.formData = payload
         }
@@ -362,6 +375,29 @@ const store = createStore({
             const data = (await axios.get('http://127.0.0.1:8000/api/instruction/addNew')).data
             context.commit('setFormData', await data.form_data)
             console.log(data);
+        },
+        deleteAttachmentInstruction(context, i) {
+            const file = context.state.instructionData.attachment[i].download
+            axios.delete(`http://127.0.0.1:8000/api/instruction/deleteFile/${file}`)
+            .then(()=>{
+                context.commit('deleteAttachment', i)
+            })
+        },
+        submitInstruction(context) {
+            context.commit('updateStatus', 'In Progress')
+            const { instruction_id, ...other } = context.state.instructionData
+            console.log(other);
+            axios.post('/api/instruction/add', other)
+            .then((data)=>console.log(data))
+            .catch((err)=>console.log(err))
+        },
+        saveAsDraft(context) {
+            context.commit('updateStatus', 'Draft')
+            const { instruction_id, ...other } = context.state.instructionData
+            console.log(other)
+            axios.post('/api/instruction/add', other)
+            .then((data)=>console.log(data))
+            .catch((err)=>console.log(err))
         }
     },
 });
