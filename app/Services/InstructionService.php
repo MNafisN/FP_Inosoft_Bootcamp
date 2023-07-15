@@ -556,7 +556,7 @@ class InstructionService
         $validator = Validator::make($formData, [
             'instruction_id' => 'required|string',
             'termination_reason' => 'required|string',
-            'attachment' => 'sometimes|nullable',
+            'attachment.*' => 'sometimes|nullable',
         ]);
 
         if ($validator->fails()) {
@@ -570,9 +570,15 @@ class InstructionService
             throw ValidationException::withMessages(['Data instruksi tidak ditemukan']);
         }
 
-        $formData['file_name'] = $formData['attachment'];
-        $formData['file_name']['posted_by'] = auth()->user()['username'];
-        $formData['file_name']['created_at'] = (string)Carbon::now('+7:00');
+        if (empty($formData['attachment']) == false) {
+            $document = $request->attachment;
+            foreach ($formData['attachment'] as $key => $file) {
+                // $formData['attachment'][$key] = $document[$key];
+                $formData['file_name'][$key] = $document[$key];
+                $formData['file_name'][$key]['posted_by'] = auth()->user()['username'];
+                $formData['file_name'][$key]['created_at'] = (string)Carbon::now('+7:00');
+            }
+        }
 
         $updatedInstruction = $this->instructionRepository->saveTermination($formData, auth()->user()['username']);
         return $updatedInstruction;
