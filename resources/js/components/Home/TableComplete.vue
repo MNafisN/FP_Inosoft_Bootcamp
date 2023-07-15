@@ -48,7 +48,7 @@
 </template>
 
 <script>
-import { reactive, toRefs, ref } from "vue";
+import { reactive, toRefs } from "vue";
 
 import DataTable from "datatables.net-vue3";
 import DataTablesCore from "datatables.net-bs5";
