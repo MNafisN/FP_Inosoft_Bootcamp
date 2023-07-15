@@ -72,7 +72,7 @@ class InstructionService
 
     public function downloadFile(string $fileName)
     {
-        $fileDecoder = urldecode($fileName);
+        $fileDecoder = rawurldecode($fileName);
         $attachment = $this->attachmentRepository->getByName($fileDecoder);
         if (!$attachment) {
             throw new InvalidArgumentException('File not found');
@@ -83,7 +83,7 @@ class InstructionService
 
     public function deleteFile(string $fileName): string
     {
-        $fileDecoder = urldecode($fileName);
+        $fileDecoder = rawurldecode($fileName);
         $attachment = $this->attachmentRepository->getByName($fileDecoder);
         if (!$attachment) {
             throw new InvalidArgumentException('File not found');
@@ -95,8 +95,8 @@ class InstructionService
 
     // public function downloadAttachment(string $instructionId, string $fileName)
     // {
-    //     $idDecoder = urldecode($instructionId);
-    //     $fileDecoder = urldecode($fileName);
+    //     $idDecoder = rawurldecode($instructionId);
+    //     $fileDecoder = rawurldecode($fileName);
     //     $instruction = $this->instructionRepository->getById($idDecoder);
     //     if (!$instruction) {
     //         throw new InvalidArgumentException('Data instruksi tidak ditemukan');
@@ -111,9 +111,9 @@ class InstructionService
 
     // public function downloadInvoiceAttachment(string $instructionId, string $invoiceNumber, string $fileName)
     // {
-    //     $idDecoder = urldecode($instructionId);
-    //     $invoiceDecoder = urldecode($invoiceNumber);
-    //     $fileDecoder = urldecode($fileName);
+    //     $idDecoder = rawurldecode($instructionId);
+    //     $invoiceDecoder = rawurldecode($invoiceNumber);
+    //     $fileDecoder = rawurldecode($fileName);
     //     $instruction = $this->instructionRepository->getById($idDecoder);
     //     if (!$instruction) {
     //         throw new InvalidArgumentException('Data instruksi tidak ditemukan');
@@ -125,9 +125,9 @@ class InstructionService
 
     // public function downloadInvoiceSupportingDocument(string $instructionId, string $invoiceNumber, string $fileName)
     // {
-    //     $idDecoder = urldecode($instructionId);
-    //     $invoiceDecoder = urldecode($invoiceNumber);
-    //     $fileDecoder = urldecode($fileName);
+    //     $idDecoder = rawurldecode($instructionId);
+    //     $invoiceDecoder = rawurldecode($invoiceNumber);
+    //     $fileDecoder = rawurldecode($fileName);
     //     $instruction = $this->instructionRepository->getById($idDecoder);
     //     if (!$instruction) {
     //         throw new InvalidArgumentException('Data instruksi tidak ditemukan');
@@ -139,8 +139,8 @@ class InstructionService
 
     // public function downloadTerminationAttachment(string $instructionId, string $fileName)
     // {
-    //     $idDecoder = urldecode($instructionId);
-    //     $fileDecoder = urldecode($fileName);
+    //     $idDecoder = rawurldecode($instructionId);
+    //     $fileDecoder = rawurldecode($fileName);
     //     $instruction = $this->instructionRepository->getById($idDecoder);
     //     if (!$instruction) {
     //         throw new InvalidArgumentException('Data instruksi tidak ditemukan');
@@ -152,8 +152,8 @@ class InstructionService
 
     // public function downloadInternalAttachment(string $instructionId, string $fileName)
     // {
-    //     $idDecoder = urldecode($instructionId);
-    //     $fileDecoder = urldecode($fileName);
+    //     $idDecoder = rawurldecode($instructionId);
+    //     $fileDecoder = rawurldecode($fileName);
     //     $instruction = $this->instructionRepository->getById($idDecoder);
     //     if (!$instruction) {
     //         throw new InvalidArgumentException('Data instruksi tidak ditemukan');
@@ -180,7 +180,7 @@ class InstructionService
      */
     public function getSearched(string $query) : ?Object
     {
-        $queryDecoder = urldecode($query);
+        $queryDecoder = rawurldecode($query);
         $instructions = $this->instructionRepository->getSearched($queryDecoder);
         if ($instructions->isEmpty()) {
             throw new InvalidArgumentException('Data instruksi tidak ditemukan');
@@ -257,7 +257,7 @@ class InstructionService
      */
     public function getById(string $instructionId) : Object
     {
-        $idDecoder = urldecode($instructionId);
+        $idDecoder = rawurldecode($instructionId);
         $instruction = $this->instructionRepository->getById($idDecoder);
         if (!$instruction) {
             throw new InvalidArgumentException('Data instruksi tidak ditemukan');
@@ -368,7 +368,7 @@ class InstructionService
      */
     public function getInstructionDetail(string $id) : ?Object
     {
-        $instructionId = urldecode($id);        
+        $instructionId = rawurldecode($id);        
         $instruction = $this->instructionRepository->getById($instructionId);
         if (!$instruction) {
             throw ValidationException::withMessages(['Data instruksi tidak ditemukan']);
@@ -556,7 +556,7 @@ class InstructionService
         $validator = Validator::make($formData, [
             'instruction_id' => 'required|string',
             'termination_reason' => 'required|string',
-            'attachment' => 'sometimes|nullable',
+            'attachment.*' => 'sometimes|nullable',
         ]);
 
         if ($validator->fails()) {
@@ -570,9 +570,15 @@ class InstructionService
             throw ValidationException::withMessages(['Data instruksi tidak ditemukan']);
         }
 
-        $formData['file_name'] = $formData['attachment'];
-        $formData['file_name']['posted_by'] = auth()->user()['username'];
-        $formData['file_name']['created_at'] = (string)Carbon::now('+7:00');
+        if (empty($formData['attachment']) == false) {
+            $document = $request->attachment;
+            foreach ($formData['attachment'] as $key => $file) {
+                // $formData['attachment'][$key] = $document[$key];
+                $formData['file_name'][$key] = $document[$key];
+                $formData['file_name'][$key]['posted_by'] = auth()->user()['username'];
+                $formData['file_name'][$key]['created_at'] = (string)Carbon::now('+7:00');
+            }
+        }
 
         $updatedInstruction = $this->instructionRepository->saveTermination($formData, auth()->user()['username']);
         return $updatedInstruction;
@@ -666,7 +672,7 @@ class InstructionService
     */
     public function setDraft(string $instructionId) : Object
     {
-        $idDecoder = urldecode($instructionId);
+        $idDecoder = rawurldecode($instructionId);
         $instruction = $this->instructionRepository->getById($idDecoder);
         if (!$instruction) {
             throw new InvalidArgumentException('Data instruksi tidak ditemukan');
@@ -681,7 +687,7 @@ class InstructionService
     */
     public function setInProgress(string $instructionId) : Object
     {
-        $idDecoder = urldecode($instructionId);
+        $idDecoder = rawurldecode($instructionId);
         $instruction = $this->instructionRepository->getById($idDecoder);
         if (!$instruction) {
             throw new InvalidArgumentException('Data instruksi tidak ditemukan');
@@ -696,7 +702,7 @@ class InstructionService
     */
     public function setComplete(string $instructionId) : Object
     {
-        $idDecoder = urldecode($instructionId);
+        $idDecoder = rawurldecode($instructionId);
         $instruction = $this->instructionRepository->getById($idDecoder);
         if (!$instruction) {
             throw new InvalidArgumentException('Data instruksi tidak ditemukan');
@@ -720,7 +726,7 @@ class InstructionService
     */
     public function setCancelled(string $instructionId) : Object
     {
-        $idDecoder = urldecode($instructionId);
+        $idDecoder = rawurldecode($instructionId);
         $instruction = $this->instructionRepository->getById($idDecoder);
         if (!$instruction) {
             throw new InvalidArgumentException('Data instruksi tidak ditemukan');
@@ -744,7 +750,7 @@ class InstructionService
      */
     public function delete(string $instructionId) : string
     {
-        $idDecoder = urldecode($instructionId);
+        $idDecoder = rawurldecode($instructionId);
         $instruction = $this->instructionRepository->getById($idDecoder);
         if (!$instruction) {
             throw new InvalidArgumentException('Data instruksi tidak ditemukan');
@@ -760,7 +766,7 @@ class InstructionService
      */
     public function getInternal(string $instructionId) : ?Object
     {
-        $idDecoder = urldecode($instructionId);
+        $idDecoder = rawurldecode($instructionId);
         $instruction = $this->instructionRepository->getById($idDecoder);
         if (!$instruction) {
             throw new InvalidArgumentException('Data instruksi tidak ditemukan');

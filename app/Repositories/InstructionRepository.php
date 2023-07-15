@@ -213,7 +213,9 @@ class InstructionRepository
         //     "/documents/instructions/" . substr($data['instruction_id'], 0, 12) . "/termination_attachment",
         //     $data['file_name']
         // );
-        $termination['attachment'] = $data['file_name'];
+        if (isset($data['file_name'])) { 
+            $termination['attachment'] = $data['file_name']; 
+        } else { $termination['attachment'] = null; }
 
         $instruction->termination = $termination;
         $instruction->save();
