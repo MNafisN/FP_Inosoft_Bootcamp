@@ -340,11 +340,11 @@ class InstructionService
             throw ValidationException::withMessages($errMessageBag);
         }
 
-        if ($formData['attachment'] != null) {
-            $document = $request->file('attachment');
+        if (empty($formData['attachment']) == false) {
+            $document = $request->attachment;
             foreach ($formData['attachment'] as $key => $file) {
                 // $formData['attachment'][$key] = $document[$key];
-                $formData['file_name'][$key]['file_name'] = $document[$key]->getClientOriginalName();
+                $formData['file_name'][$key] = $document[$key];
                 $formData['file_name'][$key]['posted_by'] = auth()->user()['username'];
                 $formData['file_name'][$key]['created_at'] = (string)Carbon::now('+7:00');
             }
@@ -397,13 +397,13 @@ class InstructionService
             throw ValidationException::withMessages(['Data instruksi tidak ditemukan']);
         }
 
-        $formData['file_name']['file_name'] = $formData['attachment']->getClientOriginalName();
+        $formData['file_name'] = $formData['attachment'];
         $formData['file_name']['posted_by'] = auth()->user()['username'];
         $formData['file_name']['created_at'] = (string)Carbon::now('+7:00');
 
         $updatedInstruction = $this->instructionRepository->saveAttachment($formData, 'store');
         $this->getInternal($updatedInstruction->instruction_id);
-        $this->storeActivity($updatedInstruction->instruction_id, "A 3rd Party Instruction Attachment '" . $formData['attachment']->getClientOriginalName() . "' Uploaded");
+        $this->storeActivity($updatedInstruction->instruction_id, "A 3rd Party Instruction Attachment '" . $formData['attachment']['name'] . "' Uploaded");
         return $updatedInstruction;
     }
 
@@ -457,15 +457,15 @@ class InstructionService
             throw ValidationException::withMessages(['Data instruksi tidak ditemukan']);
         }
 
-        $formData['invoice_attachment_name']['file_name'] = $formData['invoice_attachment']->getClientOriginalName();
+        $formData['invoice_attachment_name'] = $formData['invoice_attachment'];
         $formData['invoice_attachment_name']['posted_by'] = auth()->user()['username'];
         $formData['invoice_attachment_name']['created_at'] = (string)Carbon::now('+7:00');
 
-        if ($formData['invoice_supporting_document'] != null) {
-            $document = $request->file('invoice_supporting_document');
+        if (empty($formData['invoice_supporting_document']) == false) {
+            $document = $request->invoice_supporting_document;
             foreach ($formData['invoice_supporting_document'] as $key => $file) {
                 // $formData['attachment'][$key] = $document[$key];
-                $formData['invoice_supporting_document_name'][$key]['file_name'] = $document[$key]->getClientOriginalName();
+                $formData['invoice_supporting_document_name'][$key] = $document[$key];
                 $formData['invoice_supporting_document_name'][$key]['posted_by'] = auth()->user()['username'];
                 $formData['invoice_supporting_document_name'][$key]['created_at'] = (string)Carbon::now('+7:00');
             }
@@ -501,15 +501,15 @@ class InstructionService
             throw ValidationException::withMessages(['Data instruksi tidak ditemukan']);
         }
 
-        $formData['invoice_attachment_name']['file_name'] = $formData['invoice_attachment']->getClientOriginalName();
+        $formData['invoice_attachment_name'] = $formData['invoice_attachment'];
         $formData['invoice_attachment_name']['posted_by'] = auth()->user()['username'];
         $formData['invoice_attachment_name']['created_at'] = (string)Carbon::now('+7:00');
 
-        if ($formData['invoice_supporting_document'] != null) {
-            $document = $request->file('invoice_supporting_document');
+        if (empty($formData['invoice_supporting_document']) == false) {
+            $document = $request->invoice_supporting_document;
             foreach ($formData['invoice_supporting_document'] as $key => $file) {
                 // $formData['attachment'][$key] = $document[$key];
-                $formData['invoice_supporting_document_name'][$key]['file_name'] = $document[$key]->getClientOriginalName();
+                $formData['invoice_supporting_document_name'][$key] = $document[$key];
                 $formData['invoice_supporting_document_name'][$key]['posted_by'] = auth()->user()['username'];
                 $formData['invoice_supporting_document_name'][$key]['created_at'] = (string)Carbon::now('+7:00');
             }
@@ -570,7 +570,7 @@ class InstructionService
             throw ValidationException::withMessages(['Data instruksi tidak ditemukan']);
         }
 
-        $formData['file_name']['file_name'] = $formData['attachment']->getClientOriginalName();
+        $formData['file_name'] = $formData['attachment'];
         $formData['file_name']['posted_by'] = auth()->user()['username'];
         $formData['file_name']['created_at'] = (string)Carbon::now('+7:00');
 
@@ -638,11 +638,11 @@ class InstructionService
             throw ValidationException::withMessages(['Data instruksi tidak ditemukan']);
         }
 
-        if ($formData['attachment'] != null) {
-            $document = $request->file('attachment');
+        if (empty($formData['attachment']) == false) {
+            $document = $request->attachment;
             foreach ($formData['attachment'] as $key => $file) {
                 // $formData['attachment'][$key] = $document[$key];
-                $formData['file_name'][$key]['file_name'] = $document[$key]->getClientOriginalName();
+                $formData['file_name'][$key] = $document[$key];
                 $formData['file_name'][$key]['posted_by'] = auth()->user()['username'];
                 $formData['file_name'][$key]['created_at'] = (string)Carbon::now('+7:00');
             }
@@ -795,7 +795,7 @@ class InstructionService
             throw ValidationException::withMessages(['Data instruksi tidak ditemukan, attachment internal tidak dapat disimpan']);
         }
 
-        $formData['file_name'] = $formData['attachment']->getClientOriginalName();
+        $formData['file_name'] = $formData['attachment'];
         $formData['posted_by'] = auth()->user()['username'];
         $updatedInternal = $this->internalRepository->saveAttachment($formData, 'store');
         return $updatedInternal;
