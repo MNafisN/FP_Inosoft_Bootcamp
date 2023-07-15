@@ -1,4 +1,5 @@
 import axios from 'axios';
+import router from '../router';
 
 axios.interceptors.request.use(
   (config) => {
@@ -11,5 +12,16 @@ axios.interceptors.request.use(
   (error) => {
     return Promise.reject(error);
 });
+
+axios.interceptors.response.use(
+  response => response,
+  error => {
+    if (error.response.status === 401) {
+      localStorage.removeItem('access_token');
+      router.push('/app/login');
+    }
+    return Promise.reject(error);
+  }
+);
 
 export default axios;
