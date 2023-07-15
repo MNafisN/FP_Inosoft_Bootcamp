@@ -13,7 +13,7 @@ import Header from './components/Header.vue'
         name: 'App',
         components: {Header},
         created() {
-            const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvYXBpL2F1dGgvbG9naW4iLCJpYXQiOjE2ODkzODk4MjQsImV4cCI6MTY4OTM5MzQyNCwibmJmIjoxNjg5Mzg5ODI0LCJqdGkiOiI1TnJJSkRyQVNWYjc2RGFoIiwic3ViIjoiNjRhZmZjZWQ1Nzg3ZmJhODEwMDA1OWMzIiwicHJ2IjoiMjNiZDVjODk0OWY2MDBhZGIzOWU3MDFjNDAwODcyZGI3YTU5NzZmNyJ9.76hEOJQCymqDvL5noCAFWVFG2PGThS4HxcBYEmEeTjw"
+            const token = localStorage.getItem('acces_token')
             axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
         }
     }
