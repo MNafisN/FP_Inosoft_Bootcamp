@@ -17,7 +17,7 @@
             </thead>
             <tbody>
                 <tr v-for="(item, index) in listInt" :key="index">
-                    <td scope="row">{{ item.instruction_id }}</td>
+                    <td class="cursor-pointer" scope="row" @click="selectDetail(item.instruction_id)">{{ item.instruction_id }}</td>
                     <td>{{ item.transaction_code }}</td>
                     <td class="text-center">
                         <Type :type="item.instruction_type" />
@@ -101,6 +101,9 @@ export default {
         formatDate(dateString) {
             return moment(dateString).format("DD/MM/YY");
         },
+        selectDetail(instruction_id){
+            this.$router.push(`/app/detail-instruction/${instruction_id}`);
+        }
     },
 };
 </script>
@@ -108,4 +111,7 @@ export default {
 <style>
 @import "bootstrap";
 @import "datatables.net-bs5";
+.cursor-pointer{
+    cursor: pointer;
+}
 </style>
