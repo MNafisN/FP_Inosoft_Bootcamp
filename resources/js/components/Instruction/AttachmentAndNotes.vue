@@ -22,6 +22,8 @@
                 <textarea
                     rows="5"
                     class="w-100 form-control bg-secondary-subtle border-secondary"
+                    :value="notes"
+                    @change="(e)=>updateNotes(e.target.value)"
                     :disabled="isDisable"
                 ></textarea>
             </div>
@@ -46,11 +48,17 @@ export default {
         },
         deleteAttachment(index) {
             this.$store.dispatch('deleteAttachmentInstruction', index)
+        },
+        updateNotes(text) {
+            this.$store.commit('updateNotes', text)
         }
     },
     computed: {
         attachmentList() {
             return this.$store.getters.getAttachmentList;
+        },
+        notes() {
+            return this.$store.getters.getNotes
         },
         isDisable() {
             return (

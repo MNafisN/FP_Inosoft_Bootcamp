@@ -97,6 +97,9 @@ export default {
         deleteAttachment(index) {
             this.$store.commit('deleteAttachmentTerminate', index)
         }
+    },
+    mounted() {
+        this.$store.dispatch('detailInstruction', this.$route.params.id)
     }
 };
 </script>

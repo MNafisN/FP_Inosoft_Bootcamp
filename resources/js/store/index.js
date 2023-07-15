@@ -71,17 +71,7 @@ const store = createStore({
             return state.instructionData.cost_detail.length;
         },
         getInstructionDetail(state) {
-            return {
-                instruction_type: state.instructionData.instruction_type,
-                assigned_vendor: state.instructionData.assigned_vendor,
-                vendor_address: state.instructionData.vendor_address,
-                attention_of: state.instructionData.attention_of,
-                quotation_number: state.instructionData.quotation_number,
-                invoice_to: state.instructionData.invoice_to,
-                customer_contact: state.instructionData.customer_contact,
-                cust_po_number: state.instructionData.cust_po_number,
-                instruction_status: state.instructionData.instruction_status
-            };
+            return state.instructionData
         },
         getTransactionCode(state) {
             return state.instructionData.transaction_code
@@ -91,6 +81,9 @@ const store = createStore({
         },
         getAttachmentList(state) {
             return state.instructionData.attachment;
+        },
+        getNotes(state) {
+            return state.instructionData.notes
         },
         getUsdTotal(state) {
             const vat_amount = state.instructionData.cost_detail.reduce(
@@ -208,6 +201,9 @@ const store = createStore({
     },
     mutations: {
 // update instruction
+        updateInstruction(state, payload) {
+            state.instructionData = payload
+        },
         updateStatus(state, payload) {
             state.instructionData.instruction_status = payload
         },
@@ -234,6 +230,9 @@ const store = createStore({
         },
         updatePoNumber(state, payload) {
             state.instructionData.cust_po_number = payload
+        },
+        updateNotes(state, payload) {
+            state.instructionData.notes = payload
         },
 
 // cost list
@@ -398,6 +397,18 @@ const store = createStore({
             axios.post('/api/instruction/add', other)
             .then((data)=>console.log(data))
             .catch((err)=>console.log(err))
+        },
+        detailInstruction(context, id) {
+            axios.get('/api/instruction/'+id)
+            .then((json)=>{
+                const { _id, ...other } = json.data.detail_instruction
+                context.commit('updateInstruction', other)
+                console.log(this.state.instructionData);
+            })
+        },
+        editInstruction(context) {
+            axios.put('/api/instruction/update', context.getters.getInstructionDetail)
+            .then((json)=> console.log(json.data))
         }
     },
 });

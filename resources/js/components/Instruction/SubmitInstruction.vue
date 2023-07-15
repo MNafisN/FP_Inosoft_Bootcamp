@@ -13,9 +13,16 @@
 <script>
 export default {
     name: 'submit-instruction',
+    props: {
+        type: String
+    },
     methods: {
         submit() {
-            this.$store.dispatch('submitInstruction')
+            if(this.type === "edit"){
+                this.$store.dispatch('editInstruction')
+            } else {
+                this.$store.dispatch('submitInstruction')
+            }
             this.$router.push('/app')
         },
         draft() {
