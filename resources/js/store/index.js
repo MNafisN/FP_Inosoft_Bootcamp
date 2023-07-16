@@ -387,17 +387,6 @@ const store = createStore({
                     context.commit("deleteAttachment", i);
                 });
         },
-        submitInstruction(context) {
-            context.commit("updateStatus", "In Progress");
-            const { instruction_id, ...other } = context.state.instructionData;
-            console.log(other);
-            axios
-                .post("/api/instruction/add", other)
-                .then((json) => {
-                    context.commit('updateInstructionId', json.data.instruction.instruction_id)
-                })
-                .catch((err) => console.log(err));
-        },
         saveAsDraft(context) {
             context.commit("updateStatus", "Draft");
             const { instruction_id, ...other } = context.state.instructionData;
@@ -421,14 +410,6 @@ const store = createStore({
             }
             axios.put('/api/instruction/addAttachment', data)
             .then(()=>context.dispatch('refresh'))
-        },
-        editInstruction(context) {
-            axios
-                .put(
-                    "/api/instruction/update",
-                    context.getters.getInstructionDetail
-                )
-                .then((json) => console.log(json.data));
         },
         addInvoices(context, payload) {
             const data = {
