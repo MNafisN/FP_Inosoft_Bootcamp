@@ -62,9 +62,9 @@
                 <br />
                 <br />
                 <br />
-                <div class="d-flex justify-content-end align-items-center">
+                <div class="d-flex justify-content-end align-items-center gap-2">
                     <span class="pointer" @click="showModal">Cancle</span>
-                    <button class="btn btn-secondary fw-medium submit ms-5">
+                    <button class="bg-primary-custom py-2 my-2 w-180px rounded d-flex justify-content-center border-0 text-white fw-medium">
                         Submit
                     </button>
                 </div>

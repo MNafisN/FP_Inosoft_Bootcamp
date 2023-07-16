@@ -2,10 +2,10 @@
     <AddVendorInvoice v-if="isShow" @showToggle="showToggle" :indexEdit="indexEdit" />
     <div v-if="!isDisable" class="d-flex justify-content-between">
         <span class="fw-bold">Vendor Invoice</span>
-        <button class="btn btn-secondary" @click="showToggle">
+        <button class="bg-primary-custom py-2 my-2 w-180px rounded d-flex justify-content-center border-0" @click="showToggle">
             <div class="d-flex align-items-center gap-1">
                 <div class="i-plus"></div>
-                <span>Add Vendor Invoice</span>
+                <span class="text-white fw-semibold">Add Vendor Invoice</span>
             </div>
         </button>
     </div>

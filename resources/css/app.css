@@ -1,3 +1,15 @@
+.bg-primary-custom{
+    background-color: #01AABB;
+}
+.bg-secondary-custom{
+    background-color: #B9BEC7;
+}
+.bg-background{
+    background-color: #FCFBFE;
+}
+.bg-background-filled{
+    background-color: #F8F6F8;
+}
 .h-fit{
     height: fit-content;
 }

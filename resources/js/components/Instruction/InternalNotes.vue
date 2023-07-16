@@ -13,7 +13,7 @@
                 <br>
                 <div class="d-flex justify-content-end align-items-center">
                     <span class="pointer" @click="showToggle">Cancle</span>
-                    <button class="btn btn-secondary fw-medium submit ms-5" @click="submit">
+                    <button class="bg-primary-custom py-2 my-2 w-180px rounded d-flex justify-content-center align-items-center border-0 text-white fw-medium submit ms-5" @click="submit">
                         Submit
                     </button>
                 </div>
@@ -24,25 +24,26 @@
         <div>
             <div v-for="(note, index) in internalNotes" class="mb-3">
                 <div class="d-flex justify-content-between w-100">
-                    <span class="fs-7">{{ title(note.user, note.time) }}</span>
+                    <span class="fs-7">{{ title(note.posted_by, note.date_posted) }}</span>
                     <div class="d-flex gap-3">
                         <div class="i-delete pointer" @click="deleteNotes(index)"></div>
                         <div class="i-modify pointer" @click="modifyNotes(index)"></div>
                     </div>
                 </div>
                 <div class="w-100 rounded bg-secondary-subtle p-3">
-                    <p class="m-0">{{ note.value }}</p>
+                    <p class="m-0">{{ note.note }}</p>
                 </div>
             </div>
         </div>
-        <button class="btn btn-secondary my-2 w-180px" @click="showToggle">
-            <div class="i-plus d-inline-block me-1"></div>
-            <span> Add Internal Notes</span>
+        <button class="bg-primary-custom py-2 my-2 w-180px rounded d-flex justify-content-center align-items-center gap-1 border-0" @click="showToggle">
+            <div class="i-plus"></div>
+            <span class="text-white fw-semibold"> Add Internal Notes</span>
         </button>
     </div>
 </template>
 
 <script>
+import axios from 'axios';
 import moment from 'moment';
 export default {
     name: 'internal-notes',
@@ -67,20 +68,20 @@ export default {
             this.indexEdit = -1
         },
         submit() {
-            const data = {
-                value: this.textBox,
-                user: "User",
-                time: moment().format('DD/MM/YY hh:mm A')
-            }
+            // const data = {
+            //     note: this.textBox,
+            //     time: moment().format('DD/MM/YY hh:mm A')
+            // }
             if(this.indexEdit === -1){
-                this.$store.commit('addNotesInternalOnly', data)
+                this.$store.dispatch('addNotesInternalOnly', this.textBox)
             } else {
-                this.$store.commit('updateNotesInternalOnly', {data, index: this.indexEdit})
+                this.$store.dispatch('updateNotesInternalOnly', {note: this.textBox, index: this.indexEdit})
             }
+            this.textBox = ""
             this.showToggle()
         },
         deleteNotes(index) {
-            this.$store.commit('deleteNotesInternalOnly', index)
+            this.$store.dispatch('deleteNotesInternalOnly', index)
         },
         modifyNotes(index) {
             this.indexEdit = index

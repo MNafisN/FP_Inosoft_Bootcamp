@@ -1,7 +1,7 @@
 <template>
     <h5>cost detail</h5>
     <div class="p-2">
-        <div class="row bg-secondary text-white">
+        <div class="row bg-secondary-custom text-white">
             <div class="col fg-1">Description</div>
             <div :class="'col fg-2 ' + (type === 'detail' ? 'text-end' : '')">QTY</div>
             <div class="col fg-3">UOM</div>
@@ -19,7 +19,7 @@
         <UsdTotal v-if="UsdCheck" :type="type" />
         <AudTotal v-if="AudCheck" :type="type" :UsdCheck="UsdCheck" />
         <div v-if="!UsdCheck && !AudCheck && type !== 'detail'" class="d-flex py-2 justify-content-end w-100">
-            <div class="plus bg-secondary" @click="plus">
+            <div class="plus bg-primary-custom" @click="plus">
                 <div class="i-plus"></div>
             </div>
         </div>

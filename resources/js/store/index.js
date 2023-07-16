@@ -38,20 +38,21 @@ const store = createStore({
         return {
             instructionData: JSON.parse(JSON.stringify(INITIAL_STATE)),
             internalOnly: {
-                attachment: [
-                    {
-                        name: "file1.jpg",
-                        info: "by Irfan Faqih on 26/04/22 11:43 AM",
-                        link: "",
-                    },
+                internal_attachment: [
+                    // {
+                    //     name: "file1.jpg",
+                    //     info: "by Irfan Faqih on 26/04/22 11:43 AM",
+                    //     link: "",
+                    // },
                 ],
-                notes: [
-                    {
-                        value: "ini adalah contoh untuk notes",
-                        user: "User",
-                        time: "08/07/23 05:12 PM",
-                    },
+                internal_notes: [
+                    // {
+                    //     note: "ini adalah contoh untuk notes",
+                    //     user: "User",
+                    //     time: "08/07/23 05:12 PM",
+                    // },
                 ],
+                activity_log: []
             },
             termination: {
                 termination_reason: "",
@@ -185,13 +186,13 @@ const store = createStore({
             return state.instructionData.invoices[index];
         },
         getAttachmentInternalOnly(state) {
-            return state.internalOnly.attachment;
+            return state.internalOnly.internal_attachment;
         },
         getNotesInternalOnlyAll(state) {
-            return state.internalOnly.notes;
+            return state.internalOnly.internal_notes;
         },
         getNotesInternalOnly: (state) => (index) => {
-            return state.internalOnly.notes[index].value;
+            return state.internalOnly.internal_notes[index].note;
         },
         getTermination(state) {
             return state.termination;
@@ -335,7 +336,11 @@ const store = createStore({
             console.log("edit invoice");
         },
 
-        // attachment internal only
+        // internal only
+        updateInternalOnly(state, payload) {
+            state.internalOnly = payload
+            console.log(state.internalOnly);
+        },
         addAttachmentInternalOnly(state, payload) {
             state.internalOnly.attachment.push(payload);
         },
@@ -343,7 +348,6 @@ const store = createStore({
             state.internalOnly.attachment.splice(i, 1);
         },
 
-        // notes internal only
         addNotesInternalOnly(state, payload) {
             state.internalOnly.notes.push(payload);
         },
@@ -413,7 +417,7 @@ const store = createStore({
         },
         addInvoices(context, payload) {
             const data = {
-                instruction_id: context.state.instructionData.instruction_id,
+                instruction_id: context.getters.getId,
                 ...payload,
             };
             axios.put("/api/instruction/addInvoice", data)
@@ -423,7 +427,7 @@ const store = createStore({
         },
         deleteInvoice(context, index) {
             axios.put('/api/instruction/deleteInvoice', {
-                instruction_id: context.state.instructionData.instruction_id,
+                instruction_id: context.getters.getId,
                 index
             }).then(()=>{
                 context.commit('deleteInvoice', index)
@@ -431,7 +435,7 @@ const store = createStore({
         },
         updateInvoice(context, {invoice, index}) {
             const data = {
-                instruction_id: context.state.instructionData.instruction_id,
+                instruction_id: context.getters.getId,
                 index,
                 ...invoice
             }
@@ -441,7 +445,7 @@ const store = createStore({
             })
         },
         refresh(context) {
-            axios.get("/api/instruction/" + context.state.instructionData.instruction_id)
+            axios.get("/api/instruction/" + context.getters.getId)
             .then((json) => {
                 const { _id, ...other } = json.data.detail_instruction;
                 context.commit("updateInstruction", other);
@@ -450,7 +454,7 @@ const store = createStore({
 
         },
         isCompleted(context) {
-            axios.put('/api/instruction/completed/'+ context.state.instructionData.instruction_id)
+            axios.put('/api/instruction/completed/'+ context.getters.getId)
             .then(()=>context.commit('updateStatus', 'Completed'))
         },
         terminate(context) {
@@ -467,6 +471,56 @@ const store = createStore({
                     console.log('berhasil terminate')
                     context.dispatch('refresh')
                 })
+            })
+        },
+
+// internal only
+        getDataInternalOnly(context, id) {
+            axios.get(`/api/instruction/internal/${id}`)
+            .then((json)=>{
+                console.log(json.data)
+                const data = {
+                    internal_attachment: json.data.internal_data.internal_attachment,
+                    internal_notes: json.data.internal_data.internal_notes,
+                    activity_log: json.data.internal_data.activity_log
+                }
+                context.commit('updateInternalOnly', data)
+            })
+        },
+        addAttachmentInternalOnly(context, file) {
+            const data = {
+                instruction_id: context.getters.getId,
+                attachment: file
+            }
+            axios.put('/api/instruction/internal/addAttachment', data)
+            .then(()=>{
+                context.commit('addAttachmentInternalOnly', file)
+            })
+        },
+        addNotesInternalOnly(context, payload) {
+            const data = {
+                instruction_id: context.getters.getId,
+                note: payload
+            }
+            axios.put('/api/instruction/internal/addNote', data)
+            .then((json)=>{
+                const data = {
+                    internal_attachment: json.data.internal_data.internal_attachment,
+                    internal_notes: json.data.internal_data.internal_notes,
+                    activity_log: json.data.internal_data.activity_log
+                }
+                context.commit('updateInternalOnly', data)
+            })
+        },
+        deleteNotesInternalOnly(context, index) {
+            const data = {
+                instruction_id: context.getters.getId,
+                index
+            }
+            axios.put('/api/instruction/internal/deleteNote', data)
+            .then((json)=>{
+                console.log(json.data)
+                context.commit('deleteNotesInternalOnly', index)
             })
         }
     },

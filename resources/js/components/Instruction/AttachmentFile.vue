@@ -49,11 +49,11 @@
         <label
             v-if="!isDisable && !uploadDisabled"
             :for="idName"
-            class="btn btn-secondary my-2 w-180px"
+            class="bg-primary-custom py-2 my-2 w-180px rounded d-flex justify-content-center"
         >
             <div v-if="!isUpload">
                 <div class="i-plus d-inline-block me-1"></div>
-                <span> Add Attachment</span>
+                <span class="text-white fw-semibold"> Add Attachment</span>
             </div>
             <div v-else class="d-flex align-items-center gap-2 justify-content-center">
                 <div class="loader d-inline-block"></div>

@@ -17,7 +17,7 @@
                 <br>
                 <div class="d-flex justify-content-end align-items-center">
                     <span class="pointer" @click="showToggle">Cancle</span>
-                    <button class="btn btn-secondary fw-medium submit ms-5" @click="submit">
+                    <button class="bg-primary-custom py-2 my-2 w-180px rounded d-flex justify-content-center align-items-center border-0 text-white fw-medium submit ms-5" @click="submit">
                         Submit
                     </button>
                 </div>
@@ -103,6 +103,7 @@ export default {
     },
     mounted() {
         this.$store.dispatch('detailInstruction', this.$route.params.id)
+        this.$store.dispatch('getDataInternalOnly', this.$route.params.id)
     }
 };
 </script>

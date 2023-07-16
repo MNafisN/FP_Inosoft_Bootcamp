@@ -21,7 +21,7 @@
             <div class="col-7">
                 <textarea
                     rows="5"
-                    class="w-100 form-control bg-secondary-subtle border-secondary"
+                    class="w-100 bg-background-filled form-control border-secondary"
                     :value="notes"
                     @change="(e)=>updateNotes(e.target.value)"
                     :disabled="isDisable || type === 'detail'"

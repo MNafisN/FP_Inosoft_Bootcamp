@@ -8,7 +8,7 @@
         <button class="btn border fw-medium fs-7 draft" @click="draft">
             Save as Draft
         </button>
-        <button class="btn btn-secondary fw-medium fs-7 submit" @click="submit">
+        <button class="bg-primary-custom py-2 my-2 w-180px rounded d-flex justify-content-center border-0 text-white fw-medium" @click="submit">
             Submit
         </button>
     </div>

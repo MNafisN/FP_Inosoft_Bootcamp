@@ -1,5 +1,5 @@
 <template>
-    <div class="bg-info-subtle">
+    <div class="bg-background">
         <Header></Header>
         <div class="m-4 mb-0">
             <RouterView></RouterView>
