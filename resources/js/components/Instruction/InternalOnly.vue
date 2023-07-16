@@ -19,15 +19,17 @@
                 <InternalNotes />
             </div>
         </div>
+        <ActivityNote />
     </div>
 </template>
 
 <script>
 import AttachmentFile from './AttachmentFile.vue'
 import InternalNotes from './InternalNotes.vue'
+import ActivityNote from './ActivityNote.vue'
 export default {
     name: 'internal-only',
-    components: { AttachmentFile, InternalNotes },
+    components: { AttachmentFile, InternalNotes, ActivityNote },
     computed: {
         attachmentData() {
             return this.$store.getters.getAttachmentInternalOnly
@@ -38,7 +40,7 @@ export default {
             this.$store.dispatch('addAttachmentInternalOnly', file)
         },
         deleteFile(index) {
-            this.$store.commit('deleteAttachmentInternalOnly', index)
+            this.$store.dispatch('deleteAttachmentInternalOnly', index)
         }
     }
 }

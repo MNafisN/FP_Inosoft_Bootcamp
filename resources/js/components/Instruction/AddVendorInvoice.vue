@@ -24,7 +24,7 @@
                 <AttachmentFile id-name="supportingDocument" :files="supportingDocument" @upload="addDocument" @deleteByIndex="deleteDocument" />
                 <div class="d-flex justify-content-end align-items-center">
                     <span class="pointer" @click="closePanel">Cancle</span>
-                    <button class="btn btn-secondary fw-medium submit ms-5" @click="submit">
+                    <button class="bg-primary-custom rounded border-0 text-white fw-semibold submit ms-5" @click="submit">
                         Submit
                     </button>
                 </div>

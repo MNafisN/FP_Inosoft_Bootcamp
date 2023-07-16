@@ -10,7 +10,7 @@
             </div>
         </div>
         <div class="col d-flex">
-            <div class="bg-secondary bulet d-flex justify-content-center align-items-center text-white">
+            <div class="bg-secondary-custom bulet d-flex justify-content-center align-items-center text-white">
                 <span>{{ supportingDocument }}</span>
             </div>
             <div class="dropdown">

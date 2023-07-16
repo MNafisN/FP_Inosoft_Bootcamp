@@ -57,7 +57,7 @@
             </div>
             <div v-else class="d-flex align-items-center gap-2 justify-content-center">
                 <div class="loader d-inline-block"></div>
-                <span class="fw-semibold">Uploading...</span>
+                <span class="fw-semibold text-white">Uploading...</span>
             </div>
         </label>
     </div>

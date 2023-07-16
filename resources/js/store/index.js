@@ -200,6 +200,9 @@ const store = createStore({
         getFormData(state) {
             return state.formData;
         },
+        getActivityNote(state) {
+            return state.internalOnly.activity_log
+        }
     },
     mutations: {
         reset(state) {
@@ -342,20 +345,20 @@ const store = createStore({
             console.log(state.internalOnly);
         },
         addAttachmentInternalOnly(state, payload) {
-            state.internalOnly.attachment.push(payload);
+            state.internalOnly.internal_attachment.push(payload);
         },
         deleteAttachmentInternalOnly(state, i) {
-            state.internalOnly.attachment.splice(i, 1);
+            state.internalOnly.internal_attachment.splice(i, 1);
         },
 
         addNotesInternalOnly(state, payload) {
-            state.internalOnly.notes.push(payload);
+            state.internalOnly.internal_notes.push(payload);
         },
         deleteNotesInternalOnly(state, i) {
-            state.internalOnly.notes.splice(i, 1);
+            state.internalOnly.internal_notes.splice(i, 1);
         },
         updateNotesInternalOnly(state, payload) {
-            state.internalOnly.notes[payload.index] = payload.data;
+            state.internalOnly.internal_notes[payload.index] = payload.data;
         },
 
         // termination
@@ -497,6 +500,14 @@ const store = createStore({
                 context.commit('addAttachmentInternalOnly', file)
             })
         },
+        deleteAttachmentInternalOnly(context, index) {
+            const data = {
+                instruction_id: context.getters.getId,
+                index
+            }
+            axios.put('/api/instruction/internal/deleteAttachment', data)
+            .then(()=>context.commit('deleteAttachmentInternalOnly', index))
+        },
         addNotesInternalOnly(context, payload) {
             const data = {
                 instruction_id: context.getters.getId,
@@ -521,6 +532,22 @@ const store = createStore({
             .then((json)=>{
                 console.log(json.data)
                 context.commit('deleteNotesInternalOnly', index)
+            })
+        },
+        updateNotesInternalOnly(context, payload) {
+            const data = {
+                instruction_id: context.getters.getId,
+                index: payload.index,
+                note: payload.note
+            }
+            axios.put('/api/instruction/internal/updateNote', data)
+            .then((json)=>{
+                const data = {
+                    internal_attachment: json.data.internal_data.internal_attachment,
+                    internal_notes: json.data.internal_data.internal_notes,
+                    activity_log: json.data.internal_data.activity_log
+                }
+                context.commit('updateInternalOnly', data)
             })
         }
     },

@@ -84,3 +84,17 @@
     background-size: contain;
     background-repeat: no-repeat;
 }
+.i-up{
+    width: 15px;
+    height: 15px;
+    background: url(svg/arrow-up.svg);
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+.i-down{
+    width: 15px;
+    height: 15px;
+    background: url(svg/arrow-down.svg);
+    background-size: contain;
+    background-repeat: no-repeat;
+}
