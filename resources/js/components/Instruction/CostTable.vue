@@ -58,7 +58,7 @@
         <div class="col fg-3">
             <Dropdown
                 :selected="costData.unit_of_measurement"
-                :list="['SHP', 'BILL', 'HRS', 'MEN', 'PCS', 'TRIP', 'MT']"
+                :list="['HRS', 'MEN', 'PCS', 'MT']"
                 @sendValue="(value) => updateCostUOM(value)"
             />
         </div>

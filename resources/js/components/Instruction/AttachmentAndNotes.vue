@@ -24,7 +24,7 @@
                     class="w-100 form-control bg-secondary-subtle border-secondary"
                     :value="notes"
                     @change="(e)=>updateNotes(e.target.value)"
-                    :disabled="isDisable"
+                    :disabled="isDisable || type === 'detail'"
                 ></textarea>
             </div>
         </div>
@@ -41,10 +41,16 @@ export default {
         };
     },
     components: { AttachmentFile },
+    props: {
+        type: String
+    },
     methods: {
         addAttachment(file) {
-            console.log(file);
-            this.$store.commit("addAttachment", file);
+            if(this.type === "detail") {
+                this.$store.dispatch("addAttachmentInDetail", file)
+            } else {
+                this.$store.commit("addAttachment", file);
+            }
         },
         deleteAttachment(index) {
             this.$store.dispatch('deleteAttachmentInstruction', index)

@@ -24,7 +24,7 @@
             <div class="col-1"></div>
         </div>
         <VendorInvoiceList v-for="(invoice, index) in invoiceList" :invoice="invoice" :index="index" :is-disable="isDisable" @modify="modify(index)" />
-        <div v-if="!isComplete" class="row justify-content-center gap-4 p-2 border">
+        <div v-if="!isDisable" class="row justify-content-center gap-4 p-2 border">
             <p class="width m-0 p-0">Click the button if all vendor invoices have been received</p>
             <button class="btn btn-secondary width" @click="submit">All Received</button>
         </div>
@@ -65,7 +65,7 @@ export default {
             this.isShow = true
         },
         submit() {
-            this.$store.commit('updateStatus', 'Completed')
+            this.$store.dispatch('isCompleted')
         },
     }
 }

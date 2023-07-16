@@ -9,16 +9,11 @@
             >Create 3rd Party Instruction</Button
         >
         <ul class="dropdown-menu w-inherit">
-            <li>
-                <router-link class="dropdown-item" to="/app/create-instruction"
-                    ><TruckIcon class="icon" />Logistic Instruction</router-link
-                >
+            <li class="dropdown-item" @click="create('Logistic Instruction')">
+                <TruckIcon class="icon" />Logistic Instruction
             </li>
-            <li>
-                <router-link class="dropdown-item" to="/app/create-instruction"
-                    ><ServiceIcon class="icon" />Service
-                    Instruction</router-link
-                >
+            <li class="dropdown-item" @click="create('Service Instruction')">
+                <ServiceIcon class="icon" />Service Instruction
             </li>
         </ul>
     </div>
@@ -40,6 +35,13 @@ export default {
             addIcon: shallowRef(AddIcon),
         };
     },
+    methods: {
+        create(type) {
+            this.$store.commit('reset')
+            this.$store.commit('updateInstructionType', type)
+            this.$router.push('/app/create-instruction')
+        }
+    }
 };
 </script>
 

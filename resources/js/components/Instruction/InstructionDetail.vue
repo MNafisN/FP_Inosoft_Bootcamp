@@ -214,8 +214,5 @@ export default {
             this.$store.commit('updatePoNumber', payload)
         },
     },
-    mounted() {
-        console.log(this.instructionDetail);
-    }
 };
 </script>

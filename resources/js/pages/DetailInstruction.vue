@@ -10,9 +10,9 @@
                 <label class="fs-7">Canceled by</label>
                 <p>User</p>
                 <label class="fs-7">Description</label>
-                <textarea class="w-100 border rounded p-2" rows="5"></textarea>
+                <textarea class="w-100 border rounded p-2" rows="5" :value="termination?.termination_reason" @change="e=>updateDescription(e.target.value)"></textarea>
                 <label>Attachment</label>
-                <AttachmentFile id-name="attachmentTerminate" :files="attachmentTerminate" @upload="addAttachment" @delete-by-index="deleteAttachment" />
+                <AttachmentFile id-name="attachmentTerminate" :files="termination?.attachment" @upload="addAttachment" @delete-by-index="deleteAttachment" />
                 <br>
                 <br>
                 <div class="d-flex justify-content-end align-items-center">
@@ -51,7 +51,7 @@
         <br />
         <CostDetail type="detail" />
         <br />
-        <AttachmentAndNotes />
+        <AttachmentAndNotes type="detail" />
         <br>
         <VendorInvoice />
         <br>
@@ -79,8 +79,8 @@ export default {
         instructionStatus() {
             return this.$store.getters.getStatus
         },
-        attachmentTerminate() {
-            return this.$store.getters.getAttachmentTerminate
+        termination() {
+            return this.$store.getters.gettermination
         }
     },
     methods: {
@@ -88,7 +88,7 @@ export default {
             this.isShow === false ? this.isShow = true : this.isShow = false
         },
         submit() {
-            this.$store.commit('terminateInstruction', {user: "User", description: "test"})
+            this.$store.dispatch('terminate')
             this.isShow = false
         },
         addAttachment(file) {
@@ -96,6 +96,9 @@ export default {
         },
         deleteAttachment(index) {
             this.$store.commit('deleteAttachmentTerminate', index)
+        },
+        updateDescription(text) {
+            this.$store.commit('updateDescriptionTermination', text)
         }
     },
     mounted() {

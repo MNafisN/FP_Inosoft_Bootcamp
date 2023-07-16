@@ -18,12 +18,17 @@ export default {
     },
     methods: {
         submit() {
-            if(this.type === "edit"){
-                this.$store.dispatch('editInstruction')
-            } else {
-                this.$store.dispatch('submitInstruction')
+            try {
+                if(this.type === "edit"){
+                    this.$store.dispatch('editInstruction')
+                } else {
+                    this.$store.dispatch('submitInstruction')
+                }
+            } catch (err) {
+                alert(err.message)
+            } finally {
+                this.$router.push('/app')                
             }
-            this.$router.push('/app')
         },
         draft() {
             this.$store.dispatch('saveAsDraft')

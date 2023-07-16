@@ -1,44 +1,42 @@
 import axios from "axios";
 import { createStore } from "vuex";
 
+const INITIAL_STATE = {
+    instruction_id: "",
+    instruction_type: "Logistic Instruction",
+    assigned_vendor: "",
+    vendor_address: "",
+    attention_of: "",
+    quotation_number: null,
+    invoice_to: "",
+    customer_contact: "",
+    cust_po_number: "",
+    cost_detail: [
+        {
+            cost_description: "",
+            quantity: 0,
+            unit_of_measurement: "PCS",
+            unit_price: 0,
+            GST_percentage: 0,
+            currency: "",
+            vat_amount: 0,
+            sub_total: 0,
+            total: 0,
+            charge_to: "",
+        },
+    ],
+    attachment: [],
+    notes: null,
+    transaction_code: "",
+    invoices: [],
+    termination: {},
+    instruction_status: "Draft",
+}
+
 const store = createStore({
     state() {
         return {
-            instructionData: {
-                instruction_id: "",
-                instruction_type: "Logistic Instruction",
-                assigned_vendor: "",
-                vendor_address: "",
-                attention_of: "",
-                quotation_number: null,
-                invoice_to: "",
-                customer_contact: "",
-                cust_po_number: "",
-                cost_detail: [
-                    {
-                        cost_description: "",
-                        quantity: 0,
-                        unit_of_measurement: "PCS",
-                        unit_price: 0,
-                        GST_percentage: 0,
-                        currency: "",
-                        vat_amount: 0,
-                        sub_total: 0,
-                        total: 0,
-                        charge_to: "",
-                    },
-                ],
-                attachment: [],
-                notes: null,
-                transaction_code: "",
-                invoices: [],
-                termination: {
-                    // user: "User",
-                    // description: "Test",
-                    // attachment: []
-                },
-                instruction_status: "Draft",
-            },
+            instructionData: JSON.parse(JSON.stringify(INITIAL_STATE)),
             internalOnly: {
                 attachment: [
                     {
@@ -51,30 +49,36 @@ const store = createStore({
                     {
                         value: "ini adalah contoh untuk notes",
                         user: "User",
-                        time: "08/07/23 05:12 PM"
-                    }
-                ]
+                        time: "08/07/23 05:12 PM",
+                    },
+                ],
             },
-            termination: {},
+            termination: {
+                termination_reason: "",
+                attachment: []
+            },
             formData: {
                 customers: [],
                 transactions: [],
-                vendors: []
+                vendors: [],
             },
         };
     },
     getters: {
         getStatus(state) {
-            return state.instructionData.instruction_status
+            return state.instructionData.instruction_status;
+        },
+        getId(state) {
+            return state.instructionData.instruction_id;
         },
         listCostTable(state) {
             return state.instructionData.cost_detail.length;
         },
         getInstructionDetail(state) {
-            return state.instructionData
+            return state.instructionData;
         },
         getTransactionCode(state) {
-            return state.instructionData.transaction_code
+            return state.instructionData.transaction_code;
         },
         getCostData: (state) => (index) => {
             return state.instructionData.cost_detail[index];
@@ -83,7 +87,7 @@ const store = createStore({
             return state.instructionData.attachment;
         },
         getNotes(state) {
-            return state.instructionData.notes
+            return state.instructionData.notes;
         },
         getUsdTotal(state) {
             const vat_amount = state.instructionData.cost_detail.reduce(
@@ -106,20 +110,22 @@ const store = createStore({
                 },
                 0
             );
-            const total = state.instructionData.cost_detail.reduce(
-                function (a, b) {
-                    if (b.currency === "USD") {
-                        return a + b.total;
-                    } else {
-                        return a;
-                    }
-                },
-                0);
+            const total = state.instructionData.cost_detail.reduce(function (
+                a,
+                b
+            ) {
+                if (b.currency === "USD") {
+                    return a + b.total;
+                } else {
+                    return a;
+                }
+            },
+            0);
 
             return {
                 vat_amount,
                 sub_total,
-                total
+                total,
             };
         },
         getAudTotal(state) {
@@ -143,15 +149,17 @@ const store = createStore({
                 },
                 0
             );
-            const total = state.instructionData.cost_detail.reduce(
-                function (a, b) {
-                    if (b.currency === "AUD") {
-                        return a + b.total;
-                    } else {
-                        return a;
-                    }
-                },
-                0);
+            const total = state.instructionData.cost_detail.reduce(function (
+                a,
+                b
+            ) {
+                if (b.currency === "AUD") {
+                    return a + b.total;
+                } else {
+                    return a;
+                }
+            },
+            0);
 
             return {
                 vat_amount,
@@ -161,81 +169,81 @@ const store = createStore({
             };
         },
         UsdCheck(state) {
-            return state.instructionData.cost_detail.some(
-                function(cost) {
-                    return cost.currency === "USD"
-                }
-            )
+            return state.instructionData.cost_detail.some(function (cost) {
+                return cost.currency === "USD";
+            });
         },
         AudCheck(state) {
-            return state.instructionData.cost_detail.some(
-                function(cost) {
-                    return cost.currency === "AUD"
-                }
-            )
+            return state.instructionData.cost_detail.some(function (cost) {
+                return cost.currency === "AUD";
+            });
         },
         getVendorInvoiceAll(state) {
-            return state.instructionData.invoices
+            return state.instructionData.invoices;
         },
-        getVendorInvoice: (state)=> (index)=> {
-            return state.instructionData.invoices[index]
+        getVendorInvoice: (state) => (index) => {
+            return state.instructionData.invoices[index];
         },
         getAttachmentInternalOnly(state) {
-            return state.internalOnly.attachment
+            return state.internalOnly.attachment;
         },
         getNotesInternalOnlyAll(state) {
-            return state.internalOnly.notes
+            return state.internalOnly.notes;
         },
-        getNotesInternalOnly: (state)=> (index)=> {
-            return state.internalOnly.notes[index].value
-        },
-        getAttachmentTerminate(state) {
-            return state.instructionData.termination.attachment
+        getNotesInternalOnly: (state) => (index) => {
+            return state.internalOnly.notes[index].value;
         },
         getTermination(state) {
             return state.termination;
         },
         getFormData(state) {
-            return state.formData
-        }
+            return state.formData;
+        },
     },
     mutations: {
-// update instruction
-        updateInstruction(state, payload) {
-            state.instructionData = payload
-        },
-        updateStatus(state, payload) {
-            state.instructionData.instruction_status = payload
-        },
-        updateInstructionType(state, payload) {            
-            state.instructionData.instruction_type = payload
-        },
-        updateAssignedVendor(state, payload) {
-            state.instructionData.assigned_vendor = payload
-        },
-        updateVendorAddress(state, payload) {
-            state.instructionData.vendor_address = payload
-        },
-        updateAttentionOf(state, payload) {
-            state.instructionData.attention_of = payload
-        },
-        updateQuotationNumber(state, payload) {
-            state.instructionData.quotation_number = parseInt(payload)
-        },
-        updateInvoiceTo(state, payload) {
-            state.instructionData.invoice_to = payload
-        },
-        updateCustomerContract(state, payload) {
-            state.instructionData.customer_contact = payload
-        },
-        updatePoNumber(state, payload) {
-            state.instructionData.cust_po_number = payload
-        },
-        updateNotes(state, payload) {
-            state.instructionData.notes = payload
+        reset(state) {
+            state.instructionData = JSON.parse(JSON.stringify(INITIAL_STATE))
         },
 
-// cost list
+        // update instruction
+        updateInstruction(state, payload) {
+            state.instructionData = payload;
+        },
+        updateInstructionId(state, payload) {
+            state.instructionData.instruction_id = payload;
+        },
+        updateStatus(state, payload) {
+            state.instructionData.instruction_status = payload;
+        },
+        updateInstructionType(state, payload) {
+            state.instructionData.instruction_type = payload;
+        },
+        updateAssignedVendor(state, payload) {
+            state.instructionData.assigned_vendor = payload;
+        },
+        updateVendorAddress(state, payload) {
+            state.instructionData.vendor_address = payload;
+        },
+        updateAttentionOf(state, payload) {
+            state.instructionData.attention_of = payload;
+        },
+        updateQuotationNumber(state, payload) {
+            state.instructionData.quotation_number = parseInt(payload);
+        },
+        updateInvoiceTo(state, payload) {
+            state.instructionData.invoice_to = payload;
+        },
+        updateCustomerContract(state, payload) {
+            state.instructionData.customer_contact = payload;
+        },
+        updatePoNumber(state, payload) {
+            state.instructionData.cust_po_number = payload;
+        },
+        updateNotes(state, payload) {
+            state.instructionData.notes = payload;
+        },
+
+        // cost list
         addCostList(state) {
             state.instructionData.cost_detail.push({
                 cost_description: "",
@@ -299,116 +307,186 @@ const store = createStore({
                 Math.round((data.vat_amount + data.sub_total) * 100) / 100;
         },
 
-// attachment instruction
+        // attachment instruction
         addAttachment(state, payload) {
             state.instructionData.attachment.push(payload);
         },
         deleteAttachment(state, i) {
-            state.instructionData.attachment.splice(i, 1)
+            state.instructionData.attachment.splice(i, 1);
         },
 
-// link to
+        // link to
         updateLinkTo(state, payload) {
-            state.instructionData.transaction_code = payload
+            state.instructionData.transaction_code = payload;
         },
         removeLinkTo(state) {
-            state.instructionData.transaction_code = ""
+            state.instructionData.transaction_code = "";
         },
 
-// invoice
+        // invoice
         addInvoices(state, payload) {
-            state.instructionData.invoices.push(payload)
+            state.instructionData.invoices.push(payload);
         },
         deleteInvoice(state, i) {
-            state.instructionData.invoices.splice(i,1)
+            state.instructionData.invoices.splice(i, 1);
         },
         updateInvoice(state, payload) {
-            state.instructionData.invoices[payload.index] = payload.invoice
-            console.log('edit invoice');
+            state.instructionData.invoices[payload.index] = payload.invoice;
+            console.log("edit invoice");
         },
 
-// attachment internal only
+        // attachment internal only
         addAttachmentInternalOnly(state, payload) {
-            state.internalOnly.attachment.push(payload)
+            state.internalOnly.attachment.push(payload);
         },
         deleteAttachmentInternalOnly(state, i) {
-            state.internalOnly.attachment.splice(i, 1)
+            state.internalOnly.attachment.splice(i, 1);
         },
 
-// notes internal only
+        // notes internal only
         addNotesInternalOnly(state, payload) {
-            state.internalOnly.notes.push(payload)
+            state.internalOnly.notes.push(payload);
         },
         deleteNotesInternalOnly(state, i) {
-            state.internalOnly.notes.splice(i, 1)
+            state.internalOnly.notes.splice(i, 1);
         },
         updateNotesInternalOnly(state, payload) {
-            state.internalOnly.notes[payload.index] = payload.data
+            state.internalOnly.notes[payload.index] = payload.data;
         },
 
-// attachment terminate
+        // termination
+        updateDescriptionTermination(state, payload) {
+            state.termination.termination_reason = payload
+        },
         addAttachmentTerminate(state, payload) {
-            state.instructionData.termination.attachment.push(payload)
+            state.termination.attachment.push(payload);
         },
         deleteAttachmentTerminate(state, i) {
-            state.instructionData.termination.attachment.splice(i, 1)
+            state.termination.attachment.splice(i, 1);
         },
-
-// termination
-        terminateInstruction(state, payload) {
-            state.instructionData.termination.user = payload.user
-            state.instructionData.termination.description = payload.description
-            state.instructionData.instruction_status = "Canceled"
-        },
-        setTermination(state, payload) {
-            state.termination = payload;
-        },
-
 
         setFormData(state, payload) {
-            state.formData = payload
-        }
+            state.formData = payload;
+        },
     },
     actions: {
         async getFormData(context) {
-            const data = (await axios.get('http://127.0.0.1:8000/api/instruction/addNew')).data
-            context.commit('setFormData', await data.form_data)
+            const data = (
+                await axios.get("http://127.0.0.1:8000/api/instruction/addNew")
+            ).data;
+            context.commit("setFormData", await data.form_data);
             console.log(data);
         },
         deleteAttachmentInstruction(context, i) {
-            const file = context.state.instructionData.attachment[i].download
-            axios.delete(`http://127.0.0.1:8000/api/instruction/deleteFile/${file}`)
-            .then(()=>{
-                context.commit('deleteAttachment', i)
-            })
+            const file = context.state.instructionData.attachment[i].download;
+            axios
+                .delete(
+                    `http://127.0.0.1:8000/api/instruction/deleteFile/${file}`
+                )
+                .then(() => {
+                    context.commit("deleteAttachment", i);
+                });
         },
         submitInstruction(context) {
-            context.commit('updateStatus', 'In Progress')
-            const { instruction_id, ...other } = context.state.instructionData
+            context.commit("updateStatus", "In Progress");
+            const { instruction_id, ...other } = context.state.instructionData;
             console.log(other);
-            axios.post('/api/instruction/add', other)
-            .then((data)=>console.log(data))
-            .catch((err)=>console.log(err))
+            axios
+                .post("/api/instruction/add", other)
+                .then((json) => {
+                    context.commit('updateInstructionId', json.data.instruction.instruction_id)
+                })
+                .catch((err) => console.log(err));
         },
         saveAsDraft(context) {
-            context.commit('updateStatus', 'Draft')
-            const { instruction_id, ...other } = context.state.instructionData
-            console.log(other)
-            axios.post('/api/instruction/add', other)
-            .then((data)=>console.log(data))
-            .catch((err)=>console.log(err))
+            context.commit("updateStatus", "Draft");
+            const { instruction_id, ...other } = context.state.instructionData;
+            console.log(other);
+            axios
+                .post("/api/instruction/add", other)
+                .then((data) => console.log(data))
+                .catch((err) => console.log(err));
         },
         detailInstruction(context, id) {
-            axios.get('/api/instruction/'+id)
-            .then((json)=>{
-                const { _id, ...other } = json.data.detail_instruction
-                context.commit('updateInstruction', other)
+            axios.get("/api/instruction/" + id).then((json) => {
+                const { _id, ...other } = json.data.detail_instruction;
+                context.commit("updateInstruction", other);
                 console.log(this.state.instructionData);
-            })
+            });
+        },
+        addAttachmentInDetail(context, payload) {
+            const data = {
+                instruction_id: context.getters.getId,
+                attachment: payload
+            }
+            axios.put('/api/instruction/addAttachment', data)
+            .then(()=>context.dispatch('refresh'))
         },
         editInstruction(context) {
-            axios.put('/api/instruction/update', context.getters.getInstructionDetail)
-            .then((json)=> console.log(json.data))
+            axios
+                .put(
+                    "/api/instruction/update",
+                    context.getters.getInstructionDetail
+                )
+                .then((json) => console.log(json.data));
+        },
+        addInvoices(context, payload) {
+            const data = {
+                instruction_id: context.state.instructionData.instruction_id,
+                ...payload,
+            };
+            axios.put("/api/instruction/addInvoice", data)
+            .then(() => {
+                context.commit("addInvoices", data);
+            });
+        },
+        deleteInvoice(context, index) {
+            axios.put('/api/instruction/deleteInvoice', {
+                instruction_id: context.state.instructionData.instruction_id,
+                index
+            }).then(()=>{
+                context.commit('deleteInvoice', index)
+            })
+        },
+        updateInvoice(context, {invoice, index}) {
+            const data = {
+                instruction_id: context.state.instructionData.instruction_id,
+                index,
+                ...invoice
+            }
+            axios.put('/api/instruction/updateInvoice', data)
+            .then(()=>{
+                context.commit('updateInvoice', {index, invoice})
+            })
+        },
+        refresh(context) {
+            axios.get("/api/instruction/" + context.state.instructionData.instruction_id)
+            .then((json) => {
+                const { _id, ...other } = json.data.detail_instruction;
+                context.commit("updateInstruction", other);
+                console.log(this.state.instructionData);
+            });
+
+        },
+        isCompleted(context) {
+            axios.put('/api/instruction/completed/'+ context.state.instructionData.instruction_id)
+            .then(()=>context.commit('updateStatus', 'Completed'))
+        },
+        terminate(context) {
+            const data = {
+                instruction_id: context.state.instructionData.instruction_id,
+                ...context.getters.getTermination
+            }
+            console.log(data);
+            axios.put('/api/instruction/addTermination', data)
+            .then(()=>{
+                console.log('berhasil addTerminate');
+                axios.put('/api/instruction/terminate/'+ context.state.instructionData.instruction_id)
+                .then(()=>{
+                    console.log('berhasil terminate')
+                    context.dispatch('refresh')
+                })
+            })
         }
     },
 });

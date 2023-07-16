@@ -1,7 +1,7 @@
 <template>
     <div class="modal-background d-flex justify-content-center align-items-center">
         <div class="modal-wrapper">
-            <div class="d-flex m-1 pointer" @click="$emit('showToggle')">
+            <div class="d-flex m-1 pointer" @click="closePanel">
                 <p class="mb-0 me-1 text-white">close</p>
                 <div class="i-close"></div>
             </div>
@@ -11,8 +11,8 @@
                     type="text"
                     class="form-control"
                     placeholder="Vendor Invoice No."
-                    @change="e=> this.invoice.invoice_no = e.target.value"
-                    :value="invoice.invoice_no"
+                    @change="e=> this.invoice.invoice_number = e.target.value"
+                    :value="invoice.invoice_number"
                 />
                 <br />
                 <label>Invoice Attachment</label>
@@ -23,7 +23,7 @@
                 <br />
                 <AttachmentFile id-name="supportingDocument" :files="supportingDocument" @upload="addDocument" @deleteByIndex="deleteDocument" />
                 <div class="d-flex justify-content-end align-items-center">
-                    <span class="pointer" @click="$emit('showToggle')">Cancle</span>
+                    <span class="pointer" @click="closePanel">Cancle</span>
                     <button class="btn btn-secondary fw-medium submit ms-5" @click="submit">
                         Submit
                     </button>
@@ -41,9 +41,9 @@ export default {
         return {
             isUpload: false,
             invoice: {
-                invoice_no: "",
+                invoice_number: "",
                 invoice_attachment: null,
-                supporting_document: []
+                invoice_supporting_document: []
             },
         };
     },
@@ -57,7 +57,7 @@ export default {
             return this.invoice.invoice_attachment
         },
         supportingDocument() {
-            return this.invoice.supporting_document
+            return this.invoice.invoice_supporting_document
         }
     },
     methods: {
@@ -68,24 +68,29 @@ export default {
             this.invoice.invoice_attachment = null
         },
         addDocument(file) {
-            this.invoice.supporting_document.push(file)
+            this.invoice.invoice_supporting_document.push(file)
         },
         deleteDocument(index) {
-            this.invoice.supporting_document.splice(index, 1)
+            this.invoice.invoice_supporting_document.splice(index, 1)
         },
         submit() {
             if(this.indexEdit === -1){
-                this.$store.commit('addInvoices', this.invoice)
+                this.$store.dispatch('addInvoices', this.invoice)
                 this.$emit('showToggle')
             } else {
-                this.$store.commit('updateInvoice', {invoice: this.invoice, index: this.indexEdit})
+                this.$store.dispatch('updateInvoice', {invoice: this.invoice, index: this.indexEdit})
                 this.$emit('showToggle')
             }
+        },
+        closePanel() {
+            if(this.indexEdit !== -1) this.$store.dispatch('refresh')
+            this.$emit('showToggle')
         }
     },
     mounted() {
         if(this.indexEdit !== -1){
             this.invoice = this.$store.getters.getVendorInvoice(this.indexEdit)
+            console.log(this.invoice);
         }
     }
 };
