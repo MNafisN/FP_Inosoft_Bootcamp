@@ -51,11 +51,14 @@
                         >
                         <div class="list-group">
                             <button
+                                v-for="(item, index) in termination.attachment"
+                                :key="index"
                                 type="button"
                                 class="list-group-item list-group-item-action"
                                 aria-current="true"
+                                @click="downloadFile(item.download)"
                             >
-                                {{ termination.attachment }}
+                                {{ item.name }}
                             </button>
                         </div>
                     </div>
@@ -80,8 +83,37 @@ import { mapGetters } from "vuex";
 export default {
     computed: {
         ...mapGetters({
-            termination: "getTermination",
+            termination: "getModalTermination",
         }),
+    },
+    methods: {
+        async downloadFile(item) {
+            const url = `http://127.0.0.1:8000/api/instruction/downloadFile/${item}`;
+
+            try {
+                axios({
+                    url: url,
+                    method: "GET",
+                    responseType: "blob",
+                }).then((response) => {
+                    const blob = new Blob([response.data]);
+                    const downloadUrl = URL.createObjectURL(blob);
+                    const link = document.createElement("a");
+                    link.href = downloadUrl;
+                    link.setAttribute("download", item);
+                    document.body.appendChild(link);
+                    link.click();
+                    link.remove();
+                    URL.revokeObjectURL(downloadUrl);
+                });
+            } catch (error) {
+                // Handle the error
+                console.error(
+                    "An error occurred while downloading the file:",
+                    error
+                );
+            }
+        },
     },
 };
 </script>

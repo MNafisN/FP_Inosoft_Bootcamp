@@ -16,7 +16,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="(item, index) in listInt" :key="index">
+                <tr v-for="(item, index) in filteredData" :key="index">
                     <td class="cursor-pointer" scope="row" @click="selectDetail(item.instruction_id)">{{ item.instruction_id }}</td>
                     <td>{{ item.transaction_code }}</td>
                     <td class="text-center">
@@ -38,7 +38,8 @@
 </template>
 
 <script>
-import { reactive, toRefs, ref } from "vue";
+import { reactive, toRefs } from "vue";
+import { mapGetters } from "vuex";
 
 import DataTable from "datatables.net-vue3";
 import DataTablesCore from "datatables.net-bs5";
@@ -64,8 +65,7 @@ const columns = [
 ];
 
 const options = {
-    // searching: false,
-    // paging: false,
+    searching: false,
 };
 
 export default {
@@ -96,6 +96,22 @@ export default {
             columns: columns,
             options: options,
         };
+    },
+    computed: {
+        ...mapGetters({
+            searchText: "getSearchInput",
+        }),
+        filteredData() {
+            if (!this.searchText) {
+                return this.listInt;
+            }
+            const searchTextLowerCase = this.searchText.toLowerCase();
+            return this.listInt.filter((item) =>
+                Object.values(item).some((value) =>
+                    String(value).toLowerCase().includes(searchTextLowerCase)
+                )
+            );
+        },
     },
     methods: {
         formatDate(dateString) {

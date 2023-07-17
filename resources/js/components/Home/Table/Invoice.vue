@@ -17,7 +17,7 @@
                 :key="index"
                 @click="downloadFile(item)"
             >
-                {{ item.invoice_attachment }}
+                {{ item.invoice_attachment.name }}
             </div>
         </li>
     </ul>
@@ -40,15 +40,24 @@ export default {
     },
     methods: {
         async downloadFile(item) {
-            const url = `http://127.0.0.1:8000/api/instruction/download/${this.id}/invoice/${item.invoice_number}/${item.invoice_attachment}`;
+            const url = `http://127.0.0.1:8000/api/instruction/downloadFile/${item.invoice_attachment.download}`;
 
             try {
-                const link = document.createElement("a");
-                link.href = url;
-                link.setAttribute("download", item.invoice_attachment);
-                document.body.appendChild(link);
-                link.click();
-                link.remove();
+                axios({
+                    url: url,
+                    method: "GET",
+                    responseType: "blob",
+                }).then((response) => {
+                    const blob = new Blob([response.data]);
+                    const downloadUrl = URL.createObjectURL(blob);
+                    const link = document.createElement("a");
+                    link.href = downloadUrl;
+                    link.setAttribute("download", item.invoice_attachment.name);
+                    document.body.appendChild(link);
+                    link.click();
+                    link.remove();
+                    URL.revokeObjectURL(downloadUrl);
+                });
             } catch (error) {
                 // Handle the error
                 console.error(

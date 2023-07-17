@@ -54,6 +54,7 @@ const store = createStore({
                 ],
                 activity_log: []
             },
+            modalTermination:{},
             termination: {
                 termination_reason: "",
                 attachment: []
@@ -63,6 +64,7 @@ const store = createStore({
                 transactions: [],
                 vendors: [],
             },
+            searchInput: "",
         };
     },
     getters: {
@@ -197,12 +199,18 @@ const store = createStore({
         getTermination(state) {
             return state.termination;
         },
+        getModalTermination(state) {
+            return state.modalTermination;
+        },
         getFormData(state) {
             return state.formData;
         },
         getActivityNote(state) {
             return state.internalOnly.activity_log
-        }
+        },
+        getSearchInput(state) {
+            return state.searchInput;
+        },
     },
     mutations: {
         reset(state) {
@@ -371,9 +379,15 @@ const store = createStore({
         deleteAttachmentTerminate(state, i) {
             state.termination.attachment.splice(i, 1);
         },
+        setModalTermination(state, payload) {
+            state.modalTermination = payload;
+        },
 
         setFormData(state, payload) {
             state.formData = payload;
+        },
+        setSearchInput(state, payload) {
+            state.searchInput = payload;
         },
     },
     actions: {

@@ -16,17 +16,26 @@ export default {
             exportIcon: shallowRef(ExportIcon),
         };
     },
-    methods:{
+    methods: {
         async downloadFile(item) {
             const url = `http://127.0.0.1:8000/api/instruction/exportExcel`;
 
             try {
-                const link = document.createElement("a");
-                link.href = url;
-                link.setAttribute("download", "invoices.xlsx");
-                document.body.appendChild(link);
-                link.click();
-                link.remove();
+                axios({
+                    url: url,
+                    method: "GET",
+                    responseType: "blob",
+                }).then((response) => {
+                    const blob = new Blob([response.data]);
+                    const downloadUrl = URL.createObjectURL(blob);
+                    const link = document.createElement("a");
+                    link.href = downloadUrl;
+                    link.setAttribute("download", "invoices.xlsx");
+                    document.body.appendChild(link);
+                    link.click();
+                    link.remove();
+                    URL.revokeObjectURL(downloadUrl);
+                });
             } catch (error) {
                 // Handle the error
                 console.error(
@@ -35,6 +44,6 @@ export default {
                 );
             }
         },
-    }
+    },
 };
 </script>

@@ -5,6 +5,8 @@
                 v-if="active"
                 type="text"
                 class="input"
+                v-model="inputSearch"
+                @keyup="search"
                 aria-controls="DataTables_Table_3"
             />
         </div>
@@ -24,11 +26,15 @@ export default {
         return {
             searchIcon: shallowRef(SearchIcon),
             active: false,
+            inputSearch: "",
         };
     },
     methods: {
         clickActive() {
             this.active = true;
+        },
+        search() {
+            this.$store.commit('setSearchInput', this.inputSearch);
         },
     },
 };
@@ -38,5 +44,6 @@ export default {
 .input {
     border: 0 !important;
     outline: 0 !important;
+    line-height: 10px;
 }
 </style>
