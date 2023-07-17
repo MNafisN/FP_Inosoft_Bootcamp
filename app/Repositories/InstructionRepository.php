@@ -122,7 +122,7 @@ class InstructionRepository
 
         if (isset($data['file_name'])) { 
             $instruction->attachment = $data['file_name']; 
-        } else { $instruction->attachment = null; }
+        } else { $instruction->attachment = []; }
         $instruction->notes = $data['notes'];
         $instruction->transaction_code = $data['transaction_code'];
         $instruction->invoices = $data['invoices'];
@@ -168,9 +168,9 @@ class InstructionRepository
         } else {
             $invoice['invoice_number'] = $data['invoice_number'];
             $invoice['invoice_attachment'] = $data['invoice_attachment_name'];
-            if (isset($data['invoice_supporting_document'])) {
+            if (empty($formData['invoice_supporting_document']) == false) {
                 $invoice['invoice_supporting_document'] = $data['invoice_supporting_document_name'];
-            } else { $invoice['invoice_supporting_document'] = null; }
+            } else { $invoice['invoice_supporting_document'] = []; }
 
             if ($action == 'store') {
                 // if (isset($data['invoice_supporting_document'])) {
@@ -215,7 +215,7 @@ class InstructionRepository
         // );
         if (isset($data['file_name'])) { 
             $termination['attachment'] = $data['file_name']; 
-        } else { $termination['attachment'] = null; }
+        } else { $termination['attachment'] = []; }
 
         $instruction->termination = $termination;
         $instruction->save();
