@@ -11,6 +11,7 @@ use Jenssegers\Mongodb\Relations\HasOne;
 class Attachment extends Model
 {
     // use HasFactory;
+    public $timestamps = false;
 
     protected $connection = 'mongodb';
     protected $collection = 'attachments';

@@ -47,17 +47,17 @@
             @change="(e) => upload(e.target.files[0])"
         />
         <label
-            v-if="!isDisable"
+            v-if="!isDisable && !uploadDisabled"
             :for="idName"
-            class="btn btn-secondary my-2 w-180px"
+            class="bg-primary-custom py-2 my-2 w-180px rounded d-flex justify-content-center"
         >
             <div v-if="!isUpload">
                 <div class="i-plus d-inline-block me-1"></div>
-                <span> Add Attachment</span>
+                <span class="text-white fw-semibold"> Add Attachment</span>
             </div>
             <div v-else class="d-flex align-items-center gap-2 justify-content-center">
                 <div class="loader d-inline-block"></div>
-                <span class="fw-semibold">Uploading...</span>
+                <span class="fw-semibold text-white">Uploading...</span>
             </div>
         </label>
     </div>
@@ -71,7 +71,7 @@ export default {
     data() {
         return {
             isUpload: false,
-            disabled: false,
+            uploadDisabled: false,
         };
     },
     emits: ["upload", "deleteByIndex", "deleteOne"],
@@ -85,25 +85,6 @@ export default {
     },
     methods: {
         upload(file) {
-            // const fileInfo = {
-            //     name: file.name,
-            //     info: `by User on ${moment().format('DD/MM/YY hh:mm A')}`,
-            //     download: "test link"
-            // }
-            // this.isUpload = true
-            // if(this.oneOnly) {
-            //     setTimeout(()=>{
-            //         this.$emit('upload', fileInfo)
-            //         this.isUpload = false
-            //         this.disabled = true
-            //     },2000)
-            // } else {
-            //     setTimeout(()=>{
-            //         this.isUpload = false
-            //         this.$emit('upload', fileInfo)
-            //     },2000)
-            // }
-
             this.isUpload = true;
             const formData = new FormData();
             formData.append("attachment", file);
@@ -117,7 +98,7 @@ export default {
                     };
                     this.$emit("upload", fileInfo);
                     this.isUpload = false;
-                    console.log(fileInfo)
+                    if(this.oneOnly) this.uploadDisabled = true
                 })
                 .catch((err) => {
                     console.log(err);

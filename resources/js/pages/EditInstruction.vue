@@ -10,7 +10,7 @@
     <br />
     <LinkTo />
     <br />
-    <SubmitInstruction />
+    <SubmitInstruction type="edit" />
 </template>
 
 <script>

@@ -7,11 +7,11 @@
             </div>
             <div class="col">
                 <span>LI No</span>
-                <p class="fw-bold">{{ instructionDetail.transaction_code }}</p>
+                <p class="fw-bold">{{ instructionDetail.instruction_id }}</p>
             </div>
             <div class="col">
                 <span>Transfer No</span>
-                <div class="p-2 bg-info-subtle text-center">FSFS-2020-0234</div>
+                <div class="p-2 bg-info-subtle text-center">{{ instructionDetail.transaction_code }}</div>
             </div>
             <div class="col">
                 <span>Customer</span>
@@ -213,6 +213,6 @@ export default {
         updatePoNumber(payload) {
             this.$store.commit('updatePoNumber', payload)
         },
-    }
+    },
 };
 </script>

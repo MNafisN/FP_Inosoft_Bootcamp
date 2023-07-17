@@ -7,28 +7,28 @@
         <div class="col fg-5"></div>
         <div class="col fg-6"></div>
         <div
-            class="col fg-7 d-flex justify-content-end align-items-center bg-secondary-subtle"
+            class="col fg-7 d-flex justify-content-end align-items-center bg-background-filled"
         >
             <span><b>USD </b>(total)</span>
         </div>
         <div
-            class="col fg-8 d-flex justify-content-end align-items-center bg-secondary-subtle"
+            class="col fg-8 d-flex justify-content-end align-items-center bg-background-filled"
         >   
             <span  class="fw-bold">{{ CostTotal.vat_amount }}</span>
         </div>
         <div
-            class="col fg-9 d-flex justify-content-end align-items-center bg-secondary-subtle"
+            class="col fg-9 d-flex justify-content-end align-items-center bg-background-filled"
         >
             <span class="fw-bold">{{ CostTotal.sub_total }}</span>
         </div>
         <div
-            class="col fg-10 d-flex justify-content-end align-items-center bg-secondary-subtle"
+            class="col fg-10 d-flex justify-content-end align-items-center bg-background-filled"
         >
             <span class="fw-bold">{{ CostTotal.total }}</span>
         </div>
         <div class="col fg-11"></div>
         <div class="col fg-12 py-2">
-            <div v-if="type !== 'detail'" class="plus bg-secondary" @click="plus">
+            <div v-if="type !== 'detail'" class="plus bg-primary-custom" @click="plus">
                 <div class="i-plus"></div>
             </div>
         </div>
