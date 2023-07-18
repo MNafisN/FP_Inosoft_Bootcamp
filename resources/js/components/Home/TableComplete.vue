@@ -1,7 +1,7 @@
 <template>
     <template v-if="listInt && listInt.length">
         <div class="mt-4">
-            <DataTable class="table table-hover display" :options="options" @update="filteredData">
+            <DataTable v-if="!onSearch" class="table table-hover display" :options="options" @update="filteredData">
                 <thead>
                     <tr class="table-secondary">
                         <th>Instruction ID</th>
@@ -100,6 +100,7 @@ export default {
     data() {
         return {
             options: options,
+            onSearch: false,
         };
     },
     computed: {
@@ -107,15 +108,30 @@ export default {
             searchText: "getSearchInput",
         }),
         filteredData() {
+            this.onSearch = true;
             if (!this.searchText) {
+                setTimeout(()=>{
+                    this.onSearch = false;
+                }, 100)
                 return this.listInt;
             }
+            setTimeout(()=>{
+                this.onSearch = false;
+            }, 100)
             const searchTextLowerCase = this.searchText.toLowerCase();
             return this.listInt.filter((item) =>
                 Object.values(item).some((value) =>
                     String(value).toLowerCase().includes(searchTextLowerCase)
                 )
             );
+        },
+    },
+    watch: {
+        searchText: {
+            handler() {
+                this.filteredData;
+            },
+            immediate: true,
         },
     },
     methods: {
@@ -128,3 +144,8 @@ export default {
     },
 };
 </script>
+<style scoped>
+.dataTables_length{
+    display: none;
+}
+</style>

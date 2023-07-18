@@ -17,12 +17,11 @@
                 >
             </li>
             <div class="d-flex ms-auto">
-                <li><SearchButton @search="searchTrigger" /></li>
+                <li><SearchButton /></li>
                 <li><ExportButton /></li>
             </div>
         </ul>
-        <!-- <component :is="getActiveComponent()"></component> -->
-        <TableOpen :bug-fix="bugFix" />
+        <component :is="getActiveComponent()"></component>
     </div>
     <Modal />
 </template>
@@ -54,7 +53,6 @@ export default {
                 { name: "Completed", component: "TableComplete" },
             ],
             activeTab: "Open",
-            bugFix: true
         };
     },
     methods: {
@@ -68,12 +66,6 @@ export default {
             );
             return activeTab ? activeTab.component : null;
         },
-        searchTrigger() {
-            this.bugFix = false
-            setTimeout(()=>{
-                this.bugFix = true
-            }, 1)
-        }
     },
 };
 </script>
