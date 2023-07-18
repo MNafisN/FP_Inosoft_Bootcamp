@@ -42,7 +42,7 @@ export default {
     },
     methods: {
         functionClick() {
-            this.$store.commit('setTermination', this.termination);
+            this.$store.commit('setModalTermination', this.termination);
         },
     },
 };

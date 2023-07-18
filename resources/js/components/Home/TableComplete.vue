@@ -1,7 +1,7 @@
 <template>
     <template v-if="listInt && listInt.length">
         <div class="mt-4">
-            <DataTable class="table table-hover display" :options="options">
+            <DataTable class="table table-hover display" :options="options" @update="filteredData">
                 <thead>
                     <tr class="table-secondary">
                         <th>Instruction ID</th>
@@ -17,8 +17,14 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="(item, index) in listInt" :key="index">
-                        <td class="cursor-pointer" scope="row" @click="selectDetail(item.instruction_id)">{{ item.instruction_id }}</td>
+                    <tr v-for="(item, index) in filteredData" :key="index">
+                        <td
+                            class="cursor-pointer"
+                            scope="row"
+                            @click="selectDetail(item.instruction_id)"
+                        >
+                            {{ item.instruction_id }}
+                        </td>
                         <td>{{ item.transaction_code }}</td>
                         <td class="text-center">
                             <Type :type="item.instruction_type" />
@@ -28,7 +34,10 @@
                         <td>{{ item.attention_of }}</td>
                         <td>{{ item.quotation_number }}</td>
                         <td>
-                            <Invoice :invoice="item.invoices" :id="item.instruction_id" />
+                            <Invoice
+                                :invoice="item.invoices"
+                                :id="item.instruction_id"
+                            />
                         </td>
                         <td>{{ item.cust_po_number }}</td>
                         <td>
@@ -49,6 +58,7 @@
 
 <script>
 import { reactive, toRefs } from "vue";
+import { mapGetters } from "vuex";
 
 import DataTable from "datatables.net-vue3";
 import DataTablesCore from "datatables.net-bs5";
@@ -62,8 +72,7 @@ import Skeleton from "./Table/TableSkeleton.vue";
 DataTable.use(DataTablesCore);
 
 const options = {
-    // searching: false,
-    // paging: false,
+    searching: false,
 };
 
 export default {
@@ -93,13 +102,29 @@ export default {
             options: options,
         };
     },
+    computed: {
+        ...mapGetters({
+            searchText: "getSearchInput",
+        }),
+        filteredData() {
+            if (!this.searchText) {
+                return this.listInt;
+            }
+            const searchTextLowerCase = this.searchText.toLowerCase();
+            return this.listInt.filter((item) =>
+                Object.values(item).some((value) =>
+                    String(value).toLowerCase().includes(searchTextLowerCase)
+                )
+            );
+        },
+    },
     methods: {
         formatDate(dateString) {
             return moment(dateString).format("DD/MM/YY");
         },
-        selectDetail(instruction_id){
+        selectDetail(instruction_id) {
             this.$router.push(`/app/detail-instruction/${instruction_id}`);
-        }
+        },
     },
 };
 </script>
