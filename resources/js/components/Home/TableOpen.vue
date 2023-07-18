@@ -1,7 +1,7 @@
 <template>
     <CreateButton class="mb-3" />
     <template v-if="listInt && listInt.length">
-        <DataTable class="table table-hover display" :options="options">
+        <DataTable v-if="!onSearch" class="table table-hover display" :options="options">
             <thead>
                 <tr class="table-secondary">
                     <th>Instruction ID</th>
@@ -17,7 +17,13 @@
             </thead>
             <tbody>
                 <tr v-for="(item, index) in filteredData" :key="index">
-                    <td class="cursor-pointer" scope="row" @click="selectDetail(item.instruction_id)">{{ item.instruction_id }}</td>
+                    <td
+                        class="cursor-pointer"
+                        scope="row"
+                        @click="selectDetail(item.instruction_id)"
+                    >
+                        {{ item.instruction_id }}
+                    </td>
                     <td>{{ item.transaction_code }}</td>
                     <td class="text-center">
                         <Type :type="item.instruction_type" />
@@ -95,6 +101,7 @@ export default {
             data: [],
             columns: columns,
             options: options,
+            onSearch: false,
         };
     },
     computed: {
@@ -102,9 +109,16 @@ export default {
             searchText: "getSearchInput",
         }),
         filteredData() {
+            this.onSearch = true;
             if (!this.searchText) {
+                setTimeout(()=>{
+                    this.onSearch = false;
+                }, 100)
                 return this.listInt;
             }
+            setTimeout(()=>{
+                this.onSearch = false;
+            }, 100)
             const searchTextLowerCase = this.searchText.toLowerCase();
             return this.listInt.filter((item) =>
                 Object.values(item).some((value) =>
@@ -113,13 +127,21 @@ export default {
             );
         },
     },
+    watch: {
+        searchText: {
+            handler() {
+                this.filteredData;
+            },
+            immediate: true,
+        },
+    },
     methods: {
         formatDate(dateString) {
             return moment(dateString).format("DD/MM/YY");
         },
-        selectDetail(instruction_id){
+        selectDetail(instruction_id) {
             this.$router.push(`/app/detail-instruction/${instruction_id}`);
-        }
+        },
     },
 };
 </script>
@@ -127,7 +149,10 @@ export default {
 <style>
 @import "bootstrap";
 @import "datatables.net-bs5";
-.cursor-pointer{
+.cursor-pointer {
     cursor: pointer;
+}
+.dataTables_length{
+    display: none;
 }
 </style>

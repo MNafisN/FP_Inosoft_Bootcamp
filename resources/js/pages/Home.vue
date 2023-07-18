@@ -1,6 +1,6 @@
 <template>
     <Title></Title>
-    <div class="bg-white w-100 rounded shadow p-3 mb-5">
+    <div class="bg-white w-100 rounded shadow p-3 mb-5 screen">
         <ul class="nav tab align-items-center">
             <li
                 v-for="tab in tabs"
@@ -87,5 +87,8 @@ export default {
 .tab-link.active {
     border-bottom: 3px solid #00bfbf;
     color: #00bfbf;
+}
+.screen{
+    min-height: 100vh;
 }
 </style>

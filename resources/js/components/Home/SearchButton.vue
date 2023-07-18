@@ -1,15 +1,14 @@
 <template>
     <Button :icon="searchIcon" @click="clickActive()" class="h-100 me-2">
-        <div id="DataTables_Table_3_filter" class="dataTables_filter">
+        <form @submit.prevent="search">
             <input
                 v-if="active"
                 type="text"
                 class="input"
                 v-model="inputSearch"
-                @keyup="search"
                 aria-controls="DataTables_Table_3"
             />
-        </div>
+        </form>
     </Button>
 </template>
 <script>
@@ -22,6 +21,7 @@ import SearchIcon from "./Icon/SearchIcon.vue";
 export default {
     name: "SearchButton",
     components: { Button, SearchIcon },
+    emits: ['search'],
     data() {
         return {
             searchIcon: shallowRef(SearchIcon),
@@ -35,6 +35,7 @@ export default {
         },
         search() {
             this.$store.commit('setSearchInput', this.inputSearch);
+            this.$emit('search')
         },
     },
 };
