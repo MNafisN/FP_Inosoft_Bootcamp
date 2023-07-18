@@ -1,6 +1,6 @@
 <template>
     <Title></Title>
-    <div class="bg-white w-100 rounded shadow p-3 mb-5">
+    <div class="bg-white w-100 rounded shadow p-3 mb-5 screen">
         <ul class="nav tab align-items-center">
             <li
                 v-for="tab in tabs"
@@ -17,11 +17,12 @@
                 >
             </li>
             <div class="d-flex ms-auto">
-                <li><SearchButton /></li>
+                <li><SearchButton @search="searchTrigger" /></li>
                 <li><ExportButton /></li>
             </div>
         </ul>
-        <component :is="getActiveComponent()"></component>
+        <!-- <component :is="getActiveComponent()"></component> -->
+        <TableOpen :bug-fix="bugFix" />
     </div>
     <Modal />
 </template>
@@ -53,6 +54,7 @@ export default {
                 { name: "Completed", component: "TableComplete" },
             ],
             activeTab: "Open",
+            bugFix: true
         };
     },
     methods: {
@@ -66,6 +68,12 @@ export default {
             );
             return activeTab ? activeTab.component : null;
         },
+        searchTrigger() {
+            this.bugFix = false
+            setTimeout(()=>{
+                this.bugFix = true
+            }, 1)
+        }
     },
 };
 </script>
@@ -87,5 +95,8 @@ export default {
 .tab-link.active {
     border-bottom: 3px solid #00bfbf;
     color: #00bfbf;
+}
+.screen{
+    min-height: 100vh;
 }
 </style>

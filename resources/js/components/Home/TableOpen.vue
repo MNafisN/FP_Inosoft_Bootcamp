@@ -1,7 +1,7 @@
 <template>
     <CreateButton class="mb-3" />
     <template v-if="listInt && listInt.length">
-        <DataTable class="table table-hover display" :options="options">
+        <DataTable v-if="bugFix" class="table table-hover display" :options="options">
             <thead>
                 <tr class="table-secondary">
                     <th>Instruction ID</th>
@@ -66,6 +66,7 @@ const columns = [
 
 const options = {
     searching: false,
+    paging: false
 };
 
 export default {
@@ -89,6 +90,9 @@ export default {
         Type,
         Pills,
         Skeleton,
+    },
+    props: {
+        bugFix: Boolean
     },
     data() {
         return {

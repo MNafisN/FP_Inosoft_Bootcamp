@@ -22,6 +22,7 @@ import SearchIcon from "./Icon/SearchIcon.vue";
 export default {
     name: "SearchButton",
     components: { Button, SearchIcon },
+    emits: ['search'],
     data() {
         return {
             searchIcon: shallowRef(SearchIcon),
@@ -35,6 +36,7 @@ export default {
         },
         search() {
             this.$store.commit('setSearchInput', this.inputSearch);
+            this.$emit('search')
         },
     },
 };
