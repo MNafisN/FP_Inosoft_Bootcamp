@@ -1,4 +1,29 @@
 <template>
+    <div v-if="isShow" class="modal-background">
+        <div class="modal-wrapper">
+            <div class="d-flex m-1 pointer" @click="showToggle">
+                <p class="mb-0 me-1 text-white">close</p>
+                <div class="i-close"></div>
+            </div>
+            <div class="modal-box">
+                <br><br>
+                <div class="i-warning mx-auto"></div>
+                <br>
+                <div>
+                    <p class="fs-5 mb-2 text-center">Are You to delete this vendor invoice</p>
+                    <p class="fs-6 text-center">This action can not be un-done</p>
+                </div>
+                <br>
+                <div class="d-flex justify-content-end align-items-center">
+                    <span class="pointer" @click="showToggle">Cancle</span>
+                    <button class="bg-primary-custom py-2 my-2 w-180px rounded d-flex justify-content-center align-items-center border-0 text-white fw-medium submit ms-5" @click="deleteInvoice">
+                        Confirm
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="row border p-2">
         <div class="col">
             <span>{{ invoice.invoice_number }}</span>
@@ -21,7 +46,7 @@
             </div>
         </div>
         <div class="col-1 d-flex align-items-center justify-content-end gap-3">
-            <div v-if="!isDisable" class="i-delete pointer" @click="deleteInvoice"></div>
+            <div v-if="!isDisable" class="i-delete pointer" @click="showToggle"></div>
             <div v-if="!isDisable" class="i-modify pointer" @click="$emit('modify')"></div>
         </div>
     </div>
@@ -30,6 +55,11 @@
 <script>
 export default {
     name: "vendor-invoice-list",
+    data() {
+        return {
+            isShow: false
+        }
+    },
     props: {
         invoice: Object,
         index: Number,
@@ -41,7 +71,11 @@ export default {
         }
     },
     methods: {
+        showToggle() {
+            this.isShow ? this.isShow = false : this.isShow = true
+        },
         deleteInvoice() {
+            this.showToggle()
             this.$store.dispatch('deleteInvoice', this.index)
         },
         download(download, fileName) {
