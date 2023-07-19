@@ -38,9 +38,9 @@ export default {
                     <table cellspacing='0' border='1' style='width: 100%;'>
                         <tr>
                             <td><b>Issue By</b></td>
-                            <td><b>${this.data.created_by}</b></td>
+                            <td><b>${this.data.issued_by}</b></td>
                             <td><b>Date of Issue</b></td>
-                            <td><b>${this.data.created_at}</b></td>
+                            <td><b>${this.data.date_of_issue}</b></td>
                         </tr>
                         <tr>
                             <td><b>LI Number/Rev</b></td>
