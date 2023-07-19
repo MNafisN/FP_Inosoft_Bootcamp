@@ -25,6 +25,7 @@
         </div>
     </div>
     <Title></Title>
+    <ExportButton />
     <div class="bg-white w-100 rounded-top shadow p-3">
         <div class="d-flex justify-content-between">
             <router-link to="/app" class="text-decoration-none text-black">
@@ -67,6 +68,7 @@ import AttachmentAndNotes from "../components/Instruction/AttachmentAndNotes.vue
 import VendorInvoice from "../components/Instruction/VendorInvoice.vue";
 import InternalOnly from "../components/Instruction/InternalOnly.vue";
 import AttachmentFile from "../components/Instruction/AttachmentFile.vue";
+import ExportButton from "../components/Instruction/ExportButton.vue";
 export default {
     name: "DetailInstruction",
     data() {
@@ -74,7 +76,7 @@ export default {
             isShow: false
         }
     },
-    components: { Title, InstructionDetail, CostDetail, AttachmentAndNotes, VendorInvoice, InternalOnly, AttachmentFile },
+    components: { Title, InstructionDetail, CostDetail, AttachmentAndNotes, VendorInvoice, InternalOnly, AttachmentFile, ExportButton },
     computed: {
         instructionStatus() {
             return this.$store.getters.getStatus
