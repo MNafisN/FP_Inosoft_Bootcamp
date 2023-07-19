@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Models\Instruction;
 use Illuminate\Support\Facades\Storage;
 use App\Exports\InstructionExport;
+use PDF;
 
 class InstructionRepository
 {
@@ -21,6 +22,19 @@ class InstructionRepository
     public function export()
     {
         return (new InstructionExport)->download('instructions.xlsx');
+    }
+
+    public function exportPdf($data)
+    {
+        if (array_key_exists('html', $data)) 
+        {
+            $pdf = app()->make('dompdf.wrapper');
+            $pdf->loadHTML($data['html']);
+        } else if (array_key_exists('view', $data)) 
+        {
+            $pdf = PDF::loadView($data['view']);
+        }
+        return $pdf->download();
     }
 
     /**

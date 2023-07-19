@@ -36,6 +36,20 @@ class InstructionController extends Controller
         }
     }
 
+    public function exportPdf(Request $request)
+    {
+        $data = $request->all();
+        try {
+            $instruction = $this->instructionService->exportPdf($data);
+            return $instruction;
+        } catch (Exception $err) {
+            return response()->json([
+                'status' => 404,
+                'error' => $err->getMessage()
+            ], 404);
+        }
+    }
+
     public function uploadFile(Request $request): JsonResponse
     {
         $data = $request->all();

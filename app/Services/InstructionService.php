@@ -48,6 +48,12 @@ class InstructionService
         return $instructions;
     }
 
+    public function exportPdf($data)
+    {
+        $instruction = $this->instructionRepository->exportPdf($data);
+        return $instruction;
+    }
+
     public function uploadFile(array $data)
     {
         $validator = Validator::make($data, [
@@ -295,7 +301,7 @@ class InstructionService
             'assigned_vendor' => 'required',
             'vendor_address' => 'required',
             'attention_of' => 'required|string',
-            'quotation_number' => 'nullable|numeric|min:5',
+            'quotation_number' => 'nullable|string',
             'invoice_to' => 'sometimes|required',
             'customer_contact' => 'sometimes|required',
             'cust_po_number' => 'nullable|required',
@@ -594,7 +600,7 @@ class InstructionService
             'assigned_vendor' => 'required',
             'vendor_address' => 'required',
             'attention_of' => 'required|string',
-            'quotation_number' => 'nullable|numeric|min:5',
+            'quotation_number' => 'nullable|string',
             'invoice_to' => 'sometimes|required',
             'customer_contact' => 'sometimes|required',
             'cust_po_number' => 'nullable|required',
