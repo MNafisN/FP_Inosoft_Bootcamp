@@ -143,6 +143,13 @@ class InstructionRepository
         $instruction->termination = $data['termination'];
         $instruction->instruction_status = $data['instruction_status'];
 
+        if (array_key_exists('instruction_id', $data)) {
+            // $instruction->updated_at = (string)Carbon::now('+7:00');
+        } else {
+            $instruction->issued_by = $data['issued_by'];
+            $instruction->date_of_issue = $data['date_of_issue'];
+        }
+
         $instruction->save();
         return $instruction->fresh();
     }
