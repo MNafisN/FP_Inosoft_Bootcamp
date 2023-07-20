@@ -240,7 +240,7 @@ const store = createStore({
             state.instructionData.attention_of = payload;
         },
         updateQuotationNumber(state, payload) {
-            state.instructionData.quotation_number = parseInt(payload);
+            state.instructionData.quotation_number = payload;
         },
         updateInvoiceTo(state, payload) {
             state.instructionData.invoice_to = payload;
@@ -260,7 +260,7 @@ const store = createStore({
             state.instructionData.cost_detail.push({
                 cost_description: "",
                 quantity: 0,
-                unit_of_measurement: "SHP",
+                unit_of_measurement: "PCS",
                 unit_price: 0,
                 GST_percentage: 0,
                 currency: "",

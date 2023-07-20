@@ -40,6 +40,7 @@ Route::group([
     'middleware' => 'auth:api'
 ], function() {
     Route::get('/exportExcel', [InstructionController::class, 'exportExcel']);                      // Export daftar instruksi menjadi bentuk file Excel
+    Route::post('/exportPDF', [InstructionController::class, 'exportPdf']);
 
     // Route::get('download/{id}/{file_name}', [InstructionController::class, 'downloadAttachment']);
     // Route::get('download/{id}/invoice/{invoice_no}/{file_name}', [InstructionController::class, 'downloadInvoiceAttachment']);

@@ -98,3 +98,11 @@
     background-size: contain;
     background-repeat: no-repeat;
 }
+.i-export{
+    width: 15px;
+    height: 15px;
+    background: url(svg/export.svg);
+    background-size: contain;
+    background-repeat: no-repeat;
+    display: inline-block;
+}

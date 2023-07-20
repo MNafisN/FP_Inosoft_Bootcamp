@@ -19,7 +19,7 @@
                     @input="(event) => (search = event.target.value)"
                 />
             </div>
-            <div v-if="noList" class="w-100">
+            <div v-if="list === undefined || list === []" class="w-100">
                 <p class="text-center my-3">No Data</p>
             </div>
             <ul>
@@ -31,40 +31,41 @@
                     {{ item }}
                 </li>
             </ul>
-            <div v-if="addNew" class="p-2">
+            <div v-if="validationAddNew" class="p-2">
                 <button
                     class="invoiceButton btn border w-100"
                     @click="showModal"
                 >
-                    <span class="fw-bold fs-5 lh-1">+</span> Add New Invoice
+                    <span class="fw-bold fs-5 lh-1">+</span> {{ addNewModal[addNew].button }}
                 </button>
             </div>
-            <p v-if="type === 'vendor-address' && noList" class="ms-2 mb-2">
+            <p v-if="addNew === 'vendorAddress' && list === undefined" class="ms-2 mb-2">
                 Please choose Assigned Vendor to enable adding option
             </p>
         </div>
     </div>
     <div :class="visible + ' window'" @click="dropdown"></div>
-    <div :class="modal + ' modal-background'">
+    <div v-if="addNew" :class="modal + ' modal-background'">
         <div class="modal-wrapper">
             <div class="d-flex m-1 pointer" @click="showModal">
                 <p class="mb-0 me-1 text-white">close</p>
                 <div class="i-close"></div>
             </div>
             <div class="w-100 p-4 bg-white rounded">
-                <h5 class="text-center mb-4">Add Invoice Target</h5>
-                <label> Invoice To</label>
+                <h5 class="text-center mb-4">{{ addNewModal[addNew].title }}</h5>
+                <label>{{ addNewModal[addNew].label }}</label>
                 <input
                     type="text"
                     class="form-control"
-                    placeholder="Invoice To"
+                    :placeholder="addNewModal[addNew].placeholder"
+                    @change="e=>newData = e.target.value"
                 />
                 <br />
                 <br />
                 <br />
                 <div class="d-flex justify-content-end align-items-center gap-2">
                     <span class="pointer" @click="showModal">Cancle</span>
-                    <button class="bg-primary-custom py-2 my-2 w-180px rounded d-flex justify-content-center border-0 text-white fw-medium">
+                    <button @click="()=>{selected = newData; $emit('sendValue', selected); dropdown(); showModal()}" class="bg-primary-custom py-2 my-2 w-180px rounded d-flex justify-content-center border-0 text-white fw-medium">
                         Submit
                     </button>
                 </div>
@@ -78,19 +79,32 @@ export default {
     name: "custom-dropdown",
     data() {
         return {
-            noList: false,
             search: "",
             visible: "d-none",
             modal: "d-none",
+            addNewModal: {
+                invoice: {
+                    button: "Add New Invoice",
+                    title: "Add Invoice Target",
+                    label: "Invoice To",
+                    placeholder: "Invoice To"
+                },
+                vendorAddress: {
+                    button: "Add New Vendor Address",
+                    title: "Add Vendor Address",
+                    label: "Address",
+                    placeholder: "Enter Address"
+                }
+            },
+            newData: ""
         };
     },
     props: {
         input: String,
-        type: String,
         selected: String,
         list: Array,
         searchable: Boolean,
-        addNew: Boolean,
+        addNew: String,
         disable: Boolean,
         upper: Boolean
     },
@@ -105,7 +119,6 @@ export default {
         },
         searchList(value) {
             this.$data.search = value;
-            console.log(value);
         },
         dropdown() {
             if (!this.$props.disable) {
@@ -119,6 +132,13 @@ export default {
                 ? (this.$data.modal = "")
                 : (this.$data.modal = "d-none");
         },
+    },
+    computed: {
+        validationAddNew() {
+            if(!this.addNew) return false;
+            if(this.addNew === 'vendorAddress' && this.list === undefined) return false;
+            return true
+        }
     },
 };
 </script>

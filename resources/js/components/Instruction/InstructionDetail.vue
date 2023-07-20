@@ -95,14 +95,10 @@
                 <label for="quotation-no">Quotation No.</label>
                 <input
                     id="quotation-no"
-                    type="number"
+                    type="text"
                     class="form-control"
                     placeholder="Enter Quotation"
-                    :value="
-                        instructionDetail.quotation_number === 0
-                            ? ''
-                            : instructionDetail.quotation_number
-                    "
+                    :value="instructionDetail.quotation_number"
                     required
                     @change="(e)=>updateQuotationNumber(e.target.value)"
                 />
@@ -112,7 +108,7 @@
                 <Dropdown
                     input="Select an Option"
                     :searchable="true"
-                    :add-new="true"
+                    add-new="invoice"
                     :selected="instructionDetail.invoice_to"
                     :list="['MITO']"
                     @send-value="updateInvoiceTo"
@@ -135,7 +131,7 @@
                 <label for="vendor-address">Vendor Address</label>
                 <Dropdown
                     input="Enter Vendor Address"
-                    type="vendor-address"
+                    add-new="vendorAddress"
                     :searchable="true"
                     :selected="instructionDetail.vendor_address"
                     :list="vendorAddress"

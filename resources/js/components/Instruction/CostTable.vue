@@ -1,37 +1,37 @@
 <template>
     <div v-if="type === 'detail'" class="row py-2 border">
         <div class="col py-2 fg-1">
-            <p class="m-0">test</p>
+            <p class="m-0">{{ costData.cost_description }}</p>
         </div>
         <div class="col py-2 fg-2">
-            <p class="m-0 text-end">5</p>
+            <p class="m-0 text-end">{{ costData.quantity }}</p>
         </div>
         <div class="col py-2 fg-3">
-            <p class="m-0">PCS</p>
+            <p class="m-0">{{ costData.unit_of_measurement }}</p>
         </div>
         <div class="col py-2 fg-4">
-            <p class="m-0 text-end">45</p>
+            <p class="m-0 text-end">{{ costData.unit_price }}</p>
         </div>
         <div class="col py-2 fg-5">
-            <p class="m-0 text-end">10</p>
+            <p class="m-0 text-end">{{ costData.GST_percentage }}</p>
         </div>
         <div class="col py-2 fg-6">
             <div class="i-arrow-right"></div>
         </div>
         <div class="col py-2 fg-7">
-            <p class="m-0">USD</p>
+            <p class="m-0">{{ costData.currency }}</p>
         </div>
         <div class="col py-2 fg-8">
-            <p class="m-0 text-end">123</p>
+            <p class="m-0 text-end">{{ costData.vat_amount }}</p>
         </div>
         <div class="col py-2 fg-8">
-            <p class="m-0 text-end">123</p>
+            <p class="m-0 text-end">{{ costData.sub_total }}</p>
         </div>
         <div class="col py-2 fg-8">
-            <p class="m-0 text-end">1334</p>
+            <p class="m-0 text-end">{{ costData.total }}</p>
         </div>
         <div class="col py-2 fg-11">
-            <p class="m-0">MITO</p>
+            <p class="m-0">{{ costData.charge_to }}</p>
         </div>
         <div class="col py-2 fg-12">
         </div>
