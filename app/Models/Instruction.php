@@ -38,7 +38,9 @@ class Instruction extends Model
         'transaction_code',
         'invoices',
         'termination',
-        'instruction_status'
+        'instruction_status',
+        'issued_by',
+        'date_of_issue'
     ];
 
     public function nextLId()

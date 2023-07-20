@@ -356,6 +356,9 @@ class InstructionService
             }
         }
 
+        $formData['issued_by'] = auth()->user()['username'];
+        $formData['date_of_issue'] = (string)Carbon::now('+7:00')->format('d/m/Y');
+
         $newInstruction = $this->instructionRepository->save($formData);
 
         $storeVendorData = $this->vendorRepository->save(array_intersect_key($validator->validated(), array_flip(['assigned_vendor', 'vendor_address', 'invoice_to'])));
